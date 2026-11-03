@@ -2,7 +2,7 @@
   "name": "cmu-web-placemellon",
   "version": "0.4.0",
   "private": true,
-  "description": "Placeholder images of Carnegie Mellon, in the spirit of placekitten",
+  "description": "Placeholder images for Carnegie Mellon websites and apps",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",

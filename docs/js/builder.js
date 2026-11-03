@@ -10,6 +10,8 @@
     random = $("pm-random"),
     gray = $("pm-gray"),
     photoOptions = $("pm-photo-options"),
+    solidOptions = $("pm-solid-options"),
+    text = $("pm-text"),
     url = $("pm-url"),
     html = $("pm-html"),
     preview = $("pm-preview"),
@@ -29,6 +31,7 @@
     return /^\d{1,4}$/.test(v) && +v >= 1 && +v <= 2048 ? +v : null;
   }
   function alt(k, c) {
+    if (k === "solid") return "Solid color placeholder";
     if (k === "profile") return "Placeholder profile picture of Scotty";
     if (k === "scotty") return "Placeholder image of Scotty";
     return c
@@ -42,6 +45,8 @@
     // Category and random choose photos; profile pictures are square
     // The photo choices show only under "A CMU Photo"
     photoOptions.hidden = !photo;
+    solidOptions.hidden = k !== "solid";
+    gray.disabled = k === "solid";
     height.disabled = k === "profile";
     var w = size(width),
       h = k === "profile" ? "" : size(height);
@@ -59,7 +64,8 @@
     if (photo && category.value) q.push("category=" + category.value);
     if (photo && random.checked) q.push("random");
     if (!photo) q.push(k);
-    if (gray.checked) q.push("gray");
+    if (k === "solid" && text.checked) q.push("text");
+    if (k !== "solid" && gray.checked) q.push("gray");
     var qs = q.length ? "?" + q.join("&") : "";
 
     url.textContent = PM_LIVE + path + qs;

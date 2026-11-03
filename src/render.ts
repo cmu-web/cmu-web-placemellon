@@ -60,6 +60,20 @@ export function avatarSvg(size: number): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 320 320">${avatar}</svg>`;
 }
 
+// A solid color placeholder, with optional dimensions scaled to fit even narrow images.
+export function solidSvg(w: number, h: number, text: boolean): string {
+  const label = `${w} × ${h}`;
+  const fontSize = Math.min(32, w / (label.length * 0.7), h / 3);
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect width="${w}" height="${h}" fill="#e0e0e0"/>` +
+    (text
+      ? `<text x="${w / 2}" y="${h / 2}" fill="#555" font-family="Arial, sans-serif" font-size="${fontSize}" text-anchor="middle" dominant-baseline="central">${label}</text>`
+      : "") +
+    "</svg>"
+  );
+}
+
 export async function renderSvg(svg: string, gray: boolean): Promise<Buffer> {
   let img = sharp(Buffer.from(svg));
   if (gray) img = img.grayscale();

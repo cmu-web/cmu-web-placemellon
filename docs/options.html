@@ -56,7 +56,7 @@
             <p class="cmu-lead"
               >By default, each size always gets the same photo. Options let you choose a category,
               get a random photo instead, switch to black and white, or use Scotty, standing or as a
-              round profile picture.</p
+              round profile picture, or choose a solid color placeholder.</p
             >
             <table class="alternate cmu-full">
               <thead
@@ -99,7 +99,7 @@
                   <td class="cmu-fit"><code>?gray</code></td>
                   <td
                     >Grayscale. <code>?grayscale</code> works too, and so does <code>/g/</code> in
-                    front, as on placekitten: <code>/g/400/300</code>.</td
+                    front: <code>/g/400/300</code>.</td
                   >
                   <td class="cmu-fit aligncenter"
                     ><img
@@ -134,12 +134,35 @@
                       height="96"
                   /></td>
                 </tr>
+                <tr>
+                  <td class="cmu-fit"><code>?solid</code></td>
+                  <td>A solid color placeholder instead of a photo. The default is light gray.</td>
+                  <td class="cmu-fit aligncenter"
+                    ><img
+                      src="https://placemellon.andrew.cmu.edu/160/100?solid"
+                      alt="A light gray placeholder."
+                      width="160"
+                      height="100"
+                  /></td>
+                </tr>
+                <tr>
+                  <td class="cmu-fit"><code>?solid&amp;text</code></td>
+                  <td>A light gray placeholder with its width &times; height in the center.</td>
+                  <td class="cmu-fit aligncenter"
+                    ><img
+                      src="https://placemellon.andrew.cmu.edu/160/100?solid&amp;text"
+                      alt="A light gray placeholder labeled 160 by 100."
+                      width="160"
+                      height="100"
+                  /></td>
+                </tr>
               </tbody>
             </table>
             <p
               >Add options after a <code>?</code>, joined with <code>&amp;</code>, in any order:
               <code>/400/300?category=labs&amp;gray</code>. Category and random options apply only
-              to photos. Leave them out when using Scotty or a profile picture. If an option is
+              to photos. Leave them out when using Scotty, a profile picture or a solid color
+              placeholder. Use <code>?text</code> only with <code>?solid</code>. If an option is
               misspelled or isn't supported, an error message will list the available options.</p
             >
           </div></div

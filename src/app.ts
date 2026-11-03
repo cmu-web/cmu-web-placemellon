@@ -1,16 +1,26 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import { Catalog } from "./catalog";
-import { avatarSvg, MAX, renderPhoto, renderSvg, scottySvg, StaleLinkError } from "./render";
+import {
+  avatarSvg,
+  solidSvg,
+  MAX,
+  renderPhoto,
+  renderSvg,
+  scottySvg,
+  StaleLinkError,
+} from "./render";
 import { PORTALS } from "./widen";
 
-const OPTIONS = ["category", "random", "scotty", "profile", "gray", "grayscale"];
+const OPTIONS = ["category", "random", "scotty", "profile", "solid", "text", "gray", "grayscale"];
 
 export interface Options {
   category?: string;
   random: boolean;
   scotty: boolean;
   profile: boolean;
+  solid: boolean;
+  text: boolean;
   gray: boolean;
 }
 
@@ -49,14 +59,18 @@ export function parseOptions(
     random: "random" in query,
     scotty: "scotty" in query,
     profile: "profile" in query,
+    solid: "solid" in query,
+    text: "text" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
-  if (o.scotty && o.profile) throw new OptionError(400, "Pick ?scotty or ?profile, not both.");
-  if ((o.scotty || o.profile) && (o.category || o.random))
+  if ([o.scotty, o.profile, o.solid].filter(Boolean).length > 1)
+    throw new OptionError(400, "Pick one of ?scotty, ?profile or ?solid.");
+  if ((o.scotty || o.profile || o.solid) && (o.category || o.random))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty or ?profile.",
+      "?category and ?random choose photos, so they don't go with ?scotty, ?profile or ?solid.",
     );
+  if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
   return o;
 }
 
@@ -148,6 +162,15 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     if (o.profile && w !== h) {
       const qs = req.originalUrl.slice(req.originalUrl.indexOf("?"));
       res.redirect(302, `${gray ? "/g" : ""}/${Math.min(w, h)}${qs}`);
+      return;
+    }
+
+    if (o.solid) {
+      const key = `solid ${w}x${h}${o.text ? " text" : ""}`;
+      void send(res, key, async () => ({
+        type: "png",
+        body: await renderSvg(solidSvg(w, h, o.text), false),
+      }));
       return;
     }
 

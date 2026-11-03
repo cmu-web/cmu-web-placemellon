@@ -1,9 +1,12 @@
 # PlaceMellon
 
-Placeholder images of Carnegie Mellon, in the spirit of placekitten.
+Placeholder images for Carnegie Mellon websites and apps.
 Give it a width and height, and it returns a CMU photo cropped to that size.
 It also provides grayscale images, random photos and Scotty images and
-profile pictures.
+profile pictures, plus solid color placeholders with optional dimension text.
+
+PlaceMellon is inspired by [PlaceCats](https://www.placecats.com/): put a
+size in a URL and get a placeholder image.
 
 Photos come from University Communications & Marketing's CMU Selects
 collection. Use them for Carnegie Mellon work; see the
@@ -24,7 +27,11 @@ changes.
 The [image builder](https://cmu-web.github.io/cmu-web-placemellon/builder.html)
 lets you choose a size and options, preview the image and copy its URL or
 HTML. The [options reference](https://cmu-web.github.io/cmu-web-placemellon/options.html)
-covers categories, random photos, grayscale and Scotty.
+covers categories, random photos, grayscale, Scotty and solid color placeholders.
+
+For a solid color placeholder, use `/400/300?solid`. Add `&text` to show
+its dimensions: `/400/300?solid&text`. These images work without loading
+the photo collection. The default color is light gray.
 
 ## Support
 

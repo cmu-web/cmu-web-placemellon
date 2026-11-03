@@ -4,7 +4,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp, parseSize } from "../src/app";
 import { Catalog, earliestExpiry } from "../src/catalog";
-import { pickPreview } from "../src/render";
+import { solidSvg, pickPreview, renderSvg } from "../src/render";
 import { Photo, toPhoto } from "../src/widen";
 
 const photo = (id: string, expires = 1792969200, aspect = 1.5, categories = ["campus"]): Photo => ({
@@ -54,6 +54,36 @@ describe("pickPreview", () => {
     expect(pickPreview(photo("a"), 300, 200).size).toBe(300);
     expect(pickPreview(photo("a"), 300, 201).size).toBe(600); // 3:2, so 300 is only 200 tall
     expect(pickPreview(photo("a"), 4000, 10).size).toBe(2048);
+  });
+});
+
+describe("solid rendering", () => {
+  it("renders a uniform gray image or centered dimensions, including very narrow sizes", async () => {
+    const plain = await renderSvg(solidSvg(320, 180, false), false);
+    const { channels } = await sharp(plain).removeAlpha().stats();
+    for (const c of channels.slice(0, 3)) expect([c.min, c.max]).toEqual([224, 224]);
+    const labeled = await renderSvg(solidSvg(320, 180, true), false);
+    const { data, info } = await sharp(labeled)
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const ink = [];
+    for (let y = 0; y < info.height; y++)
+      for (let x = 0; x < info.width; x++)
+        if (data[(y * info.width + x) * info.channels] < 150) ink.push([x, y]);
+    expect(ink.length).toBeGreaterThan(0);
+    const xs = ink.map(([x]) => x),
+      ys = ink.map(([, y]) => y);
+    expect(Math.abs((Math.min(...xs) + Math.max(...xs)) / 2 - 160)).toBeLessThan(5);
+    expect(Math.abs((Math.min(...ys) + Math.max(...ys)) / 2 - 90)).toBeLessThan(8);
+    for (const [w, h] of [
+      [1, 2048],
+      [2048, 1],
+      [1, 1],
+    ]) {
+      const png = await renderSvg(solidSvg(w, h, true), false);
+      expect(await sharp(png).metadata()).toMatchObject({ width: w, height: h });
+    }
   });
 });
 
@@ -158,6 +188,68 @@ describe("routes", () => {
     }
   });
 
+  it("serves solid color placeholders without a photo catalog or fetch", async () => {
+    const app = createApp(new Catalog(async () => []), (() => {
+      throw new Error("Solid color placeholders must not fetch photos");
+    }) as typeof fetch);
+    for (const [path, w, h] of [
+      ["/120/80?solid", 120, 80],
+      ["/64?solid", 64, 64],
+      ["/g/64?solid", 64, 64],
+      ["/120/80?solid&gray", 120, 80],
+    ] as const) {
+      const res = await request(app)
+        .get(path)
+        .buffer(true)
+        .parse(binary)
+        .expect(200)
+        .expect("Content-Type", /png/)
+        .expect("Cache-Control", "public, max-age=86400");
+      expect(res.headers["x-photo"]).toBeUndefined();
+      expect(await sharp(res.body).metadata()).toMatchObject({ width: w, height: h });
+      const { channels } = await sharp(res.body).removeAlpha().stats();
+      for (const c of channels.slice(0, 3)) expect([c.min, c.max]).toEqual([224, 224]);
+    }
+  });
+
+  it("adds optional dimension text and caches it separately from the plain image", async () => {
+    const app = createApp(new Catalog(async () => []), fakeFetch);
+    const plain = await request(app).get("/320/180?solid").buffer(true).parse(binary).expect(200);
+    const text = await request(app)
+      .get("/320/180?solid&text")
+      .buffer(true)
+      .parse(binary)
+      .expect(200);
+    expect(await sharp(text.body).metadata()).toMatchObject({ width: 320, height: 180 });
+    expect(text.body.equals(plain.body)).toBe(false);
+    const { channels } = await sharp(text.body).removeAlpha().stats();
+    expect(channels[0].min).toBeLessThan(100);
+    const again = await request(app)
+      .get("/320/180?text&solid")
+      .buffer(true)
+      .parse(binary)
+      .expect(200);
+    expect(again.body.equals(text.body)).toBe(true);
+    const stillPlain = await request(app)
+      .get("/320/180?solid")
+      .buffer(true)
+      .parse(binary)
+      .expect(200);
+    expect(stillPlain.body.equals(plain.body)).toBe(true);
+    for (const [w, h] of [
+      [1, 2048],
+      [2048, 1],
+      [1, 1],
+    ]) {
+      const tiny = await request(app)
+        .get(`/${w}/${h}?solid&text`)
+        .buffer(true)
+        .parse(binary)
+        .expect(200);
+      expect(await sharp(tiny.body).metadata()).toMatchObject({ width: w, height: h });
+    }
+  });
+
   it("doesn't cache ?random, whatever its value", async () => {
     const app = createApp(
       await ready(Array.from({ length: 30 }, (_, i) => photo(`p${i}`))),
@@ -198,7 +290,13 @@ describe("routes", () => {
       ["/90/60?category=dogs", 404, "campus, classrooms, labs, life"],
       ["/90/60?categroy=labs", 400, "Unknown option ?categroy"],
       ["/90/60?category=labs&category=life", 400, "once"],
-      ["/90/60?scotty&profile", 400, "not both"],
+      ["/90/60?scotty&profile", 400, "Pick one"],
+      ["/90/60?solid&scotty", 400, "Pick one"],
+      ["/90/60?solid&profile", 400, "Pick one"],
+      ["/90/60?solid&category=labs", 400, "choose photos"],
+      ["/90/60?solid&random", 400, "choose photos"],
+      ["/90/60?text", 400, "Use ?text with ?solid"],
+      ["/90/60?scotty&text", 400, "Use ?text with ?solid"],
       ["/90/60?scotty&category=labs", 400, "choose photos"],
       ["/90?profile&random", 400, "choose photos"],
     ];

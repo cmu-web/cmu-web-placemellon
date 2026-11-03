@@ -42,7 +42,7 @@ changing the Dockerfile or devcontainer configuration, use
 connected to the container.
 
 The photo list loads in the background. Photo requests return 503 until it
-is ready; the documentation and Scotty images work while it loads.
+is ready; the documentation, Scotty images and solid color placeholders work while it loads.
 
 ## Checks
 
@@ -167,18 +167,18 @@ to it. Update deployments' image digests to roll it out.
 
 ## Project structure
 
-| Path                             | Purpose                                                         |
-| -------------------------------- | --------------------------------------------------------------- |
-| `src/index.ts`                   | Starts the server and photo catalog                             |
-| `src/app.ts`                     | Routes, option validation, response caching and health endpoint |
-| `src/widen.ts`                   | Lists photos and previews from the CMU Selects portals          |
-| `src/catalog.ts`                 | Refreshes the catalog and selects photos                        |
-| `src/render.ts`                  | Crops photos and renders Scotty images with sharp               |
-| `assets/`                        | Scotty vector artwork used by the service                       |
-| `docs/`                          | User documentation, builder and browser assets                  |
-| `test/app.test.ts`               | Service tests                                                   |
-| `scripts/check-node-version.mjs` | Checks that `@types/node` matches the Dockerfile's Node version |
-| `dist/`                          | Generated server JavaScript; ignored by Git                     |
+| Path                             | Purpose                                                           |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `src/index.ts`                   | Starts the server and photo catalog                               |
+| `src/app.ts`                     | Routes, option validation, response caching and health endpoint   |
+| `src/widen.ts`                   | Lists photos and previews from the CMU Selects portals            |
+| `src/catalog.ts`                 | Refreshes the catalog and selects photos                          |
+| `src/render.ts`                  | Crops photos and renders Scotty and solid color images with sharp |
+| `assets/`                        | Scotty vector artwork used by the service                         |
+| `docs/`                          | User documentation, builder and browser assets                    |
+| `test/app.test.ts`               | Service tests                                                     |
+| `scripts/check-node-version.mjs` | Checks that `@types/node` matches the Dockerfile's Node version   |
+| `dist/`                          | Generated server JavaScript; ignored by Git                       |
 
 ## How the service works
 
@@ -202,6 +202,8 @@ Rendering fetches the smallest preview that covers the requested size.
 Sharp crops it using attention-based positioning and returns a JPEG.
 Scotty images are rendered from SVG and returned as PNGs. The artwork is
 traced from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.png).
+Solid color placeholders (`?solid`) are rendered locally as light gray PNGs;
+`?solid&text` adds centered dimensions. Neither needs the photo catalog.
 
 Recent rendered images stay in an in-memory LRU cache, limited by
 `CACHE_ENTRIES`. Non-random responses allow browser and proxy caching for
