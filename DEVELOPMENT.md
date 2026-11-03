@@ -29,7 +29,7 @@ npm run dev
 The development command watches `src/` and restarts the server when
 TypeScript changes. With `DOCS_URL` unset, the server serves the
 documentation from `docs/`. Reload the browser after editing HTML,
-JavaScript, or images there.
+JavaScript or images there.
 
 VS Code forwards container port 3000; open the local address from its
 **Ports** panel. If a host process already uses 3000, the forwarded port may
@@ -56,7 +56,7 @@ npx prek install
 ```
 
 The hooks in `.pre-commit-config.yaml` run ESLint, Prettier's formatting
-check, and TypeScript type checking before a commit. When the Dockerfile or
+check and TypeScript type checking before a commit. When the Dockerfile or
 `package.json` changes, they also check that `@types/node` matches the
 Dockerfile's Node version. They use the project's
 npm commands and check the whole project. If a check fails, fix the reported
@@ -78,27 +78,27 @@ npm run check
 ```
 
 This runs the Node version check, ESLint, Prettier's check, type checking,
-the tests, and the build. CI runs the same command by building the
+the tests and the build. CI runs the same command by building the
 Dockerfile's `test` stage; to do that outside the devcontainer:
 
 ```bash
 podman build --target test .
 ```
 
-Tests cover URL options, sizing, image rendering, photo selection, caching,
+Tests cover URL options, sizing, image rendering, photo selection, caching
 and expired preview links. They start local HTTP servers, so the environment
 must allow binding to loopback ports.
 
 ### Linting and formatting
 
 ESLint uses the recommended JavaScript and TypeScript rules in
-`eslint.config.mjs`. It checks the service, tests, browser scripts, and its
+`eslint.config.mjs`. It checks the service, tests, browser scripts and its
 own configuration. Generated output is excluded.
 
-Prettier uses `.prettierrc.json` for TypeScript, JavaScript, HTML, Markdown,
-and JSON. `.prettierignore` excludes generated output, the npm lockfile,
+Prettier uses `.prettierrc.json` for TypeScript, JavaScript, HTML, Markdown
+and JSON. `.prettierignore` excludes generated output, the npm lockfile
 and image assets. The devcontainer includes the ESLint and Prettier VS Code
-extensions, selects Prettier as the formatter for these file types, and
+extensions, selects Prettier as the formatter for these file types and
 formats them on save.
 
 To apply automatic fixes and formatting:
@@ -149,15 +149,17 @@ A release publishes the production image to GitHub Container Registry; see
 2. Choose the version:
    - **Major** when an existing URL or option stops working or behaves
      differently.
-   - **Minor** for new options, features, or runtime changes, such as a new
+   - **Minor** for new options, features or runtime changes, such as a new
      Node release line.
    - **Patch** for fixes and dependency updates.
 
-3. Create an annotated tag and push it:
+3. Update the version in `package.json` and `package-lock.json`, commit it and
+   create the matching annotated tag, then push both. Use `major`, `minor` or
+   `patch`:
 
    ```bash
-   git tag -a v0.4.0 -m "PlaceMellon 0.4.0"
-   git push origin v0.4.0
+   npm version minor -m "chore: release %s"
+   git push --follow-tags
    ```
 
 The workflow runs every check, then publishes the image and moves `latest`
@@ -165,18 +167,18 @@ to it. Update deployments' image digests to roll it out.
 
 ## Project structure
 
-| Path                             | Purpose                                                          |
-| -------------------------------- | ---------------------------------------------------------------- |
-| `src/index.ts`                   | Starts the server and photo catalog                              |
-| `src/app.ts`                     | Routes, option validation, response caching, and health endpoint |
-| `src/widen.ts`                   | Lists photos and previews from the CMU Selects portals           |
-| `src/catalog.ts`                 | Refreshes the catalog and selects photos                         |
-| `src/render.ts`                  | Crops photos and renders Scotty images with sharp                |
-| `assets/`                        | Scotty vector artwork used by the service                        |
-| `docs/`                          | User documentation, builder, and browser assets                  |
-| `test/app.test.ts`               | Service tests                                                    |
-| `scripts/check-node-version.mjs` | Checks that `@types/node` matches the Dockerfile's Node version  |
-| `dist/`                          | Generated server JavaScript; ignored by Git                      |
+| Path                             | Purpose                                                         |
+| -------------------------------- | --------------------------------------------------------------- |
+| `src/index.ts`                   | Starts the server and photo catalog                             |
+| `src/app.ts`                     | Routes, option validation, response caching and health endpoint |
+| `src/widen.ts`                   | Lists photos and previews from the CMU Selects portals          |
+| `src/catalog.ts`                 | Refreshes the catalog and selects photos                        |
+| `src/render.ts`                  | Crops photos and renders Scotty images with sharp               |
+| `assets/`                        | Scotty vector artwork used by the service                       |
+| `docs/`                          | User documentation, builder and browser assets                  |
+| `test/app.test.ts`               | Service tests                                                   |
+| `scripts/check-node-version.mjs` | Checks that `@types/node` matches the Dockerfile's Node version |
+| `dist/`                          | Generated server JavaScript; ignored by Git                     |
 
 ## How the service works
 
@@ -187,7 +189,7 @@ own application endpoints rather than a documented API; changes there may
 require updates to `src/widen.ts`.
 
 Photo selection first narrows the catalog by category and orientation.
-Wide sizes use landscape photos, tall sizes use portrait photos, and
+Wide sizes use landscape photos, tall sizes use portrait photos and
 near-square sizes use either. If no photo has the requested orientation,
 selection falls back to the category's full list.
 

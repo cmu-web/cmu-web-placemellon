@@ -1,9 +1,9 @@
 # Deployment
 
 This guide covers PlaceMellon's container image: where it's published, how
-to run and configure it, and how to check its health. The application needs
+to run and configure it and how to check its health. The application needs
 outbound HTTPS access to CMU Selects and its image CDN. It has no database,
-API keys, or persistent application data.
+API keys or persistent application data.
 
 The commands here use Podman. Most work unchanged with Docker.
 
@@ -11,7 +11,7 @@ The commands here use Podman. Most work unchanged with Docker.
 
 GitHub Actions publishes the production image to
 `ghcr.io/cmu-web/cmu-web-placemellon` when a version tag (`v*`) is pushed, after
-linting, formatting, type checking, tests, and a build pass. Pushes and pull
+linting, formatting, type checking, tests and a build pass. Pushes and pull
 requests run the same checks and build the image without publishing it. The
 workflow is `.github/workflows/publish.yml`; it can also be run by hand from
 the repository's **Actions** tab to build the current commit.
@@ -45,7 +45,7 @@ podman build --format docker -t localhost/placemellon:latest .
 ```
 
 The Dockerfile compiles TypeScript in a build stage. The production image
-contains the compiled server, production dependencies, Scotty assets, and
+contains the compiled server, production dependencies, Scotty assets and
 documentation. It runs as the non-root `node` user. The Node base image is
 pinned by digest, and npm is pinned to 12.2.1 in the shared base stage.
 Update these pins deliberately when updating the tooling.
@@ -103,7 +103,7 @@ Use a valid TCP port and a positive number of refresh hours. If changing
 curl --fail --show-error http://127.0.0.1:3000/healthz
 ```
 
-The response includes the photo count, counts by category, and the last
+The response includes the photo count, counts by category and the last
 successful refresh time. Status is 200 when the catalog contains photos
 and 503 when it is empty. This measures catalog availability; it does not
 fetch a photo or verify that every category has photos.
@@ -120,7 +120,7 @@ podman healthcheck run placemellon
 
 A nonempty catalog can still contain expired preview links if CMU Selects
 is unavailable. When investigating photo failures, check the refresh time,
-logs, and an actual image response as well as `/healthz`.
+logs and an actual image response as well as `/healthz`.
 
 ## Logs and shutdown
 

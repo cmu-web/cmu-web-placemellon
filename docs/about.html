@@ -6,7 +6,7 @@
     <title>About - PlaceMellon - Carnegie Mellon University</title>
     <meta
       name="description"
-      content="Where PlaceMellon's photos come from, how to find one, and how the service works."
+      content="Where PlaceMellon's photos come from, how to find one and how the service works."
     />
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
@@ -54,8 +54,7 @@
           ><div>
             <h1>About PlaceMellon</h1>
             <p class="cmu-lead"
-              >PlaceMellon fills Carnegie Mellon mockups, prototypes, and unfinished pages with real
-              CMU photos at whatever size the layout needs.</p
+              >PlaceMellon provides CMU photos at the size you need for mockups and prototypes.</p
             >
             <h2 class="rule-top" id="photos">Where the Photos Come From</h2>
             <p
@@ -74,47 +73,120 @@
                 >Scotty chatbot</a
               >.</p
             >
-            <div class="cmu-callout">
+            <div class="cmu-callout cmu-callout--blue">
               <p class="cmu-label">Which Photo Is This?</p>
-              <p
-                >Each photo's response has an <code>X-Photo</code> header with its file name, so you
-                can find it in CMU Selects.</p
-              >
+              <div>
+                <p
+                  >Each image comes with an <code>X-Photo</code> header that names its photo. Look
+                  it up with this command, using your image's address, then search for the name in
+                  CMU Selects:</p
+                >
+                <div class="cmu-copyable">
+                  <pre
+                    class="cmu-snippet cmu-snippet--wrap"
+                  ><code id="pm-which">curl -sI https://placemellon.andrew.cmu.edu/400/300 | grep -i x-photo</code></pre>
+                  <button
+                    type="button"
+                    class="cmu-copy"
+                    data-cmu-copy="#pm-which"
+                    aria-label="Copy Command"
+                    title="Copy Command"
+                  ></button>
+                </div>
+                <p
+                  >Or open the image in your browser, open its developer tools and find the header
+                  under the image's request on the Network tab.</p
+                >
+              </div>
             </div>
             <h2 class="rule-top" id="how">How It Works</h2>
             <p
+              >PlaceMellon picks a photo shaped like your size: landscape for wide sizes, portrait
+              for tall ones and any photo for sizes close to square. It crops the photo to fit,
+              keeping its most interesting part rather than simply the middle.</p
+            >
+            <ul class="cmu-checks">
+              <li><strong>The same size always gets the same photo.</strong></li>
+              <li
+                ><strong>Add <code>?random</code></strong> for a different photo each time.</li
+              >
+              <li
+                ><strong>Scotty stays sharp at any size,</strong> since he's drawn from vector
+                shapes.</li
+              >
+              <li
+                ><strong>Source photos aren't saved to disk.</strong> PlaceMellon fetches each one
+                from CMU Selects when it's needed.</li
+              >
+            </ul>
+            <h2 class="rule-top" id="technical">Technical Details</h2>
+            <p
               >PlaceMellon keeps a list of the CMU Selects photos and refreshes it every few hours.
-              When you ask for a size, it fetches that photo's preview from CMU Selects, crops it,
-              and sends it to you. It doesn't keep copies of the photos.</p
+              It narrows the list to photos of the right shape, then picks one by rendezvous
+              hashing, scoring each photo by your size and its ID and taking the highest. So when
+              University Communications &amp; Marketing adds or removes photos, nearly every size
+              keeps the photo it had. With <code>?random</code>, it skips the scoring and picks any
+              photo of the right shape.</p
             >
             <p
-              >PlaceMellon first narrows the list to photos shaped like your size: landscape for
-              wide sizes, portrait for tall ones, and any photo for sizes close to square. It then
-              picks one by rendezvous hashing, scoring each photo by your size and its ID and taking
-              the highest. So the same size always gets the same photo, and when University
-              Communications &amp; Marketing adds or removes photos, nearly every size keeps the
-              photo it had. With <code>?random</code>, it skips the scoring and picks any photo of
-              the right shape.</p
+              >To crop, it fetches the smallest preview that covers your size and keeps the part
+              with the most detail and color. It holds recently made images in memory for a short
+              while, and browsers may keep each one for a day, so repeat requests are fast. Random
+              photos are never held.</p
             >
             <p
-              >To crop, it fetches the smallest preview that covers your size and keeps the most
-              interesting part of the photo, where there's the most detail and color, rather than
-              simply the middle. Scotty is drawn from vector shapes, so it stays sharp at any size.
-              It holds recently made images in memory for a short while (nothing is saved to disk),
-              and browsers may keep each one for a day, so repeat requests are fast. Random photos
-              are never held.</p
-            >
-            <p
-              >PlaceMellon is a small TypeScript app built with Express and sharp, and its code is
-              public. The
+              >PlaceMellon is a small TypeScript app built with Express and sharp. The
               <a class="external" href="https://github.com/cmu-web/cmu-web-placemellon"
                 >GitHub repository</a
               >
-              has the code, its tests, and documentation. To report a problem or suggest a change,
+              has the code, its tests and documentation. To report a problem or suggest a change,
               open an issue or send a pull request.</p
             >
           </div></div
         >
+        <div class="grid column2 grey boxes">
+          <h1 id="cmu-web">More CMU Web Tools</h1>
+          <p class="cmu-grid-full">
+            PlaceMellon is one of three CMU Web projects for building Carnegie Mellon websites and
+            web apps.
+          </p>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://cmu-web.github.io/cmu-web-kit/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="images/gallery-web-kit.jpg"
+                  alt="The Carnegie Mellon Web Kit's home page: a hero with an Install the Kit button beside stacked screenshots of an app."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2>Carnegie Mellon Web Kit</h2>
+            <p>Components for websites and web apps on CMU's template.</p>
+            <p
+              ><a class="external" href="https://cmu-web.github.io/cmu-web-kit/"
+                >Visit the Web Kit</a
+              ></p
+            >
+          </div>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://cmu-web.github.io/cmu-web-markdown/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="images/gallery-web-markdown.jpg"
+                  alt="Carnegie Mellon Web Markdown's docs: plain Markdown in CMU's template, with a code block and its copy icon."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2>Carnegie Mellon Web Markdown</h2>
+            <p>A GitHub Pages theme that turns plain Markdown into pages in CMU style.</p>
+            <p
+              ><a class="external" href="https://cmu-web.github.io/cmu-web-markdown/"
+                >Visit Web Markdown</a
+              ></p
+            >
+          </div>
+        </div>
       </main>
       <footer class="grid column3 invert">
         <div>
@@ -150,6 +222,7 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script src="https://cmu-web.github.io/cmu-web-kit/js/cmu-app.js"></script>
     <script src="js/docs.js"></script>
   </body>
 </html>

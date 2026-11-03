@@ -1,11 +1,11 @@
 # Contributing
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for setup, commands, and technical
+See [DEVELOPMENT.md](DEVELOPMENT.md) for setup, commands and technical
 details.
 
 ## Issues
 
-For a bug report, include the URL or options you used, what happened, and
+For a bug report, include the URL or options you used, what happened and
 what you expected. Include the browser or runtime version when relevant.
 Check existing issues before opening a new one.
 
@@ -20,7 +20,7 @@ behavior. Include relevant validation results.
 
 Run the [development checks](DEVELOPMENT.md#checks) before submitting.
 Enable the [pre-commit hooks](DEVELOPMENT.md#pre-commit-hooks) in your checkout
-to run linting, formatting checks, and type checking when you commit.
+to run linting, formatting checks and type checking when you commit.
 Add or update tests when behavior changes, and update the user documentation
 when changing an option or its behavior.
 

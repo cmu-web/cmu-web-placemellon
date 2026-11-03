@@ -2,7 +2,7 @@
 
 Placeholder images of Carnegie Mellon, in the spirit of placekitten.
 Give it a width and height, and it returns a CMU photo cropped to that size.
-It also provides grayscale images, random photos, and Scotty images and
+It also provides grayscale images, random photos and Scotty images and
 profile pictures.
 
 Photos come from University Communications & Marketing's CMU Selects
@@ -22,9 +22,9 @@ the same photo unless you select the random option or the photo collection
 changes.
 
 The [image builder](https://cmu-web.github.io/cmu-web-placemellon/builder.html)
-lets you choose a size and options, preview the image, and copy its URL or
+lets you choose a size and options, preview the image and copy its URL or
 HTML. The [options reference](https://cmu-web.github.io/cmu-web-placemellon/options.html)
-covers categories, random photos, grayscale, and Scotty.
+covers categories, random photos, grayscale and Scotty.
 
 ## Support
 
@@ -36,13 +36,13 @@ Report problems or suggest changes in
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or pull
 request; it covers commit messages and style conventions too.
 [DEVELOPMENT.md](DEVELOPMENT.md) explains local setup, the devcontainer,
-tests, and how the service works.
+tests and how the service works.
 
 ## Deployment
 
 PlaceMellon is published as a container image on GitHub Container Registry.
 To run your own, follow [DEPLOYMENT.md](DEPLOYMENT.md) for the image,
-configuration, and health checks.
+configuration and health checks.
 
 ## License
 
