@@ -12,7 +12,17 @@ import {
 } from "./render";
 import { PORTALS } from "./widen";
 
-const OPTIONS = ["category", "random", "scotty", "profile", "solid", "text", "gray", "grayscale"];
+const OPTIONS = [
+  "category",
+  "random",
+  "scotty",
+  "profile",
+  "solid",
+  "text",
+  "white",
+  "gray",
+  "grayscale",
+];
 
 export interface Options {
   category?: string;
@@ -21,6 +31,7 @@ export interface Options {
   profile: boolean;
   solid: boolean;
   text: boolean;
+  white: boolean;
   gray: boolean;
 }
 
@@ -61,6 +72,7 @@ export function parseOptions(
     profile: "profile" in query,
     solid: "solid" in query,
     text: "text" in query,
+    white: "white" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
   if ([o.scotty, o.profile, o.solid].filter(Boolean).length > 1)
@@ -71,6 +83,7 @@ export function parseOptions(
       "?category and ?random choose photos, so they don't go with ?scotty, ?profile or ?solid.",
     );
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
+  if (o.white && !o.scotty) throw new OptionError(400, "Use ?white with ?scotty.");
   return o;
 }
 
@@ -175,8 +188,8 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     }
 
     if (o.scotty || o.profile) {
-      const svg = o.profile ? avatarSvg(w) : scottySvg(w, h);
-      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.gray ? " gray" : ""}`;
+      const svg = o.profile ? avatarSvg(w) : scottySvg(w, h, o.white);
+      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.white ? " white" : ""}${o.gray ? " gray" : ""}`;
       void send(res, key, async () => ({ type: "png", body: await renderSvg(svg, o.gray) }));
       return;
     }

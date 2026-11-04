@@ -42,8 +42,8 @@ export async function renderPhoto(
   return img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
 }
 
-// Scotty's bust on the avatar's gradient, standing on the bottom edge
-export function scottySvg(w: number, h: number): string {
+// Scotty's bust on the avatar's gradient (or plain white), standing on the bottom edge
+export function scottySvg(w: number, h: number, white = false): string {
   const s = Math.min((0.9 * w) / BUST.w, (0.9 * h) / BUST.h);
   const x = (w - BUST.w * s) / 2 - BUST.x * s;
   const y = h - BUST.h * s - BUST.y * s;
@@ -51,7 +51,7 @@ export function scottySvg(w: number, h: number): string {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
     `<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c5c6c8"/></linearGradient>` +
     `<clipPath id="crop"><rect x="${BUST.x}" y="${BUST.y}" width="${BUST.w}" height="${BUST.h}"/></clipPath></defs>` +
-    `<rect width="${w}" height="${h}" fill="url(#bg)"/>` +
+    `<rect width="${w}" height="${h}" fill="${white ? "#fff" : "url(#bg)"}"/>` +
     `<g transform="translate(${x} ${y}) scale(${s})" clip-path="url(#crop)">${bust}</g></svg>`
   );
 }

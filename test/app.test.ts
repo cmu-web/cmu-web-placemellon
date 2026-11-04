@@ -223,6 +223,7 @@ describe("routes", () => {
     for (const [path, w, h] of [
       ["/320/180?scotty", 320, 180],
       ["/g/90/160?scotty", 90, 160],
+      ["/150?scotty&white", 150, 150],
       ["/64?profile", 64, 64],
       ["/48/48?profile&grayscale", 48, 48],
     ] as const) {
@@ -234,6 +235,25 @@ describe("routes", () => {
         .expect("Content-Type", /png/);
       expect(await sharp(res.body).metadata(), path).toMatchObject({ width: w, height: h });
     }
+  });
+
+  it("serves ?scotty&white on white, cached apart from the gradient", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    const get = (path: string) => request(app).get(path).buffer(true).parse(binary).expect(200);
+    const plain = await get("/120/80?scotty");
+    const white = await get("/120/80?scotty&white");
+    expect(white.body.equals(plain.body)).toBe(false);
+    // The bottom corners are gray on the gradient and white without it
+    const corner = async (b: Buffer) =>
+      (
+        await sharp(b)
+          .extract({ left: 0, top: 79, width: 1, height: 1 })
+          .removeAlpha()
+          .raw()
+          .toBuffer()
+      )[0];
+    expect(await corner(white.body)).toBe(255);
+    expect(await corner(plain.body)).toBeLessThan(220);
   });
 
   it("serves solid color placeholders without a photo catalog or fetch", async () => {
@@ -349,6 +369,8 @@ describe("routes", () => {
       ["/90/60?solid&random", 400, "choose photos"],
       ["/90/60?text", 400, "Use ?text with ?solid"],
       ["/90/60?scotty&text", 400, "Use ?text with ?solid"],
+      ["/90/60?white", 400, "Use ?white with ?scotty"],
+      ["/90/60?profile&white", 400, "Use ?white with ?scotty"],
       ["/90/60?scotty&category=labs", 400, "choose photos"],
       ["/90?profile&random", 400, "choose photos"],
     ];

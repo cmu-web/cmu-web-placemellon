@@ -33,6 +33,9 @@ For a solid color placeholder, use `/400/300?solid`. Add `&text` to show
 its dimensions: `/400/300?solid&text`. These images work without loading
 the photo collection. The default color is Steel Gray.
 
+For Scotty on plain white instead of a gradient, as a placeholder logo, use
+`/150?scotty&white`.
+
 ## Support
 
 Report problems or suggest changes in

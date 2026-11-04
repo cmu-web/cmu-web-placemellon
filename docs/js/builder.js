@@ -11,6 +11,8 @@
     gray = $("pm-gray"),
     photoOptions = $("pm-photo-options"),
     solidOptions = $("pm-solid-options"),
+    scottyOptions = $("pm-scotty-options"),
+    white = $("pm-white"),
     text = $("pm-text"),
     url = $("pm-url"),
     html = $("pm-html"),
@@ -46,6 +48,7 @@
     // The photo choices show only under "A CMU Photo"
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
+    scottyOptions.hidden = k !== "scotty";
     gray.disabled = k === "solid";
     height.disabled = k === "profile";
     var w = size(width),
@@ -65,6 +68,7 @@
     if (photo && random.checked) q.push("random");
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
+    if (k === "scotty" && white.checked) q.push("white");
     if (k !== "solid" && gray.checked) q.push("gray");
     var qs = q.length ? "?" + q.join("&") : "";
 
