@@ -69,10 +69,9 @@ A reverse proxy on that host can forward public requests to it. To use a
 different host port, change the first port number, for example
 `-p 127.0.0.1:3001:3000`.
 
-By default, `/` serves the documentation bundled in the image. Set
-`DOCS_URL` to redirect `/` elsewhere instead, such as the documentation on
-GitHub Pages. Image URLs and `/healthz` are served by the application in
-either mode.
+`/` serves the documentation bundled in the image, alongside the image URLs
+and `/healthz`. The GitHub Pages copy of the documentation is for testing:
+it updates on every push to `main`, before a release is deployed.
 
 Restarting the container clears the image cache and
 reloads the catalog from CMU Selects. Startup does not wait for that reload;
@@ -86,12 +85,11 @@ Pass environment variables with `-e NAME=value` or `--env-file PATH`.
 start an env file. These are all of the application's configuration
 variables:
 
-| Variable        | Default | Purpose                                                                                                                        |
-| --------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `PORT`          | `3000`  | Port the application listens on inside the container                                                                           |
-| `DOCS_URL`      | unset   | Where `/` redirects, such as `https://cmu-web.github.io/cmu-web-placemellon/`; unset or empty serves the bundled documentation |
-| `REFRESH_HOURS` | `6`     | Interval between catalog refreshes; preview-link expiry can trigger an earlier refresh                                         |
-| `CACHE_ENTRIES` | `256`   | Maximum number of rendered images cached in memory; `0` disables storage in this cache                                         |
+| Variable        | Default | Purpose                                                                                |
+| --------------- | ------- | -------------------------------------------------------------------------------------- |
+| `PORT`          | `3000`  | Port the application listens on inside the container                                   |
+| `REFRESH_HOURS` | `6`     | Interval between catalog refreshes; preview-link expiry can trigger an earlier refresh |
+| `CACHE_ENTRIES` | `256`   | Maximum number of rendered images cached in memory; `0` disables storage in this cache |
 
 The production image also sets `NODE_ENV=production` for Express.
 Use a valid TCP port and a positive number of refresh hours. If changing

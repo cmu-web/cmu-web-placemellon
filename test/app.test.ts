@@ -440,7 +440,7 @@ describe("routes", () => {
     await request(app).get("/96/64.png?profile").expect(302).expect("Location", "/64.png?profile");
   });
 
-  it("serves the bundled docs at /, or redirects to DOCS_URL", async () => {
+  it("serves the bundled docs at /", async () => {
     const catalog = await ready([photo("a")]);
     const res = await request(createApp(catalog, fakeFetch))
       .get("/")
@@ -448,15 +448,6 @@ describe("routes", () => {
       .expect("Content-Type", /html/);
     expect(res.text).toContain("<title>PlaceMellon");
     await request(createApp(catalog, fakeFetch)).get("/js/docs.js").expect(200);
-    process.env.DOCS_URL = "https://cmu-web.github.io/cmu-web-placemellon/";
-    try {
-      await request(createApp(catalog, fakeFetch))
-        .get("/")
-        .expect(302)
-        .expect("Location", "https://cmu-web.github.io/cmu-web-placemellon/");
-    } finally {
-      delete process.env.DOCS_URL;
-    }
   });
 
   it("rejects bad sizes", async () => {

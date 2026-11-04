@@ -27,8 +27,8 @@ npm run dev
 ```
 
 The development command watches `src/` and restarts the server when
-TypeScript changes. With `DOCS_URL` unset, the server serves the
-documentation from `docs/`. Reload the browser after editing HTML,
+TypeScript changes. The server also serves the documentation from
+`docs/`. Reload the browser after editing HTML,
 JavaScript or images there.
 
 VS Code forwards container port 3000; open the local address from its
