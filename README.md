@@ -10,7 +10,7 @@ PlaceMellon is inspired by [PlaceCats](https://www.placecats.com/) and
 
 Photos come from University Communications & Marketing's CMU Selects
 collection. Use them for Carnegie Mellon work; see the
-[photo source and usage information](https://cmu-web.github.io/cmu-web-placemellon/about.html).
+[photo source and usage information](https://placemellon.andrew.cmu.edu/about.html).
 
 ## Get started
 
@@ -24,9 +24,9 @@ This returns a photo 400 pixels wide and 300 pixels tall. The same size gets
 the same photo unless you select the random option or the photo collection
 changes.
 
-The [image builder](https://cmu-web.github.io/cmu-web-placemellon/builder.html)
+The [image builder](https://placemellon.andrew.cmu.edu/builder.html)
 lets you choose a size and options, preview the image and copy its URL or
-HTML. The [options reference](https://cmu-web.github.io/cmu-web-placemellon/options.html)
+HTML. The [options reference](https://placemellon.andrew.cmu.edu/options.html)
 covers categories, random photos, grayscale, Scotty and solid color placeholders.
 
 For a solid color placeholder, use `/400/300?solid`. Add `&text` to show
