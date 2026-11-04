@@ -91,6 +91,36 @@ describe("solid rendering", () => {
     }
   });
 
+  it.each([
+    [720, 72, 16, 24],
+    [160, 100, 10, 16],
+    [900, 600, 20, 28],
+    [1400, 700, 24, 30],
+  ])("keeps text readable and unclipped at %i × %i", async (w, h, minHeight, maxHeight) => {
+    const png = await renderSvg(solidSvg(w, h, true), false);
+    const { data, info } = await sharp(png)
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const xs: number[] = [],
+      ys: number[] = [];
+    for (let y = 0; y < info.height; y++)
+      for (let x = 0; x < info.width; x++)
+        if (data[(y * info.width + x) * info.channels] > 180) {
+          xs.push(x);
+          ys.push(y);
+        }
+    expect(ys.length).toBeGreaterThan(0);
+    const inkHeight = Math.max(...ys) - Math.min(...ys) + 1;
+    expect(inkHeight).toBeGreaterThanOrEqual(minHeight);
+    expect(inkHeight).toBeLessThanOrEqual(maxHeight);
+    expect(Math.min(...ys)).toBeGreaterThan(0);
+    expect(Math.max(...ys)).toBeLessThan(h - 1);
+    expect(Math.min(...xs)).toBeGreaterThan(0);
+    expect(Math.max(...xs)).toBeLessThan(w - 1);
+    expect(Math.abs((Math.min(...xs) + Math.max(...xs)) / 2 - w / 2)).toBeLessThan(5);
+  });
+
   it("draws the dimensions in a real font, not missing-glyph boxes", async () => {
     // Without the font, every digit is the same box, so these come out identical
     const svg = solidSvg(300, 200, true);

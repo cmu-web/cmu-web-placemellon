@@ -63,13 +63,16 @@ export function avatarSvg(size: number): string {
 // A solid color placeholder, with optional dimensions scaled to fit even narrow images.
 export function solidSvg(w: number, h: number, text: boolean): string {
   const label = `${w} × ${h}`;
-  // Match the kit's 900 × 600 placeholder: 32px type on a 70px baseline.
-  const fontSize = Math.min(36, (32 * w) / 900, (32 * h) / 600);
+  // The kit uses 32px at 900px wide and 36px for its large hero placeholder.
+  // Keep smaller previews readable, then allow room for the label and padding.
+  const preferredSize = Math.max(16, Math.min(36, (32 * w) / 900));
+  const fontSize = Math.min(preferredSize, w / (label.length * 0.75 + 2), h / 2);
+  const baseline = Math.max((70 * h) / 600, fontSize * 1.5);
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
     `<rect width="${w}" height="${h}" fill="#6d6e71"/>` +
     (text
-      ? `<text x="${w / 2}" y="${(70 * h) / 600}" fill="#e0e0e0" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
+      ? `<text x="${w / 2}" y="${baseline}" fill="#e0e0e0" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
       : "") +
     "</svg>"
   );
