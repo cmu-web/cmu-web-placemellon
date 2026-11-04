@@ -162,6 +162,21 @@ A release publishes the production image to GitHub Container Registry; see
    git push --follow-tags
    ```
 
+   `npm version` needs a clean working tree. It replaces `%s` with the new
+   version, and it only changes your local checkout. Don't edit the version in
+   `package.json` by hand or create the tag yourself, or the file and the tag
+   can disagree. The push is what starts the release.
+
+   To undo before pushing, delete the tag and the commit, using the new version:
+
+   ```bash
+   git tag -d v0.5.0
+   git reset --hard HEAD~1
+   ```
+
+   After pushing, `v*` tags can't be moved or deleted, so fix a bad release with
+   a new version.
+
 The workflow runs every check, then publishes the image and moves `latest`
 to it. Update deployments' image digests to roll it out.
 
