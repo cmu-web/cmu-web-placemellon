@@ -31,7 +31,7 @@ covers categories, random photos, grayscale, Scotty and solid color placeholders
 
 For a solid color placeholder, use `/400/300?solid`. Add `&text` to show
 its dimensions: `/400/300?solid&text`. These images work without loading
-the photo collection. The default color is light gray.
+the photo collection. The default color is Steel Gray.
 
 ## Support
 

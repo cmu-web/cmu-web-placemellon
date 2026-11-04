@@ -58,10 +58,14 @@ describe("pickPreview", () => {
 });
 
 describe("solid rendering", () => {
-  it("renders a uniform gray image or centered dimensions, including very narrow sizes", async () => {
+  it("renders a uniform gray image or dimensions near the top, including very narrow sizes", async () => {
     const plain = await renderSvg(solidSvg(320, 180, false), false);
     const { channels } = await sharp(plain).removeAlpha().stats();
-    for (const c of channels.slice(0, 3)) expect([c.min, c.max]).toEqual([224, 224]);
+    expect(channels.slice(0, 3).map((c) => [c.min, c.max])).toEqual([
+      [109, 109],
+      [110, 110],
+      [113, 113],
+    ]);
     const labeled = await renderSvg(solidSvg(320, 180, true), false);
     const { data, info } = await sharp(labeled)
       .removeAlpha()
@@ -70,12 +74,13 @@ describe("solid rendering", () => {
     const ink = [];
     for (let y = 0; y < info.height; y++)
       for (let x = 0; x < info.width; x++)
-        if (data[(y * info.width + x) * info.channels] < 150) ink.push([x, y]);
+        if (data[(y * info.width + x) * info.channels] > 180) ink.push([x, y]);
     expect(ink.length).toBeGreaterThan(0);
     const xs = ink.map(([x]) => x),
       ys = ink.map(([, y]) => y);
     expect(Math.abs((Math.min(...xs) + Math.max(...xs)) / 2 - 160)).toBeLessThan(5);
-    expect(Math.abs((Math.min(...ys) + Math.max(...ys)) / 2 - 90)).toBeLessThan(8);
+    expect(Math.min(...ys)).toBeGreaterThan(0);
+    expect(Math.max(...ys)).toBeLessThan(info.height / 5);
     for (const [w, h] of [
       [1, 2048],
       [2048, 1],
@@ -208,7 +213,11 @@ describe("routes", () => {
       expect(res.headers["x-photo"]).toBeUndefined();
       expect(await sharp(res.body).metadata()).toMatchObject({ width: w, height: h });
       const { channels } = await sharp(res.body).removeAlpha().stats();
-      for (const c of channels.slice(0, 3)) expect([c.min, c.max]).toEqual([224, 224]);
+      expect(channels.slice(0, 3).map((c) => [c.min, c.max])).toEqual([
+        [109, 109],
+        [110, 110],
+        [113, 113],
+      ]);
     }
   });
 
@@ -223,7 +232,7 @@ describe("routes", () => {
     expect(await sharp(text.body).metadata()).toMatchObject({ width: 320, height: 180 });
     expect(text.body.equals(plain.body)).toBe(false);
     const { channels } = await sharp(text.body).removeAlpha().stats();
-    expect(channels[0].min).toBeLessThan(100);
+    expect(channels[0].max).toBeGreaterThan(180);
     const again = await request(app)
       .get("/320/180?text&solid")
       .buffer(true)

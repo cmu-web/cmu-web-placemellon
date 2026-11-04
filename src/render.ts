@@ -63,12 +63,13 @@ export function avatarSvg(size: number): string {
 // A solid color placeholder, with optional dimensions scaled to fit even narrow images.
 export function solidSvg(w: number, h: number, text: boolean): string {
   const label = `${w} × ${h}`;
-  const fontSize = Math.min(32, w / (label.length * 0.7), h / 3);
+  // Match the kit's 900 × 600 placeholder: 32px type on a 70px baseline.
+  const fontSize = Math.min(36, (32 * w) / 900, (32 * h) / 600);
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
-    `<rect width="${w}" height="${h}" fill="#e0e0e0"/>` +
+    `<rect width="${w}" height="${h}" fill="#6d6e71"/>` +
     (text
-      ? `<text x="${w / 2}" y="${h / 2}" fill="#555" font-family="Arial, sans-serif" font-size="${fontSize}" text-anchor="middle" dominant-baseline="central">${label}</text>`
+      ? `<text x="${w / 2}" y="${(70 * h) / 600}" fill="#e0e0e0" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
       : "") +
     "</svg>"
   );

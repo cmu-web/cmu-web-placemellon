@@ -217,8 +217,10 @@ Rendering fetches the smallest preview that covers the requested size.
 Sharp crops it using attention-based positioning and returns a JPEG.
 Scotty images are rendered from SVG and returned as PNGs. The artwork is
 traced from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.png).
-Solid color placeholders (`?solid`) are rendered locally as light gray PNGs;
-`?solid&text` adds centered dimensions. Neither needs the photo catalog.
+Solid color placeholders (`?solid`) are rendered locally as Steel Gray PNGs;
+`?solid&text` adds dimensions centered near the top, using Open Sans like
+the Web Kit's placeholders. The container installs the font for rendering.
+Neither needs the photo catalog.
 
 Recent rendered images stay in an in-memory LRU cache, limited by
 `CACHE_ENTRIES`. Non-random responses allow browser and proxy caching for
