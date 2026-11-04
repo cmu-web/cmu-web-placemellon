@@ -90,6 +90,19 @@ describe("solid rendering", () => {
       expect(await sharp(png).metadata()).toMatchObject({ width: w, height: h });
     }
   });
+
+  it("draws the dimensions in a real font, not missing-glyph boxes", async () => {
+    // Without the font, every digit is the same box, so these come out identical
+    const svg = solidSvg(300, 200, true);
+    const [ones, eights] = await Promise.all(
+      ["111 × 111", "888 × 888"].map(async (label) =>
+        sharp(await renderSvg(svg.replace("300 × 200", label), false))
+          .raw()
+          .toBuffer(),
+      ),
+    );
+    expect(ones.equals(eights)).toBe(false);
+  });
 });
 
 describe("widen", () => {
