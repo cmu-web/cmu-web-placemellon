@@ -5,8 +5,8 @@ Give it a width and height, and it returns a CMU photo cropped to that size.
 It also provides grayscale images, random photos and Scotty images and
 profile pictures, plus solid color placeholders with optional dimension text.
 
-PlaceMellon is inspired by [PlaceCats](https://www.placecats.com/): put a
-size in a URL and get a placeholder image.
+PlaceMellon is inspired by [PlaceCats](https://www.placecats.com/) and
+[PlaceBear](https://placebear.com/): put a size in a URL and get a placeholder image.
 
 Photos come from University Communications & Marketing's CMU Selects
 collection. Use them for Carnegie Mellon work; see the
