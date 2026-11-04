@@ -33,6 +33,10 @@ For a solid color placeholder, use `/400/300?solid`. Add `&text` to show
 its dimensions: `/400/300?solid&text`. These images work without loading
 the photo collection. The default color is Steel Gray.
 
+Photos are JPEGs. Scotty, profile pictures and solid colors are SVG, so they
+stay sharp at any size; add `.png` after the size for a PNG instead, such as
+for email: `/400/300.png?solid&text`.
+
 For Scotty on plain white instead of a gradient, as a placeholder logo, use
 `/150?scotty&white`.
 

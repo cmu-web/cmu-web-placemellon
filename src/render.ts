@@ -78,6 +78,16 @@ export function solidSvg(w: number, h: number, text: boolean): string {
   );
 }
 
+// The same image as an SVG file; gray removes its color with a filter
+export function svgFile(svg: string, gray: boolean): Buffer {
+  if (gray)
+    svg = svg.replace(
+      /^(<svg[^>]*>)([\s\S]*)(<\/svg>)$/,
+      '$1<filter id="pm-gray"><feColorMatrix type="saturate" values="0"/></filter><g filter="url(#pm-gray)">$2</g>$3',
+    );
+  return Buffer.from(svg);
+}
+
 export async function renderSvg(svg: string, gray: boolean): Promise<Buffer> {
   let img = sharp(Buffer.from(svg));
   if (gray) img = img.grayscale();

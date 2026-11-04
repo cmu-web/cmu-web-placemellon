@@ -218,23 +218,41 @@ describe("routes", () => {
     expect(await sharp(res.body).metadata()).toMatchObject({ width: 70, height: 70 });
   });
 
-  it("serves ?scotty and ?profile as PNG at the asked size", async () => {
+  it("serves ?scotty and ?profile as SVG at the asked size, or PNG with .png", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
-    for (const [path, w, h] of [
-      ["/320/180?scotty", 320, 180],
-      ["/g/90/160?scotty", 90, 160],
-      ["/150?scotty&white", 150, 150],
-      ["/64?profile", 64, 64],
-      ["/48/48?profile&grayscale", 48, 48],
+    for (const [path, w, h, type] of [
+      ["/320/180?scotty", 320, 180, /svg/],
+      ["/g/90/160?scotty", 90, 160, /svg/],
+      ["/150?scotty&white", 150, 150, /svg/],
+      ["/150.svg?scotty&white", 150, 150, /svg/],
+      ["/64?profile", 64, 64, /svg/],
+      ["/48/48?profile&grayscale", 48, 48, /svg/],
+      ["/320/180.png?scotty", 320, 180, /png/],
+      ["/g/64.png?profile", 64, 64, /png/],
     ] as const) {
       const res = await request(app)
         .get(path)
         .buffer(true)
         .parse(binary)
         .expect(200)
-        .expect("Content-Type", /png/);
+        .expect("Content-Type", type);
       expect(await sharp(res.body).metadata(), path).toMatchObject({ width: w, height: h });
     }
+  });
+
+  it("takes the color out of gray SVG and PNG alike", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    // The most any pixel's red differs from its green: big for the red scarf, 0 in gray
+    const tint = async (path: string) => {
+      const res = await request(app).get(path).buffer(true).parse(binary).expect(200);
+      const px = await sharp(res.body).removeAlpha().raw().toBuffer();
+      let most = 0;
+      for (let k = 0; k < px.length; k += 3) most = Math.max(most, Math.abs(px[k] - px[k + 1]));
+      return most;
+    };
+    expect(await tint("/90/160?scotty")).toBeGreaterThan(100);
+    expect(await tint("/g/90/160?scotty")).toBeLessThan(3);
+    expect(await tint("/90/160.png?scotty&gray")).toBeLessThan(3);
   });
 
   it("serves ?scotty&white on white, cached apart from the gradient", async () => {
@@ -265,13 +283,15 @@ describe("routes", () => {
       ["/64?solid", 64, 64],
       ["/g/64?solid", 64, 64],
       ["/120/80?solid&gray", 120, 80],
+      ["/120/80.svg?solid", 120, 80],
     ] as const) {
       const res = await request(app)
         .get(path)
         .buffer(true)
         .parse(binary)
         .expect(200)
-        .expect("Content-Type", /png/)
+        .expect("Content-Type", /svg/)
+        .expect("Content-Security-Policy", "default-src 'none'")
         .expect("Cache-Control", "public, max-age=86400");
       expect(res.headers["x-photo"]).toBeUndefined();
       expect(await sharp(res.body).metadata()).toMatchObject({ width: w, height: h });
@@ -281,6 +301,36 @@ describe("routes", () => {
         [110, 110],
         [113, 113],
       ]);
+    }
+  });
+
+  it("serves a solid color as PNG with .png, cached apart from the SVG", async () => {
+    const app = createApp(new Catalog(async () => []), fakeFetch);
+    const get = (path: string) => request(app).get(path).buffer(true).parse(binary).expect(200);
+    const png = await get("/120/80.png?solid&text");
+    expect(png.headers["content-type"]).toMatch(/png/);
+    expect(await sharp(png.body).metadata()).toMatchObject({
+      format: "png",
+      width: 120,
+      height: 80,
+    });
+    expect((await get("/120/80?solid&text")).headers["content-type"]).toMatch(/svg/);
+  });
+
+  it("takes .jpg for photos and .svg or .png only for drawn images", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    await request(app).get("/90/60.jpg").expect(200).expect("Content-Type", /jpeg/);
+    await request(app).get("/g/60.jpg").expect(200).expect("Content-Type", /jpeg/);
+    for (const [path, text] of [
+      ["/90/60.png", "Photos come as JPEGs"],
+      ["/90/60.svg?category=labs", "Photos come as JPEGs"],
+      ["/90/60.jpg?solid", "come as .svg or .png"],
+      ["/90.jpg?scotty", "come as .svg or .png"],
+      ["/90/60.gif?solid", "Sizes must be"],
+      ["/90.png/60?solid", "Sizes must be"],
+    ]) {
+      const res = await request(app).get(path).expect(400);
+      expect(res.text, path).toContain(text);
     }
   });
 
@@ -387,6 +437,7 @@ describe("routes", () => {
       .get("/g/50/80?gray&profile")
       .expect(302)
       .expect("Location", "/g/50?gray&profile");
+    await request(app).get("/96/64.png?profile").expect(302).expect("Location", "/64.png?profile");
   });
 
   it("serves the bundled docs at /, or redirects to DOCS_URL", async () => {

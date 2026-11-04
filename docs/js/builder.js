@@ -14,6 +14,7 @@
     scottyOptions = $("pm-scotty-options"),
     white = $("pm-white"),
     text = $("pm-text"),
+    png = $("pm-png"),
     url = $("pm-url"),
     html = $("pm-html"),
     preview = $("pm-preview"),
@@ -50,6 +51,7 @@
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty";
     gray.disabled = k === "solid";
+    png.disabled = photo;
     height.disabled = k === "profile";
     var w = size(width),
       h = k === "profile" ? "" : size(height);
@@ -62,7 +64,9 @@
     }
     sizeHint.textContent = HINT;
 
-    var path = "/" + w + (h === "" || h === w ? "" : "/" + h);
+    // Drawn images are SVG unless .png is asked for; photos are JPEGs
+    var path =
+      "/" + w + (h === "" || h === w ? "" : "/" + h) + (!photo && png.checked ? ".png" : "");
     var q = [];
     if (photo && category.value) q.push("category=" + category.value);
     if (photo && random.checked) q.push("random");

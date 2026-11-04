@@ -8,6 +8,7 @@ import {
   renderPhoto,
   renderSvg,
   scottySvg,
+  svgFile,
   StaleLinkError,
 } from "./render";
 import { PORTALS } from "./widen";
@@ -111,6 +112,13 @@ class Lru {
   }
 }
 
+// A last size ending in .svg, .png or .jpg picks the file type
+export function splitExt(s: string): [string, Ext | undefined] {
+  const m = /^(.*)\.(svg|png|jpg)$/.exec(s);
+  return m ? [m[1], m[2] as Ext] : [s, undefined];
+}
+type Ext = "svg" | "png" | "jpg";
+
 export function parseSize(s: string): number | null {
   if (!/^\d{1,4}$/.test(s)) return null;
   const n = Number(s);
@@ -146,6 +154,7 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       if (key) cache.set(key, out);
     }
     if (out.photo) res.set("X-Photo", out.photo);
+    if (out.type === "svg") res.set("Content-Security-Policy", "default-src 'none'");
     res
       .set("Cache-Control", key ? "public, max-age=86400" : "no-store")
       .type(out.type)
@@ -153,8 +162,11 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
   }
 
   const image = (gray: boolean) => (req: Request<{ w: string; h?: string }>, res: Response) => {
-    const w = parseSize(req.params.w),
-      h = req.params.h === undefined ? w : parseSize(req.params.h);
+    const [ws, wExt] = req.params.h === undefined ? splitExt(req.params.w) : [req.params.w];
+    const [hs, hExt] = req.params.h === undefined ? [] : splitExt(req.params.h);
+    const ext = wExt ?? hExt;
+    const w = parseSize(ws),
+      h = hs === undefined ? w : parseSize(hs);
     if (w === null || h === null) {
       res.status(400).type("text/plain").send(`Sizes must be whole numbers from 1 to ${MAX}.\n`);
       return;
@@ -174,23 +186,34 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     // Profile pictures are square: send /96/64?profile to /64?profile
     if (o.profile && w !== h) {
       const qs = req.originalUrl.slice(req.originalUrl.indexOf("?"));
-      res.redirect(302, `${gray ? "/g" : ""}/${Math.min(w, h)}${qs}`);
+      res.redirect(302, `${gray ? "/g" : ""}/${Math.min(w, h)}${ext ? "." + ext : ""}${qs}`);
       return;
     }
 
+    // Drawn images are SVG unless .png is asked for; photos are JPEGs
+    const drawn = o.solid || o.scotty || o.profile;
+    if (drawn && ext === "jpg") {
+      res.status(400).type("text/plain").send("Scotty and solid colors come as .svg or .png.\n");
+      return;
+    }
+    if (!drawn && (ext === "svg" || ext === "png")) {
+      res.status(400).type("text/plain").send("Photos come as JPEGs: use .jpg or no extension.\n");
+      return;
+    }
+    const png = ext === "png";
+    const draw = async (svg: string, g: boolean): Promise<Rendered> =>
+      png ? { type: "png", body: await renderSvg(svg, g) } : { type: "svg", body: svgFile(svg, g) };
+
     if (o.solid) {
-      const key = `solid ${w}x${h}${o.text ? " text" : ""}`;
-      void send(res, key, async () => ({
-        type: "png",
-        body: await renderSvg(solidSvg(w, h, o.text), false),
-      }));
+      const key = `solid ${w}x${h}${o.text ? " text" : ""}${png ? " png" : ""}`;
+      void send(res, key, () => draw(solidSvg(w, h, o.text), false));
       return;
     }
 
     if (o.scotty || o.profile) {
       const svg = o.profile ? avatarSvg(w) : scottySvg(w, h, o.white);
-      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.white ? " white" : ""}${o.gray ? " gray" : ""}`;
-      void send(res, key, async () => ({ type: "png", body: await renderSvg(svg, o.gray) }));
+      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.white ? " white" : ""}${o.gray ? " gray" : ""}${png ? " png" : ""}`;
+      void send(res, key, () => draw(svg, o.gray));
       return;
     }
 
