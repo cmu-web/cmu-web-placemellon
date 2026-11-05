@@ -51,13 +51,12 @@
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty";
     gray.disabled = k === "solid";
-    // Photos come only as JPEGs; drawn images as SVG or PNG
-    format.disabled = photo;
-    format.querySelector('[value="jpg"]').hidden = !photo;
-    format.querySelector('[value="svg"]').hidden = photo;
-    format.querySelector('[value="png"]').hidden = photo;
-    if (photo) format.value = "jpg";
-    else if (format.value === "jpg") format.value = "svg";
+    // Photos come as JPEG or WebP; drawn images as SVG or PNG
+    var types = photo ? ["jpg", "webp"] : ["svg", "png"];
+    Array.prototype.forEach.call(format.options, function (o) {
+      o.hidden = types.indexOf(o.value) < 0;
+    });
+    if (types.indexOf(format.value) < 0) format.value = types[0];
     height.disabled = k === "profile";
     var w = size(width),
       h = k === "profile" ? "" : size(height);
@@ -70,9 +69,12 @@
     }
     sizeHint.textContent = HINT;
 
-    // Drawn images are SVG unless PNG is chosen; photos are JPEGs
+    // SVG and JPEG are the defaults, so only PNG and WebP add an extension
     var path =
-      "/" + w + (h === "" || h === w ? "" : "/" + h) + (format.value === "png" ? ".png" : "");
+      "/" +
+      w +
+      (h === "" || h === w ? "" : "/" + h) +
+      (format.value === "png" || format.value === "webp" ? "." + format.value : "");
     var q = [];
     if (photo && category.value) q.push("category=" + category.value);
     if (photo && random.checked) q.push("random");

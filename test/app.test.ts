@@ -317,15 +317,18 @@ describe("routes", () => {
     expect((await get("/120/80?solid&text")).headers["content-type"]).toMatch(/svg/);
   });
 
-  it("takes .jpg for photos and .svg or .png only for drawn images", async () => {
+  it("takes .jpg or .webp for photos and .svg or .png only for drawn images", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     await request(app).get("/90/60.jpg").expect(200).expect("Content-Type", /jpeg/);
     await request(app).get("/g/60.jpg").expect(200).expect("Content-Type", /jpeg/);
+    await request(app).get("/90/60.webp").expect(200).expect("Content-Type", /webp/);
+    await request(app).get("/g/60.webp").expect(200).expect("Content-Type", /webp/);
     for (const [path, text] of [
-      ["/90/60.png", "Photos come as JPEGs"],
-      ["/90/60.svg?category=labs", "Photos come as JPEGs"],
+      ["/90/60.png", "Photos come as JPEG or WebP"],
+      ["/90/60.svg?category=labs", "Photos come as JPEG or WebP"],
       ["/90/60.jpg?solid", "come as .svg or .png"],
       ["/90.jpg?scotty", "come as .svg or .png"],
+      ["/90.webp?profile", "come as .svg or .png"],
       ["/90/60.gif?solid", "Sizes must be"],
       ["/90.png/60?solid", "Sizes must be"],
     ]) {

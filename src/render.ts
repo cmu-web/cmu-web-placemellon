@@ -30,6 +30,7 @@ export async function renderPhoto(
   h: number,
   gray: boolean,
   get: typeof fetch = fetch,
+  webp = false,
 ): Promise<Buffer> {
   const res = await get(pickPreview(photo, w, h).url);
   if (res.status === 403 || res.status === 404) throw new StaleLinkError(`preview ${res.status}`);
@@ -39,7 +40,11 @@ export async function renderPhoto(
     position: sharp.strategy.attention,
   });
   if (gray) img = img.grayscale();
-  return img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+  // WebP at 75 with full effort: about a quarter smaller than the JPEG, and
+  // looks the same
+  return webp
+    ? img.webp({ quality: 75, effort: 6, smartSubsample: true }).toBuffer()
+    : img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
 }
 
 // Scotty's bust on the avatar's gradient (or plain white), standing on the bottom edge

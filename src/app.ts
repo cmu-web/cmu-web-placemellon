@@ -112,12 +112,12 @@ class Lru {
   }
 }
 
-// A last size ending in .svg, .png or .jpg picks the file type
+// A last size ending in .svg, .png, .jpg or .webp picks the file type
 export function splitExt(s: string): [string, Ext | undefined] {
-  const m = /^(.*)\.(svg|png|jpg)$/.exec(s);
+  const m = /^(.*)\.(svg|png|jpg|webp)$/.exec(s);
   return m ? [m[1], m[2] as Ext] : [s, undefined];
 }
-type Ext = "svg" | "png" | "jpg";
+type Ext = "svg" | "png" | "jpg" | "webp";
 
 export function parseSize(s: string): number | null {
   if (!/^\d{1,4}$/.test(s)) return null;
@@ -188,14 +188,18 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       return;
     }
 
-    // Drawn images are SVG unless .png is asked for; photos are JPEGs
+    // Drawn images are SVG unless .png is asked for; photos are JPEGs unless
+    // .webp is asked for
     const drawn = o.solid || o.scotty || o.profile;
-    if (drawn && ext === "jpg") {
+    if (drawn && (ext === "jpg" || ext === "webp")) {
       res.status(400).type("text/plain").send("Scotty and solid colors come as .svg or .png.\n");
       return;
     }
     if (!drawn && (ext === "svg" || ext === "png")) {
-      res.status(400).type("text/plain").send("Photos come as JPEGs: use .jpg or no extension.\n");
+      res
+        .status(400)
+        .type("text/plain")
+        .send("Photos come as JPEG or WebP: use .jpg, .webp or no extension.\n");
       return;
     }
     const png = ext === "png";
@@ -219,17 +223,21 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       res.status(503).type("text/plain").send("Photos are still loading. Try again shortly.\n");
       return;
     }
-    const key = o.random ? null : `photo ${w}x${h} ${o.category ?? "all"}${o.gray ? " gray" : ""}`;
+    const webp = ext === "webp",
+      type = webp ? "webp" : "jpeg";
+    const key = o.random
+      ? null
+      : `photo ${w}x${h} ${o.category ?? "all"}${o.gray ? " gray" : ""}${webp ? " webp" : ""}`;
     void send(res, key, async () => {
       let p = catalog.pick(w, h, o.random, o.category)!;
       try {
-        return { type: "jpeg", body: await renderPhoto(p, w, h, o.gray, get), photo: p.filename };
+        return { type, body: await renderPhoto(p, w, h, o.gray, get, webp), photo: p.filename };
       } catch (e) {
         if (!(e instanceof StaleLinkError)) throw e;
         // Preview links expired early; re-list and try once more
         await catalog.refresh();
         p = catalog.pick(w, h, o.random, o.category)!;
-        return { type: "jpeg", body: await renderPhoto(p, w, h, o.gray, get), photo: p.filename };
+        return { type, body: await renderPhoto(p, w, h, o.gray, get, webp), photo: p.filename };
       }
     });
   };
