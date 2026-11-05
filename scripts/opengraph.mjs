@@ -13,7 +13,7 @@ const IMAGE = {
   src: "images/preview.jpg",
   width: 1200,
   height: 630,
-  alt: "PlaceMellon's home page: From Here, Any Dimension Is Possible, beside a Scotty placeholder.",
+  alt: "PlaceMellon's home page: From Here, Any Dimension Is Possible, beside a photo of Dr. Bunsen Honeydew.",
 };
 const START = "<!-- Link previews: written by scripts/opengraph.mjs -->";
 const END = "<!-- End of link previews -->";
