@@ -10,7 +10,7 @@ import * as prettier from "prettier";
 const BASE = "https://placemellon.andrew.cmu.edu/";
 const SITE = "PlaceMellon";
 const IMAGE = {
-  src: "images/og.jpg",
+  src: "images/preview.jpg",
   width: 1200,
   height: 630,
   alt: "PlaceMellon's home page: From Here, Any Dimension Is Possible, beside a Scotty placeholder.",
