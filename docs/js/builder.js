@@ -14,7 +14,7 @@
     scottyOptions = $("pm-scotty-options"),
     white = $("pm-white"),
     text = $("pm-text"),
-    png = $("pm-png"),
+    format = $("pm-format"),
     url = $("pm-url"),
     html = $("pm-html"),
     preview = $("pm-preview"),
@@ -51,7 +51,13 @@
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty";
     gray.disabled = k === "solid";
-    png.disabled = photo;
+    // Photos come only as JPEGs; drawn images as SVG or PNG
+    format.disabled = photo;
+    format.querySelector('[value="jpg"]').hidden = !photo;
+    format.querySelector('[value="svg"]').hidden = photo;
+    format.querySelector('[value="png"]').hidden = photo;
+    if (photo) format.value = "jpg";
+    else if (format.value === "jpg") format.value = "svg";
     height.disabled = k === "profile";
     var w = size(width),
       h = k === "profile" ? "" : size(height);
@@ -64,9 +70,9 @@
     }
     sizeHint.textContent = HINT;
 
-    // Drawn images are SVG unless .png is asked for; photos are JPEGs
+    // Drawn images are SVG unless PNG is chosen; photos are JPEGs
     var path =
-      "/" + w + (h === "" || h === w ? "" : "/" + h) + (!photo && png.checked ? ".png" : "");
+      "/" + w + (h === "" || h === w ? "" : "/" + h) + (format.value === "png" ? ".png" : "");
     var q = [];
     if (photo && category.value) q.push("category=" + category.value);
     if (photo && random.checked) q.push("random");
