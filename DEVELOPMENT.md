@@ -220,7 +220,7 @@ traced from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.p
 `?scotty&white` swaps the gradient for plain white.
 Solid color placeholders (`?solid`) are Steel Gray SVGs, or PNGs with `.png`;
 `?solid&text` adds dimensions centered near the top, using Open Sans like
-the Web Kit's placeholders. The container installs the font for PNGs; an SVG
+the Web Kilt's placeholders. The container installs the font for PNGs; an SVG
 uses the viewer's fonts and falls back to Arial.
 Neither needs the photo catalog.
 
