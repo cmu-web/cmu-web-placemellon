@@ -120,9 +120,9 @@
             </div>
             <h2 class="rule-top" id="how">How It Works</h2>
             <p
-              >PlaceMellon picks a photo shaped like your size: landscape for wide sizes, portrait
-              for tall ones and any photo for sizes close to square. It crops the photo to fit,
-              keeping the most interesting part, which isn't always the middle.</p
+              >PlaceMellon picks a photo with similar proportions: landscape for wide sizes,
+              portrait for tall ones and any photo for sizes close to square. It crops the photo to
+              fit and keeps the part with the most detail and color.</p
             >
             <ul class="cmu-checks">
               <li><strong>The same size always gets the same photo.</strong></li>
@@ -141,17 +141,17 @@
             <h2 class="rule-top" id="technical">Technical Details</h2>
             <p
               >PlaceMellon keeps a list of the CMU Selects photos and refreshes it every few hours.
-              It narrows the list to photos of the right shape, then picks one by rendezvous
-              hashing, scoring each photo by your size and its ID and taking the highest. So when
-              University Communications &amp; Marketing adds or removes photos, nearly every size
-              keeps the photo it had. With <code>?random</code>, it skips the scoring and picks any
-              photo of the right shape.</p
+              It narrows the list to photos with similar proportions, then picks one by rendezvous
+              hashing, scoring each photo by your size and its ID and taking the highest. That way,
+              when University Communications &amp; Marketing adds or removes photos, most sizes keep
+              the same photo. With <code>?random</code>, it skips the scoring and picks any photo
+              with similar proportions.</p
             >
             <p
               >To crop, it fetches the smallest preview that covers your size and keeps the part
-              with the most detail and color. It holds recently made images in memory for a short
-              while, and browsers may keep each one for a day, so repeat requests are fast. Random
-              photos are never held.</p
+              with the most detail and color. It caches recently generated images in memory, and
+              browsers may keep each one for a day, so repeat requests are fast. Random photos are
+              never held.</p
             >
             <p>PlaceMellon is a small TypeScript app built with Express and sharp.</p>
           </div></div
