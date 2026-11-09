@@ -1,6 +1,6 @@
 {
   "name": "cmu-web-placemellon",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "private": true,
   "description": "Placeholder images for Carnegie Mellon websites and apps",
   "scripts": {
