@@ -11,6 +11,8 @@ const svgInner = (file: string) =>
 const avatar = svgInner("scotty-avatar.svg"); // 320 x 320
 const bust = svgInner("scotty-bust.svg"); // viewBox 30 40 268 260
 const BUST = { x: 30, y: 40, w: 268, h: 260 };
+const wordmark = svgInner("cmu-wordmark-stacked.svg"); // viewBox 0 0 95.97 61.16
+const WORDMARK = { w: 95.973335, h: 61.16 };
 
 export class StaleLinkError extends Error {}
 
@@ -80,6 +82,23 @@ export function solidSvg(w: number, h: number, text: boolean): string {
       ? `<text x="${w / 2}" y="${baseline}" fill="#e0e0e0" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
       : "") +
     "</svg>"
+  );
+}
+
+// A bio placeholder as on CMU's own staff pages: the stacked wordmark in dark
+// gray on gray, three-quarters of the width, a little above center (at 41% of
+// the height, as on the 600 x 750 original). In a wide image it's centered
+// and fits the height too.
+export function bioSvg(w: number, h: number): string {
+  const ww = 0.73 * Math.min(w, (h * 0.8 * WORDMARK.w) / WORDMARK.h / 1.25);
+  const s = ww / WORDMARK.w;
+  const cy = h > w ? 0.41 * h : 0.5 * h;
+  const x = (w - ww) / 2;
+  const y = cy - (WORDMARK.h * s) / 2;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect width="${w}" height="${h}" fill="#a6a6a6"/>` +
+    `<g transform="translate(${x} ${y}) scale(${s})" fill="#6d6e72">${wordmark}</g></svg>`
   );
 }
 

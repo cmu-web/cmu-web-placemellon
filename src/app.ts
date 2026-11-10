@@ -3,6 +3,7 @@ import path from "path";
 import { Catalog } from "./catalog";
 import {
   avatarSvg,
+  bioSvg,
   solidSvg,
   MAX,
   renderPhoto,
@@ -18,6 +19,7 @@ const OPTIONS = [
   "random",
   "scotty",
   "profile",
+  "bio",
   "solid",
   "text",
   "white",
@@ -30,6 +32,7 @@ export interface Options {
   random: boolean;
   scotty: boolean;
   profile: boolean;
+  bio: boolean;
   solid: boolean;
   text: boolean;
   white: boolean;
@@ -71,17 +74,18 @@ export function parseOptions(
     random: "random" in query,
     scotty: "scotty" in query,
     profile: "profile" in query,
+    bio: "bio" in query,
     solid: "solid" in query,
     text: "text" in query,
     white: "white" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
-  if ([o.scotty, o.profile, o.solid].filter(Boolean).length > 1)
-    throw new OptionError(400, "Pick one of ?scotty, ?profile or ?solid.");
-  if ((o.scotty || o.profile || o.solid) && (o.category || o.random))
+  if ([o.scotty, o.profile, o.bio, o.solid].filter(Boolean).length > 1)
+    throw new OptionError(400, "Pick one of ?scotty, ?profile, ?bio or ?solid.");
+  if ((o.scotty || o.profile || o.bio || o.solid) && (o.category || o.random))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty, ?profile or ?solid.",
+      "?category and ?random choose photos, so they don't go with ?scotty, ?profile, ?bio or ?solid.",
     );
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
   if (o.white && !o.scotty) throw new OptionError(400, "Use ?white with ?scotty.");
@@ -190,9 +194,12 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
 
     // Drawn images are SVG unless .png is asked for; photos are JPEGs unless
     // .webp is asked for
-    const drawn = o.solid || o.scotty || o.profile;
+    const drawn = o.solid || o.scotty || o.profile || o.bio;
     if (drawn && (ext === "jpg" || ext === "webp")) {
-      res.status(400).type("text/plain").send("Scotty and solid colors come as .svg or .png.\n");
+      res
+        .status(400)
+        .type("text/plain")
+        .send("Scotty, bio placeholders and solid colors come as .svg or .png.\n");
       return;
     }
     if (!drawn && (ext === "svg" || ext === "png")) {
@@ -209,6 +216,12 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     if (o.solid) {
       const key = `solid ${w}x${h}${o.text ? " text" : ""}${png ? " png" : ""}`;
       void send(res, key, () => draw(solidSvg(w, h, o.text), false));
+      return;
+    }
+
+    if (o.bio) {
+      const key = `bio ${w}x${h}${png ? " png" : ""}`;
+      void send(res, key, () => draw(bioSvg(w, h), false));
       return;
     }
 

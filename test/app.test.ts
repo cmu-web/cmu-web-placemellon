@@ -229,6 +229,8 @@ describe("routes", () => {
       ["/48/48?profile&grayscale", 48, 48, /svg/],
       ["/320/180.png?scotty", 320, 180, /png/],
       ["/g/64.png?profile", 64, 64, /png/],
+      ["/600/750?bio", 600, 750, /svg/],
+      ["/800/300.png?bio", 800, 300, /png/],
     ] as const) {
       const res = await request(app)
         .get(path)
@@ -426,6 +428,9 @@ describe("routes", () => {
       ["/90/60?profile&white", 400, "Use ?white with ?scotty"],
       ["/90/60?scotty&category=labs", 400, "choose photos"],
       ["/90?profile&random", 400, "choose photos"],
+      ["/90/60?bio&scotty", 400, "Pick one"],
+      ["/90/60?bio&category=labs", 400, "choose photos"],
+      ["/90/60.jpg?bio", 400, "come as .svg or .png"],
     ];
     for (const [path, status, text] of cases) {
       const res = await request(app).get(path).expect(status);
