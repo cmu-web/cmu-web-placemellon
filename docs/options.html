@@ -38,7 +38,7 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.2.0/css/cmu-cms.css"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.3.0/css/cmu-cms.css"
       rel="stylesheet"
       type="text/css"
     />
@@ -70,8 +70,8 @@
             <h1>Customize Your Placeholder</h1>
             <p class="cmu-lead"
               >By default, each size always gets the same photo. Options can limit photos to one
-              category, give a random photo or make it grayscale, or use Scotty or a solid color
-              instead of a photo.</p
+              category, give a random photo or make it grayscale, or use Scotty, CMU's bio
+              placeholder or a solid color instead of a photo.</p
             >
             <table class="alternate cmu-full">
               <thead
@@ -161,6 +161,21 @@
                   /></td>
                 </tr>
                 <tr>
+                  <td class="cmu-fit"><code>?bio</code></td>
+                  <td
+                    >CMU's bio placeholder: the stacked wordmark in gray, as on CMU's own staff
+                    pages, for a person page without a photo yet. <code>/600/750?bio</code> matches
+                    the original.</td
+                  >
+                  <td class="cmu-fit aligncenter"
+                    ><img
+                      src="https://placemellon.andrew.cmu.edu/80/100?bio"
+                      alt="A gray placeholder with the Carnegie Mellon wordmark."
+                      width="80"
+                      height="100"
+                  /></td>
+                </tr>
+                <tr>
                   <td class="cmu-fit"><code>?solid</code></td>
                   <td>A solid color placeholder instead of a photo. The default is Steel Gray.</td>
                   <td class="cmu-fit aligncenter"
@@ -187,17 +202,17 @@
             <p
               >Add options after a <code>?</code>, joined with <code>&amp;</code>, in any order:
               <code>/400/300?category=labs&amp;gray</code>. Category and random options apply only
-              to photos. Leave them out when using Scotty, a profile picture or a solid color
-              placeholder. Use <code>?white</code> only with <code>?scotty</code> and
+              to photos. Leave them out when using Scotty, a profile picture, the bio placeholder or
+              a solid color placeholder. Use <code>?white</code> only with <code>?scotty</code> and
               <code>?text</code> only with <code>?solid</code>. If an option is misspelled or
               doesn't exist, the error message lists the valid ones.</p
             >
             <h2 id="file-types">File Types</h2>
             <p
               >Photos are JPEGs; add <code>.webp</code> after the size for a smaller WebP file:
-              <code>/400/300.webp?category=campus</code>. Scotty, profile pictures and solid colors
-              are SVG, so they stay sharp at any size. For a PNG instead, such as for email or a
-              document that doesn't take SVG, add <code>.png</code> after the size:
+              <code>/400/300.webp?category=campus</code>. Scotty, profile pictures, bio placeholders
+              and solid colors are SVG, so they stay sharp at any size. For a PNG instead, such as
+              for email or a document that doesn't take SVG, add <code>.png</code> after the size:
               <code>/400/300.png?solid&amp;text</code>. A <code>.jpg</code> on a photo or
               <code>.svg</code> on the others also works.</p
             >
@@ -284,6 +299,7 @@
             <ul>
               <li><a href="builder.html">Builder</a></li>
               <li class="active"><a href="options.html">Options</a></li>
+              <li><a href="assets.html">Assets</a></li>
               <li><a href="about.html">About</a></li>
             </ul>
           </nav>

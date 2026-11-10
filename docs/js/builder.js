@@ -24,6 +24,25 @@
     sizeHint = $("pm-size-hint");
   var HINT = sizeHint.textContent,
     tries = 0;
+  // The bio placeholder starts at UCM's own size, 600 x 750, unless the size
+  // has been typed in; back on another kind, the starting size returns
+  var START = { w: width.value, h: height.value },
+    BIO = { w: "600", h: "750" },
+    sizeTyped = false,
+    lastKind = null;
+  [width, height].forEach(function (input) {
+    input.addEventListener("input", function () {
+      sizeTyped = true;
+    });
+  });
+  function sizeFor(k) {
+    if (sizeTyped || k === lastKind) return;
+    var to = k === "bio" ? BIO : lastKind === "bio" ? START : null;
+    if (to) {
+      width.value = to.w;
+      height.value = to.h;
+    }
+  }
 
   function kind() {
     return document.querySelector('input[name="pm-kind"]:checked').value;
@@ -36,6 +55,7 @@
   function alt(k, c) {
     if (k === "solid") return "Solid color placeholder";
     if (k === "profile") return "Placeholder profile picture of Scotty";
+    if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
     if (k === "scotty") return "Placeholder image of Scotty";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
@@ -45,12 +65,15 @@
   function update() {
     var k = kind(),
       photo = k === "photo";
+    sizeFor(k);
+    lastKind = k;
     // Category and random choose photos; profile pictures are square
     // The photo choices show only under "A CMU Photo"
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty";
-    gray.disabled = k === "solid";
+    // Solid colors and the bio placeholder are gray already
+    gray.disabled = k === "solid" || k === "bio";
     // Photos come as JPEG or WebP; drawn images as SVG or PNG
     var types = photo ? ["jpg", "webp"] : ["svg", "png"];
     Array.prototype.forEach.call(format.options, function (o) {
@@ -81,7 +104,7 @@
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
     if (k === "scotty" && white.checked) q.push("white");
-    if (k !== "solid" && gray.checked) q.push("gray");
+    if (k !== "solid" && k !== "bio" && gray.checked) q.push("gray");
     var qs = q.length ? "?" + q.join("&") : "";
 
     url.textContent = PM_LIVE + path + qs;
