@@ -18,7 +18,7 @@
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="PlaceMellon's home page: From Here, Any Dimension Is Possible, beside a photo of Dr. Bunsen Honeydew."
+      content="PlaceMellon's home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <!-- End of link previews -->
@@ -38,7 +38,16 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.3.1/css/cmu-cms.css"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-cms.css"
+      integrity="sha384-jLB4PsCj8eJZzLvX09Rp//BaeUnjZFFNVOS3iVyZhktnIw9EkiZPVseQWE+Yjz/q"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-app.css"
+      integrity="sha384-Jt4iIjchoqX/sKhhQp2b6Afg8uzXHR9eFVQEgTYnffI+pgwCUQAe48nmkKCRUdhI"
+      crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
@@ -60,7 +69,7 @@
         </div>
         <div id="sitename">
           <span class="sitetitle"><a href="./">PlaceMellon</a></span>
-          <h2>Placeholder images of Carnegie Mellon</h2>
+          <h2>My Art Is in the Work</h2>
         </div>
       </header>
       <main id="content">
@@ -68,7 +77,7 @@
           ><div>
             <div class="cmu-hero">
               <div>
-                <h1>From Here, Any Dimension Is Possible</h1>
+                <h1>Placeholder Images, Fresh From the Mellon Patch</h1>
                 <p class="cmu-lead"
                   >Put a PlaceMellon address in an image tag and get a CMU photo cropped to exactly
                   that size. Use it for mockups, prototypes and pages that don't have their real
@@ -130,6 +139,19 @@
             <p><a class="cta" href="builder.html">Build Your Placeholder</a></p>
           </div></div
         >
+        <div class="content wide"
+          ><div>
+            <!-- prettier-ignore -->
+            <div class="cmu-agent">
+              <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
+              <p>Copy the prompt into an AI coding agent in your editor or terminal, and it sets up PlaceMellon for your project. <button type="button" class="cmu-copy" data-cmu-copy="#pm-agent-prompt" aria-label="Copy the Prompt" title="Copy the Prompt"></button></p>
+              <details class="cmu-more">
+                <summary><span class="cmu-more-closed">Want to read it first?</span> <span class="cmu-more-link"><span class="cmu-more-closed">See the Prompt</span><span class="cmu-more-open">Hide the Prompt</span></span></summary>
+                <pre class="cmu-snippet"><code id="pm-agent-prompt">Use PlaceMellon for placeholder images in this project. Read https://placemellon.andrew.cmu.edu/options.html and https://placemellon.andrew.cmu.edu/assets.html first. Use image addresses at the size the layout uses, such as https://placemellon.andrew.cmu.edu/400/300. Choose campus photos, Scotty, profile pictures, bio placeholders or solid placeholders to suit the page. Keep images stable unless random photos are requested, and write useful alt text. Use photos for mockups and prototypes; for a finished page, choose and credit a photo from the source collection. The supplied artwork and placeholders can be used on live sites.</code></pre>
+              </details>
+            </div>
+          </div></div
+        >
       </main>
       <footer class="grid column3 invert">
         <div>
@@ -161,6 +183,11 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/js/cmu-app.js"
+      integrity="sha384-Etmkex3xbkUyRJUcASnyzfeR4g6yNwaWbaK+Z3sJvOxk76pCKgcYHAtNZppbmH8Z"
+      crossorigin="anonymous"
+    ></script>
     <script src="js/docs.js"></script>
   </body>
 </html>

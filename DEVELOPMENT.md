@@ -48,6 +48,14 @@ or devcontainer configuration, select **Dev Containers: Rebuild Container**.
 | The runtime image or development environment      | `Dockerfile` and `.devcontainer/`   |
 | Tooling checks or link preview generation         | `scripts/`                          |
 
+## Maintain the CMU Web Preview
+
+`docs/images/cmu-web-preview.webp` is this site's screenshot for cards and
+gallery entries on the other CMU Web sites. Keep it at 1040 by 656 pixels,
+without a decorative browser frame, and publish updates at the same path.
+Consumers use the public URL directly. The Open Graph image,
+`images/preview.jpg`, is maintained separately.
+
 ## Checks
 
 ```bash

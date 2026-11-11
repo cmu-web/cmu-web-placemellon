@@ -1,6 +1,8 @@
 # PlaceMellon
 
-**From Here, Any Dimension Is Possible**
+**My Art Is in the Work**
+
+Placeholder Images, Fresh From the Mellon Patch
 
 Building a CMU website or app? PlaceMellon gives you placeholder images at
 whatever size your layout calls for, from campus photos to Scotty profile
@@ -10,7 +12,7 @@ pictures and plain gray boxes.
 [Build a Placeholder](https://placemellon.andrew.cmu.edu/builder.html) ·
 [Explore the Options](https://placemellon.andrew.cmu.edu/options.html)
 
-[![The PlaceMellon home page: From Here, Any Dimension Is Possible, beside a photo of Dr. Bunsen Honeydew.](docs/images/preview.jpg)](https://placemellon.andrew.cmu.edu/)
+[![The PlaceMellon home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew.](docs/images/preview.jpg)](https://placemellon.andrew.cmu.edu/)
 
 Put a width and height in the URL, such as
 `https://placemellon.andrew.cmu.edu/400/300`, and use it wherever you need
