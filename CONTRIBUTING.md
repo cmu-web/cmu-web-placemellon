@@ -36,4 +36,5 @@ One-line code comments are fragments without a period.
 Follow the Web Kilt's [writing conventions](https://webkilt.andrew.cmu.edu/conventions.html)
 for documentation and examples: AP style, Title Case for headings, buttons
 and labels, and action verbs at the start of buttons and calls to action.
-Use made-up content, gray placeholders or Scotty in examples.
+Use made-up content, gray placeholders or Scotty in examples, and Andrew
+Carnegie (ac00) for a person.

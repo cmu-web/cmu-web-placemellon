@@ -2,8 +2,8 @@
 
 PlaceMellon is a TypeScript service built with Express and sharp. It keeps
 its photo catalog and rendered image cache in memory, with no database or
-API keys. Live photos need access to CMU Selects and its image CDN. Tests
-use a fake photo source.
+API keys. Live photos come from CMU Selects and its image CDN. Tests use a
+fake photo source.
 
 ## Set Up the Devcontainer
 

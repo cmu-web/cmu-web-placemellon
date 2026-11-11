@@ -19,13 +19,16 @@ The builder lets you preview the result and copy its URL or HTML.
 
 Inspired by [PlaceCats](https://www.placecats.com/) and
 [PlaceBear](https://placebear.com/), with photos from CMU Selects.
-Use it for CMU mockups and prototypes; for a finished page, choose and
-credit a photo from the source collection.
+Use the photos for CMU mockups and prototypes; for a finished page, choose
+and credit a photo from the source collection. The
+[images and icons](https://placemellon.andrew.cmu.edu/assets.html), such as
+the sample ID card, bio placeholder and default profile picture, are fine
+on live sites.
 
 ## Start With What You're Building
 
 - **A page layout:** [Find a photo that fits](https://placemellon.andrew.cmu.edu/builder.html).
-- **A people page:** [Explore Scotty and bio placeholders](https://placemellon.andrew.cmu.edu/options.html).
+- **A people page:** [Use the bio placeholder and default profile picture](https://placemellon.andrew.cmu.edu/assets.html).
 - **A wireframe:** [Try solid placeholders with dimensions](https://placemellon.andrew.cmu.edu/options.html).
 
 The docs cover image formats, sizes and options, plus
