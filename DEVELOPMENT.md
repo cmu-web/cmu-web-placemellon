@@ -1,66 +1,83 @@
 # Development
 
-PlaceMellon is a TypeScript service built with Express and sharp. It has no
-database and needs no API keys. Photo requests need access to CMU Selects
-and its image CDN; the tests use a fake photo source and do not need either.
+PlaceMellon is a TypeScript service built with Express and sharp. It keeps
+its photo catalog and rendered image cache in memory, with no database or
+API keys. Live photos need access to CMU Selects and its image CDN. Tests
+use a fake photo source.
 
-## Development environment
+## Set Up the Devcontainer
 
-Develop in the devcontainer. Use Docker and install the VS Code Dev
-Containers extension. Open the
-repository in VS Code. From the VS Code Command Palette, select
-**Dev Containers: Reopen in Container**.
+Use Docker and the VS Code Dev Containers extension. Open the repository
+in VS Code and select **Dev Containers: Reopen in Container** from the
+Command Palette.
 
-The devcontainer builds the Dockerfile's `development` stage, so it has the
-same Node and npm as the production image; the Dockerfile's `FROM` line is
-the project's only Node version. It installs dependencies with `npm ci` and
-runs as the `node` user. Git and curl are
-included. The checkout is mounted at `/app`, and dependencies live in a
-separate named volume so host and container installations stay separate.
+The devcontainer uses the Dockerfile's `development` stage, with the same
+Node and npm as production. The Dockerfile is the source of truth for the
+Node version. Dependencies are installed with `npm ci` in a separate volume;
+the checkout is mounted at `/app`, and commands run as the `node` user.
 
-Enable the [pre-commit hooks](#pre-commit-hooks) and start the server in
-the container terminal:
+In the container terminal:
 
 ```bash
 npx prek install
 npm run dev
 ```
 
-The development command watches `src/` and restarts the server when
-TypeScript changes. The server also serves the documentation from
-`docs/`. Reload the browser after editing HTML,
-JavaScript or images there.
+Open the forwarded address for port 3000 in VS Code's **Ports** panel.
+If that port is already in use on the host, VS Code may forward another
+local port. Opening the container does not start the server automatically.
 
-VS Code forwards container port 3000; open the local address from its
-**Ports** panel. If a host process already uses 3000, the forwarded port may
-be 3001 or another available port. Opening the container does not start
-the development server automatically.
+`npm run dev` watches `src/` and restarts the service when TypeScript
+changes. It also serves `docs/` at `/`; reload the browser after editing
+those HTML, JavaScript or image files. Photos return 503 until the catalog
+loads. Drawn placeholders and the documentation are available immediately.
 
-Run `npm ci` in the container after pulling dependency changes. After
-changing the Dockerfile or devcontainer configuration, use
-**Dev Containers: Rebuild Container** from the Command Palette while
-connected to the container.
+Run `npm ci` after pulling dependency changes. After changing the Dockerfile
+or devcontainer configuration, select **Dev Containers: Rebuild Container**.
 
-The photo list loads in the background. Photo requests return 503 until it
-is ready; the documentation, Scotty images and solid color placeholders work while it loads.
+## Where to Make Changes
+
+| To Change                                         | Start Here                          |
+| ------------------------------------------------- | ----------------------------------- |
+| Image URLs, option validation or response caching | `src/app.ts`                        |
+| Photo discovery, catalog refreshes or selection   | `src/widen.ts` and `src/catalog.ts` |
+| Image rendering or placeholder artwork            | `src/render.ts` and `assets/`       |
+| Documentation and examples                        | HTML pages in `docs/`               |
+| The image builder or docs interactions            | `docs/js/`                          |
+| Service tests                                     | `test/`                             |
+| The runtime image or development environment      | `Dockerfile` and `.devcontainer/`   |
+| Tooling checks or link preview generation         | `scripts/`                          |
 
 ## Checks
 
-### Pre-commit hooks
+```bash
+npm run check
+```
 
-Prek is installed as an npm development dependency. After `npm ci`, enable
-the hooks once per checkout, from the environment where you make commits:
+This checks the Node types version, ESLint, Prettier, link preview metadata
+and TypeScript, then runs tests and compiles the service. CI runs the same
+command in the Dockerfile's `test` stage. To reproduce that from the host:
+
+```bash
+podman build --target test .
+```
+
+Tests cover URL options, sizing, rendering, selection, caching and expired
+preview links. They start local HTTP servers and require loopback ports.
+They do not contact CMU Selects.
+
+### Pre-commit Hooks
+
+Enable hooks once per checkout in the environment where you make commits:
 
 ```bash
 npx prek install
 ```
 
-The hooks in `.pre-commit-config.yaml` run ESLint, Prettier's formatting
-check and TypeScript type checking before a commit. When the Dockerfile or
-`package.json` changes, they also check that `@types/node` matches the
-Dockerfile's Node version. They use the project's
-npm commands and check the whole project. If a check fails, fix the reported
-problems and retry the commit.
+The hooks run linting, formatting and type checking. Relevant tooling
+changes also trigger the Node version check. They use the npm dependencies
+and Node installation available to Git; run them inside the devcontainer
+when committing there.
 
 To run all hooks manually:
 
@@ -68,168 +85,98 @@ To run all hooks manually:
 npx prek run --all-files
 ```
 
-Inside the devcontainer, run these commands in its terminal. Prek uses the
-Node installation and dependencies in the environment where Git runs.
+Hooks cover part of the full check. Run `npm run check` before submitting.
 
-### Full validation
-
-```bash
-npm run check
-```
-
-This runs the Node version check, ESLint, Prettier's check, type checking,
-the tests and the build. CI runs the same command by building the
-Dockerfile's `test` stage; to do that outside the devcontainer:
-
-```bash
-podman build --target test .
-```
-
-Tests cover URL options, sizing, image rendering, photo selection, caching
-and expired preview links. They start local HTTP servers, so the environment
-must allow binding to loopback ports.
-
-### Linting and formatting
-
-ESLint uses the recommended JavaScript and TypeScript rules in
-`eslint.config.mjs`. It checks the service, tests, browser scripts and its
-own configuration. Generated output is excluded.
-
-Prettier uses `.prettierrc.json` for TypeScript, JavaScript, HTML, Markdown
-and JSON. `.prettierignore` excludes generated output, the npm lockfile
-and image assets. The devcontainer includes the ESLint and Prettier VS Code
-extensions, selects Prettier as the formatter for these file types and
-formats them on save.
-
-To apply automatic fixes and formatting:
+### Linting and Formatting
 
 ```bash
 npm run lint:fix
 npm run format
 ```
 
-Review the resulting diff. ESLint reports problems it cannot fix
-automatically; `npm run format:check` checks formatting without changing files.
+Review the diff after applying fixes. `npm run lint` and
+`npm run format:check` check without changing files. The devcontainer
+includes ESLint and Prettier extensions and formats supported files on save.
 
-## Compile and run
+After changing documentation titles or descriptions, run
+`npm run opengraph` to refresh link preview metadata, then format the results.
+
+## Compile and Run
 
 ```bash
 npm run build
 npm start
 ```
 
-`npm run build` runs `tsc`. The settings in `tsconfig.json` compile
-`src/*.ts` into CommonJS JavaScript in `dist/`; `npm start` runs
-`dist/index.js`. Edit the TypeScript source rather than the generated files.
-The browser scripts in `docs/js/` are plain JavaScript and have no build step.
+The build compiles TypeScript from `src/` to CommonJS JavaScript in `dist/`.
+`npm start` runs `dist/index.js`. Browser scripts in `docs/js/` have no
+build step. Runtime settings are listed in
+[Deployment](DEPLOYMENT.md#configuration); the service does not load an
+`.env` file automatically.
 
-Environment variables and their defaults are listed in
-[Deployment configuration](DEPLOYMENT.md#configuration).
+## Update Node
 
-## Updating Node
-
-Dependabot proposes new Node release lines by updating the Dockerfile's
-`FROM` line. In that pull request, update `@types/node` to the same major
-version; `npm run check:node` fails until it matches. Node's odd-numbered
-releases never get long-term support; close their pull requests, or comment
-`@dependabot ignore this major version`.
+Dependabot proposes Node changes through the Dockerfile's `FROM` line.
+Update `@types/node` to the same major in that pull request; the
+`check:node` command enforces the match. Rebuild the devcontainer and run
+checks with the updated image. Keep the project on an even-numbered Node
+release line; close proposals for odd-numbered lines.
 
 ## Releasing
 
-A release publishes the production image to GitHub Container Registry; see
-[Images](DEPLOYMENT.md#images) for its tags.
+A release publishes a container image to GitHub Container Registry.
 
-1. Release from an up-to-date `main` whose latest CI run has passed:
-
-   ```bash
-   git switch main
-   git pull
-   ```
-
-2. Choose the version:
-   - **Major** when an existing URL or option stops working or behaves
-     differently.
-   - **Minor** for new options, features or runtime changes, such as a new
-     Node release line.
-   - **Patch** for fixes and dependency updates.
-
-3. Update the version in `package.json` and `package-lock.json`, commit it and
-   create the matching annotated tag, then push both. Use `major`, `minor` or
-   `patch`:
+1. Start from an up-to-date `main` with passing CI and a clean working tree.
+2. Choose a major version for incompatible URL or option changes, a minor
+   version for new features or runtime changes, or a patch for fixes and
+   dependency updates.
+3. Run `npm version major`, `npm version minor` or `npm version patch` with
+   a Conventional Commits release message. For example:
 
    ```bash
    npm version minor -m "chore: release %s"
-   git push --follow-tags
    ```
 
-   `npm version` needs a clean working tree. It replaces `%s` with the new
-   version, and it only changes your local checkout. Don't edit the version in
-   `package.json` by hand or create the tag yourself, or the file and the tag
-   can disagree. The push is what starts the release.
+   This updates `package.json` and `package-lock.json`, creates a local
+   commit and creates an annotated `v` tag. Review the commit and tag
+   before publishing.
 
-   To undo before pushing, delete the tag and the commit, using the new version:
+4. Push `main` and the specific new tag together. The version tag starts
+   the publishing workflow.
+5. Confirm the workflow passed, add release notes and update deployments
+   to the published image digest. See [Deployment](DEPLOYMENT.md#images).
 
-   ```bash
-   git tag -d v0.5.0
-   git reset --hard HEAD~1
-   ```
+Before pushing, correct any release preparation mistake locally and rerun
+the checks. After publication, leave the tag in place and fix mistakes in
+a new version.
 
-   After pushing, `v*` tags can't be moved or deleted, so fix a bad release with
-   a new version.
+## How the Service Works
 
-The workflow runs every check, then publishes the image and moves `latest`
-to it. Update deployments' image digests to roll it out.
+The catalog lists photos from CMU Selects' category portals. It refreshes
+every six hours by default and before signed preview links expire. These
+are Widen application endpoints, so upstream changes may require changes
+to `src/widen.ts`.
 
-## Project structure
-
-| Path                             | Purpose                                                           |
-| -------------------------------- | ----------------------------------------------------------------- |
-| `src/index.ts`                   | Starts the server and photo catalog                               |
-| `src/app.ts`                     | Routes, option validation, response caching and health endpoint   |
-| `src/widen.ts`                   | Lists photos and previews from the CMU Selects portals            |
-| `src/catalog.ts`                 | Refreshes the catalog and selects photos                          |
-| `src/render.ts`                  | Crops photos and renders Scotty and solid color images with sharp |
-| `assets/`                        | Scotty vector artwork used by the service                         |
-| `docs/`                          | User documentation, builder and browser assets                    |
-| `test/app.test.ts`               | Service tests                                                     |
-| `scripts/check-node-version.mjs` | Checks that `@types/node` matches the Dockerfile's Node version   |
-| `dist/`                          | Generated server JavaScript; ignored by Git                       |
-
-## How the service works
-
-The catalog lists photos from CMU Selects' category portals and keeps the
-list in memory. It refreshes every six hours by default, or sooner when
-signed preview links are about to expire. The portal endpoints are Widen's
-own application endpoints rather than a documented API; changes there may
-require updates to `src/widen.ts`.
-
-Photo selection first narrows the catalog by category and orientation.
-Wide sizes use landscape photos, tall sizes use portrait photos and
-near-square sizes use either. If no photo has the requested orientation,
-selection falls back to the category's full list.
-
-For a fixed size and category, rendezvous hashing scores each candidate by
-the requested size and photo ID. The highest score wins. This keeps the
-selection stable while limiting changes when photos are added or removed.
-Random requests skip the scoring.
+Selection narrows photos by category and orientation. Wide requests prefer
+landscape photos, tall requests prefer portrait photos and near-square
+requests use either. If the preferred orientation is unavailable, selection
+uses all photos in the category. Rendezvous hashing scores photos by size
+and photo ID to make selection stable as the catalog changes. Random
+requests skip scoring.
 
 Rendering fetches the smallest preview that covers the requested size.
-Sharp crops it using attention-based positioning and returns a JPEG.
-Scotty images are SVG, or PNGs rendered by sharp with `.png`. The artwork is
-traced from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.png).
-`?scotty&white` swaps the gradient for plain white.
-Solid color placeholders (`?solid`) are Steel Gray SVGs, or PNGs with `.png`;
-`?solid&text` adds dimensions centered near the top, using Open Sans like
-the Web Kilt's placeholders. The container installs the font for PNGs; an SVG
-uses the viewer's fonts and falls back to Arial.
-Neither needs the photo catalog.
+Sharp crops photos with attention-based positioning and produces JPEG or
+WebP. Scotty, profile pictures, bio placeholders and solid colors are
+rendered as SVG or PNG without the catalog. The Scotty artwork is traced
+from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.png).
+Dimension text in solid placeholders uses Open Sans, installed in the
+container for PNG rendering; SVGs use the viewer's fonts.
 
-Recent rendered images stay in an in-memory LRU cache, limited by
-`CACHE_ENTRIES`. Non-random responses allow browser and proxy caching for
-one day. Random requests bypass the rendered-image cache and return
-`Cache-Control: no-store`. The `X-Photo` response header identifies the
-source photo by filename.
+Rendered images stay in an in-memory LRU cache, limited by `CACHE_ENTRIES`.
+Non-random responses allow browser and proxy caching for one day. Random
+requests bypass the image cache and return `Cache-Control: no-store`.
+The `X-Photo` response header identifies the source photo by filename.
 
-An expired preview returning 403 or 404 triggers a catalog refresh and one
-retry. Refresh failures leave the existing catalog available, and the
-catalog schedules another refresh. Nothing is written to disk.
+A preview returning 403 or 404 triggers a catalog refresh and one retry.
+Refresh failures preserve the previous catalog and schedule another
+attempt. Nothing is written to disk.

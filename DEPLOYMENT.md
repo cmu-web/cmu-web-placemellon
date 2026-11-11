@@ -1,60 +1,37 @@
 # Deployment
 
-This guide covers PlaceMellon's container image: where it's published, how
-to run and configure it and how to check its health. The application needs
-outbound HTTPS access to CMU Selects and its image CDN. It has no database,
-API keys or persistent application data.
-
-The commands here use Podman. Most work unchanged with Docker.
+PlaceMellon runs as a container with no database or persistent application
+data. It uses outbound HTTPS to reach CMU Selects and its image CDN.
+The commands below use Podman; Docker can also build and run the image.
 
 ## Images
 
-GitHub Actions publishes the production image to
-`ghcr.io/cmu-web/cmu-web-placemellon` when a version tag (`v*`) is pushed, after
-linting, formatting, type checking, tests and a build pass. Pushes and pull
-requests run the same checks and build the image without publishing it. The
-workflow is `.github/workflows/publish.yml`; it can also be run by hand from
-the repository's **Actions** tab to build the current commit.
+The [publishing workflow](.github/workflows/publish.yml) runs all checks
+and builds the production image. It publishes to
+`ghcr.io/cmu-web/cmu-web-placemellon` for `v*` tags and manual workflow runs.
+Ordinary branch pushes and pull requests build without publishing.
 
-Releases are tagged from `main`; see
-[Releasing](DEVELOPMENT.md#releasing).
+| Image Tag      | Meaning                                   |
+| -------------- | ----------------------------------------- |
+| `latest`       | Most recently published version-tag build |
+| `X.Y.Z`        | Build of release tag `vX.Y.Z`             |
+| `sha-<commit>` | Build identified by its short commit hash |
 
-| Tag            | Points to                         |
-| -------------- | --------------------------------- |
-| `latest`       | The most recent release           |
-| `0.1.0`        | The build of version tag `v0.1.0` |
-| `sha-<commit>` | The build of one commit           |
+A manual run publishes the commit image without moving `latest`. The
+workflow builds for `linux/amd64`. To create a versioned release, follow
+[Development](DEVELOPMENT.md#releasing).
 
-Tags move, so pin deployments to an image digest and update it deliberately:
+For a deployment, pull the selected release and record its digest:
 
 ```bash
 podman pull ghcr.io/cmu-web/cmu-web-placemellon:latest
 podman image inspect --format '{{.Digest}}' ghcr.io/cmu-web/cmu-web-placemellon:latest
 ```
 
-Use the result as `ghcr.io/cmu-web/cmu-web-placemellon@sha256:...`.
+Use `ghcr.io/cmu-web/cmu-web-placemellon@sha256:...` to pin that exact
+image. Save the previous digest so you can redeploy it if needed.
 
-The image is built for `linux/amd64`.
-
-## Build the image yourself
-
-To build from a checkout instead, from the repository root:
-
-```bash
-podman build --format docker -t localhost/placemellon:latest .
-```
-
-The Dockerfile compiles TypeScript in a build stage. The production image
-contains the compiled server, production dependencies, Scotty assets and
-documentation. It runs as the non-root `node` user. The Node base image is
-pinned by digest, and npm is pinned to 12.2.1 in the shared base stage.
-Update these pins deliberately when updating the tooling.
-
-`--format docker` preserves the Dockerfile's `HEALTHCHECK`; Docker doesn't
-need it. If building an OCI image instead, configure the health check in the runtime
-or service definition; for a Quadlet, use `HealthCmd=`.
-
-## Run the container
+## Run the Container
 
 ```bash
 podman run -d --name placemellon \
@@ -62,76 +39,87 @@ podman run -d --name placemellon \
   ghcr.io/cmu-web/cmu-web-placemellon:latest
 ```
 
-For an image you built yourself, use its local name instead, such as
-`localhost/placemellon:latest`.
-The binding exposes the service only on the host's loopback interface.
-A reverse proxy on that host can forward public requests to it. To use a
-different host port, change the first port number, for example
-`-p 127.0.0.1:3001:3000`.
+For a deployment, replace `:latest` with the recorded digest. The port
+binding exposes the service on the host's loopback interface; a reverse
+proxy can forward public requests to it. Change the first port number to
+use a different host port.
 
-`/` serves the documentation bundled in the image, alongside the image URLs
-and `/healthz`. The GitHub Pages copy of the documentation is for testing:
-it updates on every push to `main`, before a release is deployed.
-
-Restarting the container clears the image cache and
-reloads the catalog from CMU Selects. Startup does not wait for that reload;
-photo requests return 503 until the catalog is ready, while the
-documentation (when served locally) and Scotty images remain available.
+The container serves documentation at `/`, image URLs such as `/400/300`
+and catalog health at `/healthz`. Startup loads the catalog in the
+background. Photo requests return 503 until it is ready; documentation and
+drawn placeholders remain available. Restarting clears the catalog and
+rendered image cache.
 
 ## Configuration
 
-Pass environment variables with `-e NAME=value` or `--env-file PATH`.
-[`.env.example`](.env.example) lists them with their defaults; copy it to
-start an env file. These are all of the application's configuration
-variables:
+Pass settings with `-e NAME=value` or `--env-file PATH`.
+[`.env.example`](.env.example) is a starting point for an env file.
 
-| Variable        | Default | Purpose                                                                                |
-| --------------- | ------- | -------------------------------------------------------------------------------------- |
-| `PORT`          | `3000`  | Port the application listens on inside the container                                   |
-| `REFRESH_HOURS` | `6`     | Interval between catalog refreshes; preview-link expiry can trigger an earlier refresh |
-| `CACHE_ENTRIES` | `256`   | Maximum number of rendered images cached in memory; `0` disables storage in this cache |
+| Variable        | Default | Purpose                                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------------------- |
+| `PORT`          | `3000`  | Listening port inside the container                                                   |
+| `REFRESH_HOURS` | `6`     | Hours between catalog refreshes; expiring preview links can trigger earlier refreshes |
+| `CACHE_ENTRIES` | `256`   | Maximum rendered images in memory; `0` disables this cache                            |
 
-The production image also sets `NODE_ENV=production` for Express.
-Use a valid TCP port and a positive number of refresh hours. If changing
-`PORT`, update the container-side port in the published-port mapping too.
+Use a valid TCP port, a positive refresh interval and a nonnegative whole
+number of cache entries. If changing `PORT`, update the container-side port
+in the mapping too. The image sets `NODE_ENV=production` for Express.
 
-## Health checks
+## Check the Service
 
 ```bash
 curl --fail --show-error http://127.0.0.1:3000/healthz
+curl --fail --show-error http://127.0.0.1:3000/400/300 -o /tmp/placemellon-check.jpg
 ```
 
-The response includes the photo count, counts by category and the last
-successful refresh time. Status is 200 when the catalog contains photos
-and 503 when it is empty. This measures catalog availability; it does not
-fetch a photo or verify that every category has photos.
+`/healthz` returns photo counts, counts by category and the last successful
+refresh time. It returns 200 for a nonempty catalog and 503 for an empty
+one. It does not fetch a photo or guarantee that every category is ready,
+so check an actual image response too.
 
-The image's health check uses Node to request `/healthz` every 30 seconds,
-with a five-second timeout and a 60-second startup grace period. It reads
-`PORT`, so it follows changes to the application's listening port.
-
-Run the check manually:
+The Dockerfile's health check requests `/healthz` every 30 seconds, with
+a five-second timeout and a 60-second startup grace period. It follows
+`PORT`. Where the runtime supports that health check, run it manually with:
 
 ```bash
 podman healthcheck run placemellon
 ```
 
-A nonempty catalog can still contain expired preview links if CMU Selects
-is unavailable. When investigating photo failures, check the refresh time,
-logs and an actual image response as well as `/healthz`.
+For OCI images that omit the Dockerfile health check, configure an
+equivalent in the container runtime or service definition.
 
-## Logs and shutdown
+### Investigate Failures
 
 ```bash
 podman logs --tail 100 placemellon
 podman logs --follow placemellon
+```
+
+The application logs catalog refreshes and rendering errors to standard
+output and standard error. A catalog can be nonempty while its signed
+preview links have expired. For photo failures, check the refresh time,
+logs and image response together.
+
+To stop the service:
+
+```bash
 podman stop placemellon
 ```
 
-The application logs catalog refresh results and image-rendering errors to
-standard output and standard error, which the container runtime captures.
+## Build From Source
 
-Under a Quadlet unit, the output goes to the journal. The unit is named
-after its `.container` file; for `placemellon.container`, a rootless unit's
-logs are at `journalctl --user -u placemellon`, run as the user that owns
-the unit. For a system-wide unit, leave out `--user`.
+From the repository root:
+
+```bash
+podman build --target test .
+podman build --format docker -t localhost/placemellon:latest .
+```
+
+Use `localhost/placemellon:latest` in the run command. `--format docker`
+preserves the Dockerfile's `HEALTHCHECK` when building with Podman; omit
+that flag with Docker.
+
+The production image contains compiled TypeScript, production dependencies,
+vector artwork and documentation. It runs as the non-root `node` user.
+The Dockerfile pins the Node base image by digest and pins npm in the
+shared base stage.

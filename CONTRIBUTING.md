@@ -1,43 +1,39 @@
 # Contributing
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for setup, commands and technical
-details.
+For setup and checks, see [Development](DEVELOPMENT.md). For image URLs and
+options, see the [user documentation](https://placemellon.andrew.cmu.edu/).
 
-## Issues
+## Report a Problem
 
-For a bug report, include the URL or options you used, what happened and
-what you expected. Include the browser or runtime version when relevant.
-Check existing issues before opening a new one.
+Check existing issues first. Include the image URL or options you used,
+what happened and what you expected. Include the browser or runtime
+version if it affects the result.
 
-For a proposed feature, describe the use case. Discuss larger changes in
-an issue before starting the implementation.
+For a feature request, describe the page or workflow it would help.
+Discuss larger changes in an issue before starting implementation.
 
-## Pull requests
+## Submit a Pull Request
 
-Branch from `main` and open pull requests against `main`. Keep each pull
-request focused on one concern, and explain the problem and the resulting
-behavior. Include relevant validation results.
+Branch from `main` and open the pull request against `main`. Keep it
+focused on one concern. Explain the problem, the resulting behavior and
+how you checked the change.
 
-Run the [development checks](DEVELOPMENT.md#checks) before submitting.
-Enable the [pre-commit hooks](DEVELOPMENT.md#pre-commit-hooks) in your checkout
-to run linting, formatting checks and type checking when you commit.
-Add or update tests when behavior changes, and update the user documentation
-when changing an option or its behavior.
+Run the [checks](DEVELOPMENT.md#checks) before submitting and enable the
+[pre-commit hooks](DEVELOPMENT.md#pre-commit-hooks). Add or update tests
+when behavior changes. Update the options reference and builder when
+changing a public image option.
 
-## Commit messages
+Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+for commit subjects.
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+## Code and Writing Style
 
-## Style
+Edit TypeScript in `src/`; `dist/` is generated and is not committed.
+Browser scripts live in `docs/js/`. ESLint and Prettier use the checked-in
+configuration; see [Linting and Formatting](DEVELOPMENT.md#linting-and-formatting).
+One-line code comments are fragments without a period.
 
-ESLint checks TypeScript and browser JavaScript. Prettier controls
-formatting; use the checked-in configuration. See the
-[linting and formatting instructions](DEVELOPMENT.md#linting-and-formatting).
-
-For documentation, follow the
-[GitHub Docs style guide](https://docs.github.com/en/contributing/style-guide-and-content-model/style-guide).
-For general grammar and punctuation, use the
-[Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/),
-which GitHub uses as its reference.
-
-Edit TypeScript in `src/`; generated files in `dist/` are not committed.
+Follow the Web Kilt's [writing conventions](https://webkilt.andrew.cmu.edu/conventions.html)
+for documentation and examples: AP style, Title Case for headings, buttons
+and labels, and action verbs at the start of buttons and calls to action.
+Use made-up content, gray placeholders or Scotty in examples.
