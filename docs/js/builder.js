@@ -1,5 +1,8 @@
 // Builder: builds a PlaceMellon address from the form, with the same rules as
-// the service (src/app.ts), and previews it from PM_BASE (docs.js).
+// the service (src/app.ts), and previews it from PM_BASE (docs.js). The page's
+// own address keeps the form's options in the image address's terms (width,
+// height, format, then the image's own options), so a builder link opens
+// with the same image.
 (function () {
   var $ = function (id) {
     return document.getElementById(id);
@@ -106,6 +109,10 @@
     if (k === "scotty" && white.checked) q.push("white");
     if (k !== "solid" && k !== "bio" && gray.checked) q.push("gray");
     var qs = q.length ? "?" + q.join("&") : "";
+    var state = ["width=" + w];
+    if (h !== "") state.push("height=" + h);
+    if (format.value !== types[0]) state.push("format=" + format.value);
+    history.replaceState(null, "", "?" + state.concat(q).join("&"));
 
     url.textContent = PM_LIVE + path + qs;
     html.textContent =
@@ -138,8 +145,33 @@
     e.preventDefault();
   });
   another.addEventListener("click", update);
-  // builder.html?category=labs starts on that category (from the Options page)
-  var start = new URLSearchParams(location.search).get("category");
-  if (start && category.querySelector('option[value="' + start + '"]')) category.value = start;
+  // Options from the address, where they name something the form has, such
+  // as builder.html?category=labs from the Options page
+  var start = new URLSearchParams(location.search);
+  [
+    ["width", width],
+    ["height", height],
+  ].forEach(function (pair) {
+    if (start.has(pair[0])) {
+      pair[1].value = start.get(pair[0]);
+      sizeTyped = true;
+    }
+  });
+  ["scotty", "profile", "bio", "solid"].forEach(function (k) {
+    var radio = document.querySelector('input[name="pm-kind"][value="' + k + '"]');
+    if (start.has(k) && radio) radio.checked = true;
+  });
+  [
+    ["random", random],
+    ["gray", gray],
+    ["white", white],
+    ["text", text],
+  ].forEach(function (pair) {
+    if (start.has(pair[0])) pair[1].checked = true;
+  });
+  var wanted = start.get("category");
+  if (wanted && category.querySelector('option[value="' + wanted + '"]')) category.value = wanted;
+  wanted = start.get("format");
+  if (wanted && format.querySelector('option[value="' + wanted + '"]')) format.value = wanted;
   update();
 })();
