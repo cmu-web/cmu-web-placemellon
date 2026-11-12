@@ -8,13 +8,14 @@ The commands below use Podman; Docker can also build and run the image.
 
 The [publishing workflow](.github/workflows/publish.yml) runs all checks
 and builds the production image. It publishes to
-`ghcr.io/cmu-web/cmu-web-placemellon` for `v*` tags and manual workflow runs.
-Ordinary branch pushes and pull requests build without publishing.
+`ghcr.io/cmu-web/cmu-web-placemellon` for version tags, such as `1.4.0`, and
+manual workflow runs. Ordinary branch pushes and pull requests build
+without publishing.
 
 | Image Tag      | Meaning                                   |
 | -------------- | ----------------------------------------- |
 | `latest`       | Most recently published version-tag build |
-| `X.Y.Z`        | Build of release tag `vX.Y.Z`             |
+| `X.Y.Z`        | Build of release tag `X.Y.Z`              |
 | `sha-<commit>` | Build identified by its short commit hash |
 
 A manual run publishes the commit image without moving `latest`. The
