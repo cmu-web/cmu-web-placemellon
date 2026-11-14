@@ -14,7 +14,7 @@ PlaceMellon release publishes it at the same version.
 Add it to your `Gemfile`, usually in the development group:
 
 ```ruby
-gem 'cmu-web-placemellon', '~> 1.3'
+gem 'cmu-web-placemellon', '~> 2.0'
 ```
 
 ## In Rails Views
