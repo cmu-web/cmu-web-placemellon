@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (Google Analytics): docs pages only, never on placeholder images -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MTRD2JHT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reference - PlaceMellon - Carnegie Mellon University</title>
+    <!-- Link previews: written by scripts/opengraph.mjs -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PlaceMellon" />
+    <meta property="og:title" content="Reference - PlaceMellon" />
+    <meta
+      property="og:description"
+      content="PlaceMellon image URLs, parameters, categories, colors, file formats, source photos and errors."
+    />
+    <meta property="og:url" content="https://placemellon.andrew.cmu.edu/reference.html" />
+    <meta property="og:image" content="https://placemellon.andrew.cmu.edu/images/preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="PlaceMellon's home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- End of link previews -->
+    <meta
+      name="description"
+      content="PlaceMellon image URLs, parameters, categories, colors, file formats, source photos and errors."
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://www.cmu.edu/common/standard-v6/css/main.6.7.min.css"
+      media="screen"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-cms.css"
+      integrity="sha384-yLW+PJWgOwzCEFs7dOsWaFrTYhJHqjb5ZEJvoEnLbHFN/L9GTXF5Df+awov2VyUr"
+      crossorigin="anonymous"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link href="//www.cmu.edu/favicon.ico" rel="icon" />
+    <link href="//www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed" />
+    <meta content="#9f0000" name="msapplication-TileColor" />
+    <meta content="//www.cmu.edu/favicon-144.png" name="msapplication-TileImage" />
+  </head>
+  <body class="no-js">
+    <div id="container">
+      <header>
+        <div class="roof red invert">
+          <div>
+            <a class="wordmark" href="https://www.cmu.edu/">Carnegie Mellon University</a>
+            <button aria-label="toggle menu" aria-pressed="false" class="menu-btn" href="#nav"
+              ><b>&#8212;</b><b>&#8212;</b><b>&#8212;</b></button
+            >
+          </div>
+        </div>
+        <div id="sitename">
+          <span class="sitetitle"><a href="./">PlaceMellon</a></span>
+          <h2>My Art Is in the Work</h2>
+        </div>
+      </header>
+      <main id="content">
+        <div class="breadcrumbs"><a href="./">PlaceMellon</a>&nbsp;&rsaquo;&nbsp;Reference</div>
+        <div class="content wide"
+          ><div
+            ><h1>PlaceMellon Reference</h1
+            ><p class="cmu-lead"
+              >Request an image at the size your layout uses. Add a category or visual treatment,
+              then use the address in your page or save the image with your project.</p
+            ></div
+          ></div
+        ><div class="grid column3 nav cmu-on-this-page"
+          ><p class="cmu-label">On This Page</p
+          ><div
+            ><div class="nav-list"
+              ><ul
+                ><li><a href="#image-addresses">Image URLs</a></li
+                ><li><a href="#parameters">Parameters</a></li
+                ><li><a href="#categories">Category Values</a></li></ul
+              ></div
+            ></div
+          ><div
+            ><div class="nav-list"
+              ><ul
+                ><li><a href="#colors">Color Values</a></li
+                ><li><a href="#file-types">File Types</a></li
+                ><li><a href="#embedding">Embedding and Downloads</a></li></ul
+              ></div
+            ></div
+          ><div
+            ><div class="nav-list"
+              ><ul
+                ><li><a href="#photo-source">Find the Original Photo</a></li
+                ><li><a href="#caching">Selection and Caching</a></li
+                ><li><a href="#errors">Errors</a></li></ul
+              ></div
+            ></div
+          ></div
+        ><div class="content wide"
+          ><div
+            ><h2 id="image-addresses" class="rule-top">Image URLs</h2
+            ><table class="alternate cmu-full"
+              ><thead
+                ><tr><th scope="col">Request</th><th scope="col">Response</th></tr></thead
+              ><tbody
+                ><tr
+                  ><th scope="row"><code>GET /{width}/{height}</code></th
+                  ><td>An image at the requested width and height.</td></tr
+                ><tr
+                  ><th scope="row"><code>GET /{size}</code></th
+                  ><td>A square image.</td></tr
+                ><tr
+                  ><th scope="row"
+                    ><code>GET /g/{width}/{height}</code><br /><code>GET /g/{size}</code></th
+                  ><td>A grayscale photo. Equivalent to adding <code>?gray</code>.</td></tr
+                ></tbody
+              ></table
+            >
+            <p
+              >Dimensions are whole numbers from one to 2048 pixels. Without options, the response
+              is a JPEG photo. Put a file extension after the last dimension to request another
+              supported format.</p
+            ><div class="cmu-copyable">
+              <pre
+                class="cmu-snippet cmu-snippet--wrap"
+              ><code id="pm-ref-url">https://placemellon.andrew.cmu.edu/400/300.webp?category=labs&amp;gray</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#pm-ref-url"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button
+            ></div>
+            <h2 id="parameters" class="rule-top">Parameters</h2>
+            <p
+              >Start the query string with <code>?</code> and separate options with
+              <code>&amp;</code>. Flags are enabled by their presence:
+              <code>?random=false</code> still requests a random photo.</p
+            ><table class="alternate cmu-full"
+              ><thead
+                ><tr
+                  ><th scope="col">Parameter</th><th scope="col">Accepted Value or Effect</th
+                  ><th scope="col">Default</th></tr
+                ></thead
+              ><tbody
+                ><tr
+                  ><th scope="row"><code>category</code></th
+                  ><td>A <a href="#categories">category value</a>. Photos only.</td
+                  ><td>All categories</td></tr
+                ><tr
+                  ><th scope="row"><code>random</code></th
+                  ><td
+                    >Flag. Select a photo on each request. A value like
+                    <code>random=1</code> distinguishes addresses; it is not a seed or photo ID.</td
+                  ><td>Consistent selection</td></tr
+                ><tr
+                  ><th scope="row"><code>gray</code>, <code>grayscale</code></th
+                  ><td
+                    >Flag. Convert a photo to grayscale. The <code>/g/</code> prefix also works.</td
+                  ><td>Color</td></tr
+                ><tr
+                  ><th scope="row"><code>scotty</code></th
+                  ><td>Flag. Draw the Scotty graphic.</td><td>Photo</td></tr
+                ><tr
+                  ><th scope="row"><code>gradient</code></th
+                  ><td
+                    >Flag. Add a white-to-gray background to the Scotty graphic. Requires
+                    <code>scotty</code>.</td
+                  ><td>Transparent</td></tr
+                ><tr
+                  ><th scope="row"><code>profile</code></th
+                  ><td
+                    >Flag. Draw a round Scotty profile picture. A rectangular request redirects to a
+                    square using the smaller dimension.</td
+                  ><td>Photo</td></tr
+                ><tr
+                  ><th scope="row"><code>bio</code></th
+                  ><td>Flag. Draw the gray stacked-wordmark bio placeholder.</td><td>Photo</td></tr
+                ><tr
+                  ><th scope="row"><code>solid</code></th
+                  ><td>Flag. Fill the image with a CMU brand color.</td><td>Photo</td></tr
+                ><tr
+                  ><th scope="row"><code>color</code></th
+                  ><td>A <a href="#colors">color value</a>. Requires <code>solid</code>.</td
+                  ><td><code>iron-gray</code></td></tr
+                ><tr
+                  ><th scope="row"><code>text</code></th
+                  ><td
+                    >Flag. Show the width &times; height on a solid placeholder. Requires
+                    <code>solid</code>.</td
+                  ><td>No dimensions</td></tr
+                ></tbody
+              ></table
+            >
+            <p
+              >Choose at most one of <code>scotty</code>, <code>profile</code>, <code>bio</code> and
+              <code>solid</code>. Photo options (<code>category</code>, <code>random</code> and
+              grayscale) do not combine with those image types. Supply <code>category</code> and
+              <code>color</code> once each. Unknown parameter names are rejected.</p
+            >
+            <h2 id="categories" class="rule-top">Category Values</h2
+            ><table class="alternate cmu-full"
+              ><thead
+                ><tr><th scope="col">Category</th><th scope="col">Value</th></tr></thead
+              ><tbody
+                ><tr
+                  ><th scope="row">Campus</th><td><code>campus</code></td></tr
+                ><tr
+                  ><th scope="row">Classrooms</th><td><code>classrooms</code></td></tr
+                ><tr
+                  ><th scope="row">Labs</th><td><code>labs</code></td></tr
+                ><tr
+                  ><th scope="row">Life</th><td><code>life</code></td></tr
+                ></tbody
+              ></table
+            >
+            <h2 id="colors" class="rule-top">Color Values</h2>
+            <p
+              >Use these values with <code>?solid&amp;color=</code>. The colors follow
+              <a class="external" href="https://brand.cmu.edu/visual-identity/colors"
+                >CMU's brand palettes</a
+              >.</p
+            >
+            <table class="alternate cmu-full"
+              ><thead
+                ><tr
+                  ><th scope="col">Color</th><th scope="col">Value</th><th scope="col">Hex</th
+                  ><th scope="col">Palette</th></tr
+                ></thead
+              ><tbody>
+                <!-- colors:start -->
+                <tr
+                  ><th scope="row">Carnegie Red</th><td><code>carnegie-red</code></td
+                  ><td><code>#c41230</code></td
+                  ><td>Core</td></tr
+                >
+                <tr
+                  ><th scope="row">Black</th><td><code>black</code></td
+                  ><td><code>#000000</code></td
+                  ><td>Core</td></tr
+                >
+                <tr
+                  ><th scope="row">Iron Gray</th><td><code>iron-gray</code></td
+                  ><td><code>#6d6e71</code></td
+                  ><td>Core</td></tr
+                >
+                <tr
+                  ><th scope="row">Steel Gray</th><td><code>steel-gray</code></td
+                  ><td><code>#e0e0e0</code></td
+                  ><td>Core</td></tr
+                >
+                <tr
+                  ><th scope="row">White</th><td><code>white</code></td
+                  ><td><code>#ffffff</code></td
+                  ><td>Core</td></tr
+                >
+                <tr
+                  ><th scope="row">Scots Rose</th><td><code>scots-rose</code></td
+                  ><td><code>#ef3a47</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Gold Thread</th><td><code>gold-thread</code></td
+                  ><td><code>#fdb515</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Green Thread</th><td><code>green-thread</code></td
+                  ><td><code>#009647</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Teal Thread</th><td><code>teal-thread</code></td
+                  ><td><code>#008f91</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Blue Thread</th><td><code>blue-thread</code></td
+                  ><td><code>#043673</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Highlands Sky Blue</th><td><code>highlands-sky-blue</code></td
+                  ><td><code>#007bc0</code></td
+                  ><td>Tartan</td></tr
+                >
+                <tr
+                  ><th scope="row">Machinery Hall Tan</th><td><code>machinery-hall-tan</code></td
+                  ><td><code>#bcb49e</code></td
+                  ><td>Campus</td></tr
+                >
+                <tr
+                  ><th scope="row">Kittanning Brick Beige</th
+                  ><td><code>kittanning-brick-beige</code></td
+                  ><td><code>#e4dac4</code></td
+                  ><td>Campus</td></tr
+                >
+                <tr
+                  ><th scope="row">Hornbostel Teal</th><td><code>hornbostel-teal</code></td
+                  ><td><code>#1f4c4c</code></td
+                  ><td>Campus</td></tr
+                >
+                <tr
+                  ><th scope="row">Palladian Green</th><td><code>palladian-green</code></td
+                  ><td><code>#719f94</code></td
+                  ><td>Campus</td></tr
+                >
+                <tr
+                  ><th scope="row">Weaver Blue</th><td><code>weaver-blue</code></td
+                  ><td><code>#182c4b</code></td
+                  ><td>Campus</td></tr
+                >
+                <tr
+                  ><th scope="row">Skibo Red</th><td><code>skibo-red</code></td
+                  ><td><code>#941120</code></td
+                  ><td>Campus</td></tr
+                >
+                <!-- colors:end -->
+              </tbody></table
+            >
+            <h2 id="file-types" class="rule-top">File Types</h2
+            ><table class="alternate cmu-full"
+              ><thead
+                ><tr
+                  ><th scope="col">Image</th><th scope="col">Default</th
+                  ><th scope="col">Accepted Extensions</th></tr
+                ></thead
+              ><tbody
+                ><tr
+                  ><th scope="row">Photos</th><td>JPEG (<code>image/jpeg</code>)</td
+                  ><td><code>.jpg</code>, <code>.webp</code></td></tr
+                ><tr
+                  ><th scope="row">Scotty, Profile Pictures, Bio Placeholders and Solid Colors</th
+                  ><td>SVG (<code>image/svg+xml</code>)</td
+                  ><td><code>.svg</code>, <code>.png</code></td></tr
+                ></tbody
+              ></table
+            >
+            <p
+              >The extension belongs on the final dimension, before the query string:
+              <code>/400/300.webp?gray</code> or <code>/400/300.png?solid&amp;text</code>. PNG is
+              <code>image/png</code>; WebP is <code>image/webp</code>. Unsupported image type and
+              format combinations return an error.</p
+            >
+            <h2 id="embedding" class="rule-top">Embedding and Downloads</h2>
+            <p>Use an image URL in HTML, with <code>&amp;amp;</code> between query parameters:</p
+            ><div class="cmu-copyable">
+              <pre
+                class="cmu-snippet cmu-snippet--wrap"
+              ><code id="pm-ref-html">&lt;img src="https://placemellon.andrew.cmu.edu/400/300?category=labs&amp;amp;gray"
+     width="400" height="300" alt="Placeholder photo of a CMU lab"&gt;</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#pm-ref-html"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button
+            ></div>
+            <p
+              >For several random photos on one page, use distinct addresses like
+              <code>?random=1</code> and <code>?random=2</code>. A browser can reuse one response
+              for images with the same address.</p
+            >
+            <p
+              >To keep an image with your project, download the response. Quote the URL so the shell
+              preserves its query string:</p
+            ><div class="cmu-copyable">
+              <pre
+                class="cmu-snippet cmu-snippet--wrap"
+              ><code id="pm-ref-download">curl --fail --show-error 'https://placemellon.andrew.cmu.edu/400/300.webp?category=labs&amp;gray' \
+  --output placeholder.webp</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#pm-ref-download"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button
+            ></div>
+            <h2 id="photo-source" class="rule-top">Find the Original Photo</h2>
+            <p
+              >Photo responses include an <code>X-Photo</code> header with the source filename. Look
+              up that name in
+              <a
+                class="external"
+                href="https://cmu.widencollective.com/portals/iff7gdfg/CMUPhotographyPortal-Master"
+                >CMU Selects</a
+              >
+              to download the full photo for a finished page. Graphics do not have this header.</p
+            ><div class="cmu-copyable">
+              <pre
+                class="cmu-snippet cmu-snippet--wrap"
+              ><code id="pm-which">curl --fail --show-error --head 'https://placemellon.andrew.cmu.edu/400/300?category=campus'</code></pre
+              ><button
+                type="button"
+                class="cmu-copy"
+                data-cmu-copy="#pm-which"
+                aria-label="Copy Code"
+                title="Copy Code"
+              ></button
+            ></div>
+            <p
+              >In a browser, open the image request in the developer tools' Network tab and read its
+              response headers. For a random photo, inspect the request that produced the image you
+              see; another request can select a different photo.</p
+            >
+            <h2 id="caching" class="rule-top">Selection and Caching</h2>
+            <p
+              >The size and category determine the default photo selection. Wide requests favor
+              landscape photos, tall requests favor portraits and near-square requests use either.
+              If a category has no photos of the preferred orientation, PlaceMellon uses the
+              available photos. The result is cropped to fill the requested dimensions.</p
+            >
+            <p
+              >Adding or removing source photos can change the selection. Save the response if you
+              need to preserve an exact image.</p
+            >
+            <p
+              >Nonrandom images are cached in memory, and responses allow browser caching for up to
+              a day. Random photos skip both caches and return <code>Cache-Control: no-store</code>.
+              Development responses also use <code>no-store</code>.</p
+            >
+            <h2 id="errors" class="rule-top">Errors</h2
+            ><table class="alternate cmu-full"
+              ><thead
+                ><tr
+                  ><th scope="col">Status</th><th scope="col">Meaning</th
+                  ><th scope="col">What to Check</th></tr
+                ></thead
+              ><tbody
+                ><tr
+                  ><th scope="row">400</th><td>Invalid size, parameter or combination.</td
+                  ><td
+                    >Read the plain-text response. Check dimensions, parameter names, image type and
+                    extension.</td
+                  ></tr
+                ><tr
+                  ><th scope="row">404</th><td>Unknown category, color or route.</td
+                  ><td
+                    >Use a value from the category or color table and a supported URL path.</td
+                  ></tr
+                ><tr
+                  ><th scope="row">502</th
+                  ><td>The source image could not be fetched or rendered.</td
+                  ><td
+                    >Try again shortly. If it keeps happening, report the image URL on GitHub.</td
+                  ></tr
+                ><tr
+                  ><th scope="row">503</th
+                  ><td>Photos are still loading or the selected category has no photos.</td
+                  ><td
+                    >Retry later or choose a different category. Graphics do not need the photo
+                    catalog.</td
+                  ></tr
+                ></tbody
+              ></table
+            >
+            <p
+              >Check the status and content type before saving a response as an image.
+              <code>GET /healthz</code> returns JSON with the total photo count, category counts and
+              <code>refreshedAt</code>; its status is 200 when the catalog contains photos or 503
+              when empty.</p
+            >
+            <p
+              >To set up an AI coding agent, use the
+              <a href="./#agent">prompt on the home page</a>.</p
+            ></div
+          ></div
+        >
+      </main>
+      <footer class="grid column3 invert">
+        <div>
+          <p
+            >PlaceMellon<br />Carnegie Mellon University<br />5000 Forbes Avenue<br />Pittsburgh, PA
+            15213</p
+          >
+          <ul
+            ><li><a href="https://www.cmu.edu/legal/">Legal Info</a></li
+            ><li><a href="https://www.cmu.edu/">www.cmu.edu</a></li></ul
+          >
+          <ul
+            ><li>&copy; 2026 Carnegie Mellon University</li></ul
+          >
+        </div>
+        <div></div>
+        <div>
+          <nav id="nav"
+            ><ul
+              ><li><a href="builder.html">Builder</a></li
+              ><li><a href="styles.html">Styles</a></li
+              ><li class="active"><a href="reference.html" aria-current="page">Reference</a></li
+              ><li><a href="assets.html">Production Assets</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
+        </div>
+      </footer>
+    </div>
+    <script src="https://www.cmu.edu/common/standard-v6/js/list.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
+    <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/docs.js"></script>
+  </body>
+</html>

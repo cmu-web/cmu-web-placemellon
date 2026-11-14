@@ -7,3 +7,5 @@ coverage
 .env
 .env.*
 !.env.example
+packages/ruby/pkg
+packages/ruby/Gemfile.lock

@@ -1,10 +1,10 @@
 import sharp from "sharp";
 import type { Stream } from "node:stream";
 import request from "supertest";
-import { describe, expect, it } from "vitest";
-import { createApp, parseSize } from "../src/app";
+import { describe, expect, it, vi } from "vitest";
+import { createApp, Lru, parseSize } from "../src/app";
 import { Catalog, earliestExpiry } from "../src/catalog";
-import { solidSvg, pickPreview, renderSvg } from "../src/render";
+import { solidSvg, pickPreview, renderPhoto, renderSvg } from "../src/render";
 import { Photo, toPhoto } from "../src/widen";
 
 const photo = (id: string, expires = 1792969200, aspect = 1.5, categories = ["campus"]): Photo => ({
@@ -59,14 +59,14 @@ describe("pickPreview", () => {
 
 describe("solid rendering", () => {
   it("renders a uniform gray image or dimensions near the top, including very narrow sizes", async () => {
-    const plain = await renderSvg(solidSvg(320, 180, false), false);
+    const plain = await renderSvg(solidSvg(320, 180, false));
     const { channels } = await sharp(plain).removeAlpha().stats();
     expect(channels.slice(0, 3).map((c) => [c.min, c.max])).toEqual([
       [109, 109],
       [110, 110],
       [113, 113],
     ]);
-    const labeled = await renderSvg(solidSvg(320, 180, true), false);
+    const labeled = await renderSvg(solidSvg(320, 180, true));
     const { data, info } = await sharp(labeled)
       .removeAlpha()
       .raw()
@@ -86,7 +86,7 @@ describe("solid rendering", () => {
       [2048, 1],
       [1, 1],
     ]) {
-      const png = await renderSvg(solidSvg(w, h, true), false);
+      const png = await renderSvg(solidSvg(w, h, true));
       expect(await sharp(png).metadata()).toMatchObject({ width: w, height: h });
     }
   });
@@ -97,7 +97,7 @@ describe("solid rendering", () => {
     [900, 600, 20, 28],
     [1400, 700, 24, 30],
   ])("keeps text readable and unclipped at %i × %i", async (w, h, minHeight, maxHeight) => {
-    const png = await renderSvg(solidSvg(w, h, true), false);
+    const png = await renderSvg(solidSvg(w, h, true));
     const { data, info } = await sharp(png)
       .removeAlpha()
       .raw()
@@ -126,7 +126,7 @@ describe("solid rendering", () => {
     const svg = solidSvg(300, 200, true);
     const [ones, eights] = await Promise.all(
       ["111 × 111", "888 × 888"].map(async (label) =>
-        sharp(await renderSvg(svg.replace("300 × 200", label), false))
+        sharp(await renderSvg(svg.replace("300 × 200", label)))
           .raw()
           .toBuffer(),
       ),
@@ -189,7 +189,73 @@ describe("pick", () => {
   });
 });
 
+describe("catalog retries", () => {
+  it("tries again within minutes, not hours, while it has no photos", async () => {
+    vi.useFakeTimers();
+    try {
+      let calls = 0;
+      const catalog = new Catalog(async () => {
+        calls++;
+        if (calls === 1) throw new Error("CMU Selects is down");
+        return [photo("a")];
+      });
+      await catalog.start();
+      expect(catalog.photos).toHaveLength(0);
+      await vi.advanceTimersByTimeAsync(61_000);
+      expect(calls).toBe(2);
+      expect(catalog.photos).toHaveLength(1);
+      catalog.stop();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("timeouts", () => {
+  it("gives each CMU Selects image request a time limit", async () => {
+    let signal: AbortSignal | null | undefined;
+    const get = (async (_url: string, init?: RequestInit) => {
+      signal = init?.signal;
+      return new Response(await jpeg);
+    }) as unknown as typeof fetch;
+    await renderPhoto(photo("a"), 60, 40, false, get);
+    expect(signal).toBeInstanceOf(AbortSignal);
+  });
+});
+
+describe("image cache", () => {
+  const entry = (n: number) => ({ type: "png", body: Buffer.alloc(n) });
+  it("drops the oldest images once they pass the memory limit", () => {
+    const lru = new Lru(10, 100);
+    lru.set("a", entry(40));
+    lru.set("b", entry(40));
+    lru.set("c", entry(40));
+    expect(lru.get("a")).toBeUndefined();
+    expect(lru.get("b")).toBeDefined();
+    expect(lru.size).toBe(2);
+  });
+  it("skips an image bigger than the whole limit, and caches nothing at 0 entries", () => {
+    const lru = new Lru(10, 100);
+    lru.set("big", entry(200));
+    expect(lru.size).toBe(0);
+    const off = new Lru(0, 100);
+    off.set("a", entry(1));
+    expect(off.size).toBe(0);
+  });
+});
+
 describe("routes", () => {
+  it("renders an image once when several requests for it arrive together", async () => {
+    let fetches = 0;
+    const counting = (async (url: string) => {
+      fetches++;
+      return fakeFetch(url);
+    }) as unknown as typeof fetch;
+    const app = createApp(await ready([photo("a")]), counting);
+    await Promise.all([1, 2, 3].map(() => request(app).get("/120/80").expect(200)));
+    expect(fetches).toBe(1);
+  });
+
   it("crops a photo to size, the same photo each time", async () => {
     const app = createApp(await ready([photo("a"), photo("b"), photo("c")]), fakeFetch);
     const res = await request(app)
@@ -222,13 +288,14 @@ describe("routes", () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     for (const [path, w, h, type] of [
       ["/320/180?scotty", 320, 180, /svg/],
-      ["/g/90/160?scotty", 90, 160, /svg/],
-      ["/150?scotty&white", 150, 150, /svg/],
-      ["/150.svg?scotty&white", 150, 150, /svg/],
+      ["/90/160?scotty", 90, 160, /svg/],
+      ["/600/750?scotty", 600, 750, /svg/],
+      ["/600/750.png?scotty&gradient", 600, 750, /png/],
+      ["/150.svg?scotty", 150, 150, /svg/],
       ["/64?profile", 64, 64, /svg/],
-      ["/48/48?profile&grayscale", 48, 48, /svg/],
+      ["/48/48?profile", 48, 48, /svg/],
       ["/320/180.png?scotty", 320, 180, /png/],
-      ["/g/64.png?profile", 64, 64, /png/],
+      ["/64.png?profile", 64, 64, /png/],
       ["/600/750?bio", 600, 750, /svg/],
       ["/800/300.png?bio", 800, 300, /png/],
     ] as const) {
@@ -242,7 +309,7 @@ describe("routes", () => {
     }
   });
 
-  it("takes the color out of gray SVG and PNG alike", async () => {
+  it("keeps Scotty's red scarf, since grayscale is for photos only", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     // The most any pixel's red differs from its green: big for the red scarf, 0 in gray
     const tint = async (path: string) => {
@@ -253,39 +320,43 @@ describe("routes", () => {
       return most;
     };
     expect(await tint("/90/160?scotty")).toBeGreaterThan(100);
-    expect(await tint("/g/90/160?scotty")).toBeLessThan(3);
-    expect(await tint("/90/160.png?scotty&gray")).toBeLessThan(3);
+    expect(await tint("/90/160.png?scotty")).toBeGreaterThan(100);
+    for (const path of [
+      "/g/90/160?scotty",
+      "/90/160.png?scotty&gray",
+      "/64?profile&grayscale",
+      "/g/64?solid",
+      "/120/80?bio&gray",
+    ])
+      expect((await request(app).get(path).expect(400)).text, path).toContain("photos only");
   });
 
-  it("serves ?scotty&white on white, cached apart from the gradient", async () => {
+  it("serves ?scotty on a transparent background and ?scotty&gradient on the gradient", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const get = (path: string) => request(app).get(path).buffer(true).parse(binary).expect(200);
-    const plain = await get("/120/80?scotty");
-    const white = await get("/120/80?scotty&white");
-    expect(white.body.equals(plain.body)).toBe(false);
-    // The bottom corners are gray on the gradient and white without it
+    const clear = await get("/120/80.png?scotty");
+    const gradient = await get("/120/80.png?scotty&gradient");
+    // A bottom corner: see-through without the gradient, light gray with it
     const corner = async (b: Buffer) =>
-      (
-        await sharp(b)
-          .extract({ left: 0, top: 79, width: 1, height: 1 })
-          .removeAlpha()
-          .raw()
-          .toBuffer()
-      )[0];
-    expect(await corner(white.body)).toBe(255);
-    expect(await corner(plain.body)).toBeLessThan(220);
+      sharp(b).extract({ left: 0, top: 79, width: 1, height: 1 }).ensureAlpha().raw().toBuffer();
+    expect((await corner(clear.body))[3]).toBe(0);
+    const [r, , , alpha] = await corner(gradient.body);
+    expect(alpha).toBe(255);
+    expect(r).toBeLessThan(240);
   });
 
   it("serves solid color placeholders without a photo catalog or fetch", async () => {
     const app = createApp(new Catalog(async () => []), (() => {
       throw new Error("Solid color placeholders must not fetch photos");
     }) as typeof fetch);
-    for (const [path, w, h] of [
-      ["/120/80?solid", 120, 80],
-      ["/64?solid", 64, 64],
-      ["/g/64?solid", 64, 64],
-      ["/120/80?solid&gray", 120, 80],
-      ["/120/80.svg?solid", 120, 80],
+    // Iron Gray unless a brand color is named
+    const iron = [109, 110, 113],
+      teal = [0, 143, 145];
+    for (const [path, w, h, rgb] of [
+      ["/120/80?solid", 120, 80, iron],
+      ["/64?solid", 64, 64, iron],
+      ["/120/80.svg?solid", 120, 80, iron],
+      ["/120/80?solid&color=teal-thread", 120, 80, teal],
     ] as const) {
       const res = await request(app)
         .get(path)
@@ -298,11 +369,7 @@ describe("routes", () => {
       expect(res.headers["x-photo"]).toBeUndefined();
       expect(await sharp(res.body).metadata()).toMatchObject({ width: w, height: h });
       const { channels } = await sharp(res.body).removeAlpha().stats();
-      expect(channels.slice(0, 3).map((c) => [c.min, c.max])).toEqual([
-        [109, 109],
-        [110, 110],
-        [113, 113],
-      ]);
+      expect(channels.slice(0, 3).map((c) => [c.min, c.max])).toEqual(rgb.map((v) => [v, v]));
     }
   });
 
@@ -418,17 +485,21 @@ describe("routes", () => {
       ["/90/60?categroy=labs", 400, "Unknown option ?categroy"],
       ["/90/60?category=labs&category=life", 400, "once"],
       ["/90/60?scotty&profile", 400, "Pick one"],
-      ["/90/60?solid&scotty", 400, "Pick one"],
+      ["/90/60?solid&bio", 400, "Pick one"],
       ["/90/60?solid&profile", 400, "Pick one"],
       ["/90/60?solid&category=labs", 400, "choose photos"],
       ["/90/60?solid&random", 400, "choose photos"],
       ["/90/60?text", 400, "Use ?text with ?solid"],
       ["/90/60?scotty&text", 400, "Use ?text with ?solid"],
-      ["/90/60?white", 400, "Use ?white with ?scotty"],
-      ["/90/60?profile&white", 400, "Use ?white with ?scotty"],
+      ["/90/60?white", 400, "Unknown option ?white"],
+      ["/90/60?bio&scotty", 400, "Pick one"],
       ["/90/60?scotty&category=labs", 400, "choose photos"],
       ["/90?profile&random", 400, "choose photos"],
-      ["/90/60?bio&scotty", 400, "Pick one"],
+      ["/90/60?bio&profile", 400, "Pick one"],
+      ["/90/60?gradient", 400, "Use ?gradient with ?scotty"],
+      ["/90/60?color=teal-thread", 400, "Use ?color with ?solid"],
+      ["/90/60?solid&color=purple", 404, "Use a CMU brand color"],
+      ["/90/60?bio&gradient", 400, "Use ?gradient with ?scotty"],
       ["/90/60?bio&category=labs", 400, "choose photos"],
       ["/90/60.jpg?bio", 400, "come as .svg or .png"],
     ];
@@ -441,10 +512,6 @@ describe("routes", () => {
   it("redirects a non-square ?profile to the smaller square", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     await request(app).get("/96/64?profile").expect(302).expect("Location", "/64?profile");
-    await request(app)
-      .get("/g/50/80?gray&profile")
-      .expect(302)
-      .expect("Location", "/g/50?gray&profile");
     await request(app).get("/96/64.png?profile").expect(302).expect("Location", "/64.png?profile");
   });
 

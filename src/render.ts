@@ -1,16 +1,18 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import { Photo, Preview } from "./widen";
+import { Photo, Preview, TIMEOUT_MS } from "./widen";
 
 export const MAX = 2048; // largest Widen preview
 
 const ASSETS = path.join(__dirname, "..", "assets");
 const svgInner = (file: string) =>
   fs.readFileSync(path.join(ASSETS, file), "utf8").replace(/^<svg[^>]*>|<\/svg>\s*$/g, "");
-const avatar = svgInner("scotty-avatar.svg"); // 320 x 320
-const bust = svgInner("scotty-bust.svg"); // viewBox 30 40 268 260
-const BUST = { x: 30, y: 40, w: 268, h: 260 };
+// UCM's red-scarf Scotty portrait (the same file as QRnegie's)
+const head = svgInner("scotty-head.svg"); // viewBox 0 0 330.17 443.51
+const HEAD = { w: 330.17, h: 443.51 };
+// A slight gradient behind him, white at the top to light gray at the bottom
+const GRADIENT = `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4e5e6"/></linearGradient>`;
 const wordmark = svgInner("cmu-wordmark-stacked.svg"); // viewBox 0 0 95.97 61.16
 const WORDMARK = { w: 95.973335, h: 61.16 };
 
@@ -34,7 +36,7 @@ export async function renderPhoto(
   get: typeof fetch = fetch,
   webp = false,
 ): Promise<Buffer> {
-  const res = await get(pickPreview(photo, w, h).url);
+  const res = await get(pickPreview(photo, w, h).url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (res.status === 403 || res.status === 404) throw new StaleLinkError(`preview ${res.status}`);
   if (!res.ok) throw new Error(`preview ${res.status}`);
   let img = sharp(Buffer.from(await res.arrayBuffer())).resize(w, h, {
@@ -49,26 +51,87 @@ export async function renderPhoto(
     : img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
 }
 
-// Scotty's bust on the avatar's gradient (or plain white), standing on the bottom edge
-export function scottySvg(w: number, h: number, white = false): string {
-  const s = Math.min((0.9 * w) / BUST.w, (0.9 * h) / BUST.h);
-  const x = (w - BUST.w * s) / 2 - BUST.x * s;
-  const y = h - BUST.h * s - BUST.y * s;
+// The Scotty graphic: Scotty centered on a transparent background, to blend
+// into any page, or on the slight gradient, edge to edge, to read as a full
+// image
+export function scottySvg(w: number, h: number, gradient = false): string {
+  const s = Math.min((0.8 * w) / HEAD.w, (0.8 * h) / HEAD.h);
+  const x = (w - HEAD.w * s) / 2;
+  const y = (h - HEAD.h * s) / 2;
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
-    `<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c5c6c8"/></linearGradient>` +
-    `<clipPath id="crop"><rect x="${BUST.x}" y="${BUST.y}" width="${BUST.w}" height="${BUST.h}"/></clipPath></defs>` +
-    `<rect width="${w}" height="${h}" fill="${white ? "#fff" : "url(#bg)"}"/>` +
-    `<g transform="translate(${x} ${y}) scale(${s})" clip-path="url(#crop)">${bust}</g></svg>`
+    `<defs>${GRADIENT}</defs>` +
+    (gradient ? `<rect width="${w}" height="${h}" fill="url(#bg)"/>` : "") +
+    `<g transform="translate(${+x.toFixed(2)} ${+y.toFixed(2)}) scale(${+s.toFixed(5)})">${head}</g></svg>`
   );
 }
 
-export function avatarSvg(size: number): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 320 320">${avatar}</svg>`;
+// A round profile picture: a white ring around Scotty on the slight
+// gradient, large enough that the circle crops the tip of his scarf
+export function profileSvg(size: number): string {
+  const r = 160,
+    // A white ring, 2.5% of the size but never under 2 pixels, so it shows
+    // on colored backgrounds at small sizes too
+    ring = Math.max(8, (2 * 320) / size),
+    s = 280 / HEAD.h,
+    x = r - (HEAD.w * s) / 2 + 6,
+    y = 34;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 320 320">` +
+    `<defs>${GRADIENT}<clipPath id="inside"><circle cx="${r}" cy="${r}" r="${r - ring}"/></clipPath></defs>` +
+    `<circle cx="${r}" cy="${r}" r="${r}" fill="#fff"/>` +
+    `<g clip-path="url(#inside)"><rect width="320" height="320" fill="url(#bg)"/>` +
+    `<g transform="translate(${+x.toFixed(2)} ${y}) scale(${+s.toFixed(5)})">${head}</g></g></svg>`
+  );
 }
 
-// A solid color placeholder, with optional dimensions scaled to fit even narrow images.
-export function solidSvg(w: number, h: number, text: boolean): string {
+// CMU's brand colors (brand.cmu.edu/visual-identity/colors), by name: the core
+// colors, then the secondary Tartan and Campus palettes. The size label is
+// white or black, whichever reads better on the color (Highlands Sky Blue is
+// a near tie, so it takes white, as the brand usually pairs it).
+export const COLORS: Record<
+  string,
+  { name: string; hex: string; label: "#fff" | "#000"; group: "Core" | "Tartan" | "Campus" }
+> = {
+  "carnegie-red": { name: "Carnegie Red", hex: "#c41230", label: "#fff", group: "Core" },
+  black: { name: "Black", hex: "#000000", label: "#fff", group: "Core" },
+  "iron-gray": { name: "Iron Gray", hex: "#6d6e71", label: "#fff", group: "Core" },
+  "steel-gray": { name: "Steel Gray", hex: "#e0e0e0", label: "#000", group: "Core" },
+  white: { name: "White", hex: "#ffffff", label: "#000", group: "Core" },
+  "scots-rose": { name: "Scots Rose", hex: "#ef3a47", label: "#000", group: "Tartan" },
+  "gold-thread": { name: "Gold Thread", hex: "#fdb515", label: "#000", group: "Tartan" },
+  "green-thread": { name: "Green Thread", hex: "#009647", label: "#000", group: "Tartan" },
+  "teal-thread": { name: "Teal Thread", hex: "#008f91", label: "#000", group: "Tartan" },
+  "blue-thread": { name: "Blue Thread", hex: "#043673", label: "#fff", group: "Tartan" },
+  "highlands-sky-blue": {
+    name: "Highlands Sky Blue",
+    hex: "#007bc0",
+    label: "#fff",
+    group: "Tartan",
+  },
+  "machinery-hall-tan": {
+    name: "Machinery Hall Tan",
+    hex: "#bcb49e",
+    label: "#000",
+    group: "Campus",
+  },
+  "kittanning-brick-beige": {
+    name: "Kittanning Brick Beige",
+    hex: "#e4dac4",
+    label: "#000",
+    group: "Campus",
+  },
+  "hornbostel-teal": { name: "Hornbostel Teal", hex: "#1f4c4c", label: "#fff", group: "Campus" },
+  "palladian-green": { name: "Palladian Green", hex: "#719f94", label: "#000", group: "Campus" },
+  "weaver-blue": { name: "Weaver Blue", hex: "#182c4b", label: "#fff", group: "Campus" },
+  "skibo-red": { name: "Skibo Red", hex: "#941120", label: "#fff", group: "Campus" },
+};
+export const DEFAULT_COLOR = "iron-gray";
+
+// A solid brand color, Iron Gray unless another is named, with optional
+// dimensions scaled to fit even narrow images.
+export function solidSvg(w: number, h: number, text: boolean, color = DEFAULT_COLOR): string {
+  const { hex, label: ink } = COLORS[color];
   const label = `${w} × ${h}`;
   // The kit uses 32px at 900px wide and 36px for its large hero placeholder.
   // Keep smaller previews readable, then allow room for the label and padding.
@@ -77,9 +140,9 @@ export function solidSvg(w: number, h: number, text: boolean): string {
   const baseline = Math.max((70 * h) / 600, fontSize * 1.5);
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
-    `<rect width="${w}" height="${h}" fill="#6d6e71"/>` +
+    `<rect width="${w}" height="${h}" fill="${hex}"/>` +
     (text
-      ? `<text x="${w / 2}" y="${baseline}" fill="#e0e0e0" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
+      ? `<text x="${w / 2}" y="${baseline}" fill="${ink}" font-family="Open Sans, Arial, sans-serif" font-size="${fontSize}" text-anchor="middle">${label}</text>`
       : "") +
     "</svg>"
   );
@@ -102,18 +165,11 @@ export function bioSvg(w: number, h: number): string {
   );
 }
 
-// The same image as an SVG file; gray removes its color with a filter
-export function svgFile(svg: string, gray: boolean): Buffer {
-  if (gray)
-    svg = svg.replace(
-      /^(<svg[^>]*>)([\s\S]*)(<\/svg>)$/,
-      '$1<filter id="pm-gray"><feColorMatrix type="saturate" values="0"/></filter><g filter="url(#pm-gray)">$2</g>$3',
-    );
+// The drawing as an SVG file
+export function svgFile(svg: string): Buffer {
   return Buffer.from(svg);
 }
 
-export async function renderSvg(svg: string, gray: boolean): Promise<Buffer> {
-  let img = sharp(Buffer.from(svg));
-  if (gray) img = img.grayscale();
-  return img.png().toBuffer();
+export async function renderSvg(svg: string): Promise<Buffer> {
+  return sharp(Buffer.from(svg)).png().toBuffer();
 }

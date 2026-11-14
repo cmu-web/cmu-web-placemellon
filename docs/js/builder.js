@@ -15,8 +15,8 @@
     photoOptions = $("pm-photo-options"),
     solidOptions = $("pm-solid-options"),
     scottyOptions = $("pm-scotty-options"),
-    white = $("pm-white"),
     text = $("pm-text"),
+    color = $("pm-color"),
     format = $("pm-format"),
     url = $("pm-url"),
     html = $("pm-html"),
@@ -50,16 +50,20 @@
   function kind() {
     return document.querySelector('input[name="pm-kind"]:checked').value;
   }
+  // The Scotty graphic's look: on white or on a gradient
+  function look() {
+    return document.querySelector('input[name="pm-scotty-look"]:checked').value;
+  }
   function size(input) {
     var v = input.value.trim();
     if (v === "") return "";
     return /^\d{1,4}$/.test(v) && +v >= 1 && +v <= 2048 ? +v : null;
   }
   function alt(k, c) {
-    if (k === "solid") return "Solid color placeholder";
+    if (k === "solid") return color.options[color.selectedIndex].text + " placeholder";
     if (k === "profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
-    if (k === "scotty") return "Placeholder image of Scotty";
+    if (k === "scotty") return "Placeholder graphic of Scotty";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
       : "Placeholder photo of Carnegie Mellon";
@@ -71,12 +75,11 @@
     sizeFor(k);
     lastKind = k;
     // Category and random choose photos; profile pictures are square
-    // The photo choices show only under "A CMU Photo"
+    // The photo choices show only under "CMU Photo", the looks under "Scotty
+    // Graphic"
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty";
-    // Solid colors and the bio placeholder are gray already
-    gray.disabled = k === "solid" || k === "bio";
     // Photos come as JPEG or WebP; drawn images as SVG or PNG
     var types = photo ? ["jpg", "webp"] : ["svg", "png"];
     Array.prototype.forEach.call(format.options, function (o) {
@@ -106,8 +109,10 @@
     if (photo && random.checked) q.push("random");
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
-    if (k === "scotty" && white.checked) q.push("white");
-    if (k !== "solid" && k !== "bio" && gray.checked) q.push("gray");
+    if (k === "scotty" && look() === "gradient") q.push("gradient");
+    // Grayscale is a photo option; brand colors are a solid color's
+    if (photo && gray.checked) q.push("gray");
+    if (k === "solid" && color.value !== "iron-gray") q.push("color=" + color.value);
     var qs = q.length ? "?" + q.join("&") : "";
     var state = ["width=" + w];
     if (h !== "") state.push("height=" + h);
@@ -145,8 +150,8 @@
     e.preventDefault();
   });
   another.addEventListener("click", update);
-  // Options from the address, where they name something the form has, such
-  // as builder.html?category=labs from the Options page
+  // Options from the address, where they name something the form has, like
+  // builder.html?category=labs from the Styles page
   var start = new URLSearchParams(location.search);
   [
     ["width", width],
@@ -164,13 +169,18 @@
   [
     ["random", random],
     ["gray", gray],
-    ["white", white],
     ["text", text],
   ].forEach(function (pair) {
     if (start.has(pair[0])) pair[1].checked = true;
   });
+  if (start.has("gradient")) $("pm-scotty-gradient").checked = true;
+  // ?category=any picks Any, since the form starts on Campus
   var wanted = start.get("category");
-  if (wanted && category.querySelector('option[value="' + wanted + '"]')) category.value = wanted;
+  if (wanted === "any") category.value = "";
+  else if (wanted && category.querySelector('option[value="' + wanted + '"]'))
+    category.value = wanted;
+  wanted = start.get("color");
+  if (wanted && color.querySelector('option[value="' + wanted + '"]')) color.value = wanted;
   wanted = start.get("format");
   if (wanted && format.querySelector('option[value="' + wanted + '"]')) format.value = wanted;
   update();

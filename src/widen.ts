@@ -37,8 +37,11 @@ interface WidenSection {
   type: string;
 }
 
+// How long to wait on CMU Selects before giving up
+export const TIMEOUT_MS = 20_000;
+
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init);
+  const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS), ...init });
   if (!res.ok) throw new Error(`${init?.method ?? "GET"} ${url} -> ${res.status}`);
   return (await res.json()) as T;
 }

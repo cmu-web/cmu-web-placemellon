@@ -1,13 +1,22 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (Google Analytics): docs pages only, never on placeholder images -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MTRD2JHT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Assets - PlaceMellon - Carnegie Mellon University</title>
+    <title>Production Assets - PlaceMellon - Carnegie Mellon University</title>
     <!-- Link previews: written by scripts/opengraph.mjs -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="PlaceMellon" />
-    <meta property="og:title" content="Assets - PlaceMellon" />
+    <meta property="og:title" content="Production Assets - PlaceMellon" />
     <meta
       property="og:description"
       content="Carnegie Mellon images and icons for live sites, apps and mockups, at fixed addresses: a sample ID card, a bio placeholder, Scotty and the favicon."
@@ -38,8 +47,8 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-cms.css"
-      integrity="sha384-jLB4PsCj8eJZzLvX09Rp//BaeUnjZFFNVOS3iVyZhktnIw9EkiZPVseQWE+Yjz/q"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-cms.css"
+      integrity="sha384-yLW+PJWgOwzCEFs7dOsWaFrTYhJHqjb5ZEJvoEnLbHFN/L9GTXF5Df+awov2VyUr"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -66,133 +75,178 @@
         </div>
       </header>
       <main id="content">
-        <div class="breadcrumbs"> <a href="./">PlaceMellon</a>&nbsp;&rsaquo;&nbsp;Assets </div>
+        <div class="breadcrumbs">
+          <a href="./">PlaceMellon</a>&nbsp;&rsaquo;&nbsp;Production Assets
+        </div>
         <div class="content wide">
           <div>
             <h1>Images and Icons</h1>
             <p class="cmu-lead">
-              Images and icons for live sites and apps as well as mockups. Link to them straight
-              from your pages; the addresses won't change.
+              Unlike placeholder photos, these images are ready for live sites and apps. Link to
+              them from your pages; the addresses won't change.
             </p>
           </div>
         </div>
-        <div class="grid column3 darkgrey boxes cmu-cards-bottom">
+        <div class="content wide">
           <div>
-            <img
-              src="images/cmu-id-card.svg"
-              alt="A sample Carnegie Mellon ID card for Andrew Carnegie."
-              width="506"
-              height="319"
-            />
-            <h2>Sample ID Card</h2>
-            <p>A sample CMU ID for Andrew Carnegie, for ID tap screens and mockups.</p>
-            <div class="cmu-copyable">
-              <pre
-                class="cmu-snippet cmu-snippet--wrap"
-              ><code id="pm-a-card">https://placemellon.andrew.cmu.edu/images/cmu-id-card.svg</code></pre>
-              <button
-                type="button"
-                class="cmu-copy"
-                data-cmu-copy="#pm-a-card"
-                aria-label="Copy Address"
-                title="Copy Address"
-              ></button>
+            <h2 id="bio" class="rule-top">Bio Placeholder</h2>
+            <div class="cmu-split">
+              <div>
+                <p>
+                  CMU's gray wordmark placeholder for a staff member without a photo, as on the
+                  <a class="external" href="https://www.cmu.edu/marcom/about/web-strategy.html"
+                    >Web Strategy team page</a
+                  >. Staff pages use it at 600 &times; 750.
+                </p>
+                <div class="cmu-copyable">
+                  <pre
+                    class="cmu-snippet cmu-snippet--wrap"
+                  ><code id="pm-a-bio">https://placemellon.andrew.cmu.edu/600/750?bio</code></pre
+                  ><button
+                    type="button"
+                    class="cmu-copy"
+                    data-cmu-copy="#pm-a-bio"
+                    aria-label="Copy Address"
+                    title="Copy Address"
+                  ></button
+                ></div>
+                <p class="aligncenter"
+                  ><img
+                    src="https://placemellon.andrew.cmu.edu/480/600?bio"
+                    alt="A gray placeholder with the Carnegie Mellon wordmark."
+                    width="240"
+                    height="300"
+                    loading="lazy"
+                /></p>
+              </div>
+              <div class="cmu-example"
+                ><p class="cmu-label">Example</p
+                ><figure class="cmu-shot"
+                  ><img
+                    src="images/bio-placeholder-in-use.jpg"
+                    alt="A staff list with a gray Carnegie Mellon wordmark placeholder for Andrew Carnegie between two people's headshots."
+                    width="412"
+                    height="394"
+                    loading="lazy" /></figure
+              ></div>
             </div>
-          </div>
-          <div>
-            <img
-              src="300/375?bio"
-              alt="A gray placeholder with the Carnegie Mellon wordmark."
-              width="300"
-              height="375"
-            />
-            <h2>Bio Placeholder</h2>
-            <p>
-              The gray wordmark placeholder staff pages use for a person without a photo, at the
-              same 600 &times; 750.
-            </p>
-            <div class="cmu-copyable">
-              <pre
-                class="cmu-snippet cmu-snippet--wrap"
-              ><code id="pm-a-bio">https://placemellon.andrew.cmu.edu/600/750?bio</code></pre>
-              <button
-                type="button"
-                class="cmu-copy"
-                data-cmu-copy="#pm-a-bio"
-                aria-label="Copy Address"
-                title="Copy Address"
-              ></button>
+            <h2 id="profile" class="rule-top">Default Profile Picture</h2>
+            <div class="cmu-split">
+              <div>
+                <p>
+                  Scotty as the signed-in user's picture when they don't have a photo, in the kit's
+                  <a class="external" href="https://webkilt.andrew.cmu.edu/accounts.html#photo"
+                    >profile picture</a
+                  >. One address covers both sizes, small in the roof and larger in the menu. Use it
+                  for the signed-in account only, not lists of people.
+                </p>
+                <div class="cmu-copyable">
+                  <pre
+                    class="cmu-snippet cmu-snippet--wrap"
+                  ><code id="pm-a-profile">https://placemellon.andrew.cmu.edu/112?profile</code></pre
+                  ><button
+                    type="button"
+                    class="cmu-copy"
+                    data-cmu-copy="#pm-a-profile"
+                    aria-label="Copy Address"
+                    title="Copy Address"
+                  ></button
+                ></div>
+                <p class="aligncenter"
+                  ><img
+                    src="https://placemellon.andrew.cmu.edu/480?profile"
+                    alt="Scotty in a white ring."
+                    width="240"
+                    height="240"
+                    loading="lazy"
+                /></p>
+              </div>
+              <div class="cmu-example"
+                ><p class="cmu-label">Example</p
+                ><figure class="cmu-shot"
+                  ><img
+                    src="images/profile-mockup.png"
+                    alt="Scotty as Andrew Carnegie's picture: small beside the name in the red bar, larger in the open menu."
+                    width="300"
+                    height="397"
+                    loading="lazy" /></figure
+              ></div>
             </div>
-          </div>
-          <div>
-            <img
-              src="images/profile-mockup.png"
-              alt="Scotty as Andrew Carnegie's picture: small beside the name in the red bar, larger in the open menu."
-              width="300"
-              height="157"
-            />
-            <h2>Default Profile Picture</h2>
-            <p>
-              Scotty as the signed-in user's picture when they don't have a photo, in the kit's
-              <a href="https://webkilt.andrew.cmu.edu/accounts.html#photo">profile picture</a>: for
-              the one account on the page, not lists of people. Use this one address for both sizes,
-              small in the roof and larger in the menu: it's drawn, so it stays sharp, and it loads
-              once.
-            </p>
-            <div class="cmu-copyable">
-              <pre
-                class="cmu-snippet cmu-snippet--wrap"
-              ><code id="pm-a-avatar">https://placemellon.andrew.cmu.edu/112?profile</code></pre>
-              <button
-                type="button"
-                class="cmu-copy"
-                data-cmu-copy="#pm-a-avatar"
-                aria-label="Copy Address"
-                title="Copy Address"
-              ></button>
+            <h2 id="id-card" class="rule-top">Sample ID Card</h2>
+            <div class="cmu-split">
+              <div>
+                <p>
+                  A sample CMU ID for Andrew Carnegie, for ID tap screens and mockups. It's the card
+                  in the kit's
+                  <a class="external" href="https://webkilt.andrew.cmu.edu/forms.html#tap">ID tap</a
+                  >.
+                </p>
+                <div class="cmu-copyable">
+                  <pre
+                    class="cmu-snippet cmu-snippet--wrap"
+                  ><code id="pm-a-card">https://placemellon.andrew.cmu.edu/images/cmu-id-card.svg</code></pre
+                  ><button
+                    type="button"
+                    class="cmu-copy"
+                    data-cmu-copy="#pm-a-card"
+                    aria-label="Copy Address"
+                    title="Copy Address"
+                  ></button
+                ></div>
+                <p class="aligncenter"
+                  ><img
+                    src="images/cmu-id-card.svg"
+                    alt="A sample Carnegie Mellon ID card for Andrew Carnegie."
+                    width="440"
+                    height="277"
+                    loading="lazy"
+                /></p>
+              </div>
+              <div class="cmu-example"
+                ><p class="cmu-label">Example</p
+                ><figure class="cmu-shot"
+                  ><img
+                    src="images/id-card-in-use.png"
+                    alt="The sample ID card on an ID tap screen, over Tap Your CMU ID and Ready."
+                    width="458"
+                    height="439"
+                    loading="lazy" /></figure
+              ></div>
             </div>
-          </div>
-        </div>
-        <div class="content wide darkgrey invert">
-          <div>
-            <h1 id="favicon">Favicon</h1>
+            <h2 id="favicon" class="rule-top">Favicon</h2>
             <p>
-              A favicon is the small icon a browser shows beside a page's title: in the tab, in
-              bookmarks and in history. Phones use a larger one when someone adds the page to their
-              home screen, and older versions of Windows use the tile color and image for a pinned
-              site.
+              CMU's icon for browser tabs, bookmarks and phone home screens comes from cmu.edu. Add
+              these links to your page's head, or start from the Carnegie Mellon Web Kilt's
+              <a class="external" href="https://webkilt.andrew.cmu.edu/layout.html#skeleton"
+                >page template</a
+              >, which already has them:
             </p>
             <ul class="cmu-plain">
-              <li>
-                <img src="https://www.cmu.edu/favicon.ico" width="32" height="32" alt="" />
-                In a browser tab (favicon.ico)
-              </li>
-              <li>
-                <img src="https://www.cmu.edu/favicon-152.png" width="76" height="76" alt="" />
-                On a phone's home screen (favicon-152.png)
-              </li>
+              <li
+                ><img src="https://www.cmu.edu/favicon.ico" width="32" height="32" alt="" /> Browser
+                Tab</li
+              >
+              <li
+                ><img src="https://www.cmu.edu/favicon-152.png" width="76" height="76" alt="" />
+                Phone Home Screen</li
+              >
             </ul>
-            <p>To use CMU's favicon, link to the files on cmu.edu from your page's head:</p>
             <div class="cmu-copyable">
               <pre
                 class="cmu-snippet cmu-snippet--wrap"
               ><code id="pm-a-favicon">&lt;link href="https://www.cmu.edu/favicon.ico" rel="icon"&gt;
 &lt;link href="https://www.cmu.edu/favicon-152.png" rel="apple-touch-icon-precomposed"&gt;
 &lt;meta content="#9f0000" name="msapplication-TileColor"&gt;
-&lt;meta content="https://www.cmu.edu/favicon-144.png" name="msapplication-TileImage"&gt;</code></pre>
-              <button
+&lt;meta content="https://www.cmu.edu/favicon-144.png" name="msapplication-TileImage"&gt;</code></pre
+              ><button
                 type="button"
                 class="cmu-copy"
                 data-cmu-copy="#pm-a-favicon"
                 aria-label="Copy Code"
                 title="Copy Code"
-              ></button>
-            </div>
-          </div>
-        </div>
-        <div class="content wide">
-          <div>
-            <h2 id="more">More From University Communications and Marketing</h2>
+              ></button
+            ></div>
+            <h2 id="more" class="rule-top">More From University Communications &amp; Marketing</h2>
             <p>
               CMU's <a class="external" href="https://brand.cmu.edu/">brand site</a> has the
               official wordmarks, Scotty illustrations and tartan patterns, with how to use them:
@@ -237,14 +291,16 @@
         </div>
         <div></div>
         <div>
-          <nav id="nav">
-            <ul>
-              <li><a href="builder.html">Builder</a></li>
-              <li><a href="options.html">Options</a></li>
-              <li class="active"><a href="assets.html">Assets</a></li>
-              <li><a href="about.html">About</a></li>
-            </ul>
-          </nav>
+          <nav id="nav"
+            ><ul
+              ><li><a href="builder.html">Builder</a></li
+              ><li><a href="styles.html">Styles</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li class="active"
+                ><a href="assets.html" aria-current="page">Production Assets</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
         </div>
       </footer>
     </div>
@@ -252,8 +308,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/js/cmu-app.js"
-      integrity="sha384-Etmkex3xbkUyRJUcASnyzfeR4g6yNwaWbaK+Z3sJvOxk76pCKgcYHAtNZppbmH8Z"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
       crossorigin="anonymous"
     ></script>
     <script src="js/docs.js"></script>

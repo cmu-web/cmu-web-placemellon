@@ -1,0 +1,71 @@
+name: Ruby gem
+
+# Tests the Ruby gem in packages/ruby/ and publishes it from each release tag,
+# at the tag's version. RubyGems.org trusts this workflow (trusted
+# publishing), so there's no API key to store.
+on:
+  push:
+    branches: [main]
+    tags: ["[0-9]*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: packages/ruby
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # The oldest Ruby the gem supports and a current one
+        ruby: ["3.2", "3.4"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+          working-directory: packages/ruby
+      - run: bundle exec rake test build
+
+  publish:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: rubygems
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+          working-directory: packages/ruby
+      - name: Check the tag matches package.json
+        run: test "$(ruby -rjson -e 'puts JSON.parse(File.read("../../package.json"))["version"]')" = "$GITHUB_REF_NAME"
+      - run: bundle exec rake build
+      # Trades GitHub's identity token for a RubyGems.org key that lasts 15
+      # minutes. A new gem's first push has to name the account that will own
+      # it (owner: its RubyGems.org ID), which
+      # rubygems/configure-rubygems-credentials can't pass yet.
+      - name: Get a RubyGems.org key
+        env:
+          RUBYGEMS_OWNER: "8871"
+        run: |
+          jwt=$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=rubygems.org" | jq -r .value)
+          key=$(jq -n --arg jwt "$jwt" --arg owner "$RUBYGEMS_OWNER" '{jwt: $jwt, owner: $owner}' |
+            curl --fail-with-body --silent --show-error -X POST \
+              -H "Content-Type: application/json" --data @- \
+              https://rubygems.org/api/v1/oidc/trusted_publisher/exchange_token | jq -r .rubygems_api_key)
+          echo "::add-mask::$key"
+          echo "GEM_HOST_API_KEY=$key" >> "$GITHUB_ENV"
+      - run: gem push "pkg/cmu-web-placemellon-$GITHUB_REF_NAME.gem"

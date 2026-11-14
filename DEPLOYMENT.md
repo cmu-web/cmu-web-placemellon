@@ -8,7 +8,7 @@ The commands below use Podman; Docker can also build and run the image.
 
 The [publishing workflow](.github/workflows/publish.yml) runs all checks
 and builds the production image. It publishes to
-`ghcr.io/cmu-web/cmu-web-placemellon` for version tags, such as `1.4.0`, and
+`ghcr.io/cmu-web/cmu-web-placemellon` for version tags, like `1.4.0`, and
 manual workflow runs. Ordinary branch pushes and pull requests build
 without publishing.
 
@@ -45,10 +45,11 @@ binding exposes the service on the host's loopback interface; a reverse
 proxy can forward public requests to it. Change the first port number to
 use a different host port.
 
-The container serves documentation at `/`, image URLs such as `/400/300`
+The container serves documentation at `/`, image URLs like `/400/300`
 and catalog health at `/healthz`. Startup loads the catalog in the
-background. Photo requests return 503 until it is ready; documentation and
-drawn placeholders remain available. Restarting clears the catalog and
+background. Photo requests return 503 until it is ready, and a failed load
+is tried again within minutes; documentation and drawn placeholders remain
+available. Restarting clears the catalog and
 rendered image cache.
 
 ## Configuration
@@ -61,9 +62,10 @@ Pass settings with `-e NAME=value` or `--env-file PATH`.
 | `PORT`          | `3000`  | Listening port inside the container                                                   |
 | `REFRESH_HOURS` | `6`     | Hours between catalog refreshes; expiring preview links can trigger earlier refreshes |
 | `CACHE_ENTRIES` | `256`   | Maximum rendered images in memory; `0` disables this cache                            |
+| `CACHE_MB`      | `64`    | Most memory the image cache uses, in megabytes                                        |
 
-Use a valid TCP port, a positive refresh interval and a nonnegative whole
-number of cache entries. If changing `PORT`, update the container-side port
+Use a valid TCP port, a positive refresh interval and nonnegative whole
+numbers for the cache settings. If changing `PORT`, update the container-side port
 in the mapping too. The image sets `NODE_ENV=production` for Express.
 
 ## Check the Service
@@ -124,3 +126,21 @@ The production image contains compiled TypeScript, production dependencies,
 vector artwork and documentation. It runs as the non-root `node` user.
 The Dockerfile pins the Node base image by digest and pins npm in the
 shared base stage.
+
+## Publish the Ruby Gem
+
+Each version tag also publishes the Ruby gem in `packages/ruby/`,
+`cmu-web-placemellon`, at the same version, through the
+[Ruby gem workflow](.github/workflows/rubygems.yml). It uses trusted
+publishing, so there's no API key to store, but RubyGems.org has to trust it first.
+Do this once, before the first tag that should publish the gem:
+
+1. Sign in to RubyGems.org with an account that has multi-factor
+   authentication on.
+2. Under Trusted Publishers, add a pending trusted publisher for the gem
+   `cmu-web-placemellon`: GitHub Actions, owner `cmu-web`, repository
+   `cmu-web-placemellon`, workflow `rubygems.yml` and environment `rubygems`.
+
+The first successful run creates the gem on RubyGems.org, owned by that
+account. Until then, the workflow's publish step fails on each tag; the
+image is published as usual.

@@ -2,8 +2,10 @@ import express, { Request, Response } from "express";
 import path from "path";
 import { Catalog } from "./catalog";
 import {
-  avatarSvg,
+  profileSvg,
   bioSvg,
+  COLORS,
+  DEFAULT_COLOR,
   solidSvg,
   MAX,
   renderPhoto,
@@ -22,7 +24,8 @@ const OPTIONS = [
   "bio",
   "solid",
   "text",
-  "white",
+  "color",
+  "gradient",
   "gray",
   "grayscale",
 ];
@@ -35,7 +38,8 @@ export interface Options {
   bio: boolean;
   solid: boolean;
   text: boolean;
-  white: boolean;
+  color?: string;
+  gradient: boolean;
   gray: boolean;
 }
 
@@ -49,12 +53,7 @@ export class OptionError extends Error {
 }
 
 // Reads the query string; rejects unknown options and ones that don't go together
-export function parseOptions(
-  query: Record<string, unknown>,
-  _w: number,
-  _h: number,
-  gray = false,
-): Options {
+export function parseOptions(query: Record<string, unknown>, gray = false): Options {
   const unknown = Object.keys(query).filter((k) => !OPTIONS.includes(k));
   if (unknown.length)
     throw new OptionError(
@@ -69,26 +68,39 @@ export function parseOptions(
       404,
       `No category "${category}". Try ${Object.keys(PORTALS).join(", ")}.`,
     );
+  const color = query.color;
+  if (color !== undefined && typeof color !== "string")
+    throw new OptionError(400, "Give ?color once.");
+  if (color !== undefined && !(color in COLORS))
+    throw new OptionError(
+      404,
+      `No color "${color}". Use a CMU brand color: ${Object.keys(COLORS).join(", ")}.`,
+    );
   const o: Options = {
     category,
+    color,
     random: "random" in query,
     scotty: "scotty" in query,
     profile: "profile" in query,
     bio: "bio" in query,
     solid: "solid" in query,
     text: "text" in query,
-    white: "white" in query,
+    gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
-  if ([o.scotty, o.profile, o.bio, o.solid].filter(Boolean).length > 1)
-    throw new OptionError(400, "Pick one of ?scotty, ?profile, ?bio or ?solid.");
+  if ([o.scotty, o.bio, o.profile, o.solid].filter(Boolean).length > 1)
+    throw new OptionError(400, "Pick one of ?scotty, ?bio, ?profile or ?solid.");
   if ((o.scotty || o.profile || o.bio || o.solid) && (o.category || o.random))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty, ?profile, ?bio or ?solid.",
+      "?category and ?random choose photos, so they don't go with ?scotty, ?bio, ?profile or ?solid.",
     );
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
-  if (o.white && !o.scotty) throw new OptionError(400, "Use ?white with ?scotty.");
+  if (o.color && !o.solid) throw new OptionError(400, "Use ?color with ?solid.");
+  // Grayscale is for photos; the drawn images are already flat colors
+  if (o.gray && (o.scotty || o.profile || o.bio || o.solid))
+    throw new OptionError(400, "Use ?gray (or /g/) with photos only.");
+  if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty.");
   return o;
 }
 
@@ -98,10 +110,18 @@ interface Rendered {
   photo?: string;
 }
 
-// Rendered images, newest last; the oldest go first
-class Lru {
+// Rendered images, newest last; the oldest go first when there are too many
+// or they take too much memory
+export class Lru {
   private map = new Map<string, Rendered>();
-  constructor(private max: number) {}
+  private bytes = 0;
+  constructor(
+    private maxEntries: number,
+    private maxBytes: number,
+  ) {}
+  get size() {
+    return this.map.size;
+  }
   get(k: string) {
     const v = this.map.get(k);
     if (v) {
@@ -111,8 +131,19 @@ class Lru {
     return v;
   }
   set(k: string, v: Rendered) {
+    if (v.body.length > this.maxBytes || this.maxEntries < 1) return;
+    const old = this.map.get(k);
+    if (old) {
+      this.bytes -= old.body.length;
+      this.map.delete(k);
+    }
     this.map.set(k, v);
-    if (this.map.size > this.max) this.map.delete(this.map.keys().next().value!);
+    this.bytes += v.body.length;
+    while (this.map.size > this.maxEntries || this.bytes > this.maxBytes) {
+      const [oldest, entry] = this.map.entries().next().value!;
+      this.map.delete(oldest);
+      this.bytes -= entry.body.length;
+    }
   }
 }
 
@@ -131,7 +162,12 @@ export function parseSize(s: string): number | null {
 
 export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
   const app = express();
-  const cache = new Lru(Number(process.env.CACHE_ENTRIES || 256));
+  const cache = new Lru(
+    Number(process.env.CACHE_ENTRIES ?? 256),
+    Number(process.env.CACHE_MB ?? 64) * 1024 * 1024,
+  );
+  // Renders in progress, so requests for the same image share one
+  const inFlight = new Map<string, Promise<Rendered>>();
 
   app.use(express.static(path.join(__dirname, "..", "docs"), { index: "index.html" }));
 
@@ -146,19 +182,34 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
   async function send(res: Response, key: string | null, make: () => Promise<Rendered>) {
     let out = key ? cache.get(key) : undefined;
     if (!out) {
+      let job = key ? inFlight.get(key) : undefined;
+      if (!job) {
+        job = make();
+        if (key) {
+          const k = key;
+          inFlight.set(k, job);
+          void job
+            .then((r) => cache.set(k, r))
+            .catch(() => {})
+            .finally(() => inFlight.delete(k));
+        }
+      }
       try {
-        out = await make();
+        out = await job;
       } catch (e) {
         console.error(key ?? "random", (e as Error).message);
         res.status(502).type("text/plain").send("Couldn't get that image. Try again shortly.\n");
         return;
       }
-      if (key) cache.set(key, out);
     }
     if (out.photo) res.set("X-Photo", out.photo);
     if (out.type === "svg") res.set("Content-Security-Policy", "default-src 'none'");
+    // Browsers keep an image a day, except random photos, and except in
+    // development, where an image's address can stay the same while its
+    // drawing changes
+    const keep = key && process.env.NODE_ENV !== "development";
     res
-      .set("Cache-Control", key ? "public, max-age=86400" : "no-store")
+      .set("Cache-Control", keep ? "public, max-age=86400" : "no-store")
       .type(out.type)
       .send(out.body);
   }
@@ -175,7 +226,7 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     }
     let o: Options;
     try {
-      o = parseOptions(req.query, w, h, gray);
+      o = parseOptions(req.query, gray);
     } catch (e) {
       if (!(e instanceof OptionError)) throw e;
       res
@@ -210,25 +261,25 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       return;
     }
     const png = ext === "png";
-    const draw = async (svg: string, g: boolean): Promise<Rendered> =>
-      png ? { type: "png", body: await renderSvg(svg, g) } : { type: "svg", body: svgFile(svg, g) };
+    const draw = async (svg: string): Promise<Rendered> =>
+      png ? { type: "png", body: await renderSvg(svg) } : { type: "svg", body: svgFile(svg) };
 
     if (o.solid) {
-      const key = `solid ${w}x${h}${o.text ? " text" : ""}${png ? " png" : ""}`;
-      void send(res, key, () => draw(solidSvg(w, h, o.text), false));
+      const key = `solid ${w}x${h} ${o.color ?? DEFAULT_COLOR}${o.text ? " text" : ""}${png ? " png" : ""}`;
+      void send(res, key, () => draw(solidSvg(w, h, o.text, o.color)));
       return;
     }
 
     if (o.bio) {
       const key = `bio ${w}x${h}${png ? " png" : ""}`;
-      void send(res, key, () => draw(bioSvg(w, h), false));
+      void send(res, key, () => draw(bioSvg(w, h)));
       return;
     }
 
     if (o.scotty || o.profile) {
-      const svg = o.profile ? avatarSvg(w) : scottySvg(w, h, o.white);
-      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.white ? " white" : ""}${o.gray ? " gray" : ""}${png ? " png" : ""}`;
-      void send(res, key, () => draw(svg, o.gray));
+      const svg = o.profile ? profileSvg(w) : scottySvg(w, h, o.gradient);
+      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.gradient ? " gradient" : ""}${png ? " png" : ""}`;
+      void send(res, key, () => draw(svg));
       return;
     }
 

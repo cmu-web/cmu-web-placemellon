@@ -10,20 +10,19 @@ pictures and plain gray boxes.
 
 **[Explore the Documentation](https://placemellon.andrew.cmu.edu/)** ·
 [Build a Placeholder](https://placemellon.andrew.cmu.edu/builder.html) ·
-[Explore the Options](https://placemellon.andrew.cmu.edu/options.html)
+[Explore the Styles](https://placemellon.andrew.cmu.edu/styles.html)
 
 [![The PlaceMellon home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew.](docs/images/preview.jpg)](https://placemellon.andrew.cmu.edu/)
 
-Put a width and height in the URL, such as
+Put a width and height in the URL, like
 `https://placemellon.andrew.cmu.edu/400/300`, and use it wherever you need
 an image. Choose a category, make it grayscale or ask for a random photo.
 The builder lets you preview the result and copy its URL or HTML.
 
 Inspired by [PlaceCats](https://www.placecats.com/) and
 [PlaceBear](https://placebear.com/), with photos from CMU Selects.
-Use the photos for CMU mockups and prototypes; for a finished page, choose
-and credit a photo from the source collection. The
-[images and icons](https://placemellon.andrew.cmu.edu/assets.html), such as
+Use the photos for CMU mockups and prototypes; for a finished page, download the photo from the source collection. The
+[images and icons](https://placemellon.andrew.cmu.edu/assets.html), like
 the sample ID card, bio placeholder and default profile picture, are fine
 on live sites.
 
@@ -31,9 +30,9 @@ on live sites.
 
 - **A page layout:** [Find a photo that fits](https://placemellon.andrew.cmu.edu/builder.html).
 - **A people page:** [Use the bio placeholder and default profile picture](https://placemellon.andrew.cmu.edu/assets.html).
-- **A wireframe:** [Try solid placeholders with dimensions](https://placemellon.andrew.cmu.edu/options.html).
+- **A wireframe:** [Try solid placeholders with dimensions](https://placemellon.andrew.cmu.edu/styles.html).
 
-The docs cover image formats, sizes and options, plus
+The [reference](https://placemellon.andrew.cmu.edu/reference.html) covers image URLs and parameters; the docs also explain
 [where the photos come from](https://placemellon.andrew.cmu.edu/about.html).
 
 ## Help Improve PlaceMellon

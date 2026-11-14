@@ -63,7 +63,8 @@ npm run check
 ```
 
 This checks the Node types version, ESLint, Prettier, link preview metadata
-and TypeScript, then runs tests and compiles the service. CI runs the same
+and TypeScript, then runs tests, compiles the service and checks the generated
+color reference. CI runs the same
 command in the Dockerfile's `test` stage. To reproduce that from the host:
 
 ```bash
@@ -109,6 +110,10 @@ includes ESLint and Prettier extensions and formats supported files on save.
 After changing documentation titles or descriptions, run
 `npm run opengraph` to refresh link preview metadata, then format the results.
 
+The color table in `docs/reference.html` is generated from `COLORS` in
+`src/render.ts`. After changing the palette, run `npm run docs`.
+`npm run check:docs` checks that the table matches the renderer.
+
 ## Compile and Run
 
 ```bash
@@ -146,7 +151,7 @@ A release publishes a container image to GitHub Container Registry.
    ```
 
    This updates `package.json` and `package-lock.json`, creates a local
-   commit and creates an annotated tag named for the version, such as
+   commit and creates an annotated tag named for the version, like
    `1.4.0`, with no `v` prefix (set in `.npmrc`). Review the commit and
    tag before publishing.
 
@@ -176,12 +181,16 @@ requests skip scoring.
 Rendering fetches the smallest preview that covers the requested size.
 Sharp crops photos with attention-based positioning and produces JPEG or
 WebP. Scotty, profile pictures, bio placeholders and solid colors are
-rendered as SVG or PNG without the catalog. The Scotty artwork is traced
-from the [Scotty chatbot's avatar](https://www.cmu.edu/hr/images/scotty.png).
+rendered as SVG or PNG without the catalog. The Scotty artwork,
+`assets/scotty-head.svg`, is University Communications & Marketing's
+[Scotty illustration](https://brand.cmu.edu/resources/downloads), the same
+file QRnegie uses.
 Dimension text in solid placeholders uses Open Sans, installed in the
 container for PNG rendering; SVGs use the viewer's fonts.
 
-Rendered images stay in an in-memory LRU cache, limited by `CACHE_ENTRIES`.
+Rendered images stay in an in-memory LRU cache, limited by `CACHE_ENTRIES`
+and `CACHE_MB`; requests for an image that's still rendering share that
+render. Requests to CMU Selects time out after 20 seconds.
 Non-random responses allow browser and proxy caching for one day. Random
 requests bypass the image cache and return `Cache-Control: no-store`.
 The `X-Photo` response header identifies the source photo by filename.

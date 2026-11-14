@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (Google Analytics): docs pages only, never on placeholder images -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MTRD2JHT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About - PlaceMellon - Carnegie Mellon University</title>
@@ -10,7 +19,7 @@
     <meta property="og:title" content="About - PlaceMellon" />
     <meta
       property="og:description"
-      content="Where PlaceMellon's photos come from, how to find one and how the service works."
+      content="How PlaceMellon works, where its Carnegie Mellon photos and artwork come from and how to contribute."
     />
     <meta property="og:url" content="https://placemellon.andrew.cmu.edu/about.html" />
     <meta property="og:image" content="https://placemellon.andrew.cmu.edu/images/preview.jpg" />
@@ -24,7 +33,7 @@
     <!-- End of link previews -->
     <meta
       name="description"
-      content="Where PlaceMellon's photos come from, how to find one and how the service works."
+      content="How PlaceMellon works, where its Carnegie Mellon photos and artwork come from and how to contribute."
     />
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,300,600,700,700italic"
@@ -38,8 +47,8 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-cms.css"
-      integrity="sha384-jLB4PsCj8eJZzLvX09Rp//BaeUnjZFFNVOS3iVyZhktnIw9EkiZPVseQWE+Yjz/q"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-cms.css"
+      integrity="sha384-yLW+PJWgOwzCEFs7dOsWaFrTYhJHqjb5ZEJvoEnLbHFN/L9GTXF5Df+awov2VyUr"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -70,141 +79,47 @@
         <div class="content wide"
           ><div>
             <h1>About PlaceMellon</h1>
-            <p class="cmu-lead">
-              PlaceMellon gives you CMU photos at whatever size your mockup or prototype calls for.
-              It's inspired by
-              <a class="external" href="https://www.placecats.com/">PlaceCats</a> and
-              <a class="external" href="https://placebear.com/">PlaceBear</a>, and works the same
-              way: put the size in the URL and you get a placeholder.
-            </p>
-            <h2 class="rule-top" id="photos">Where the Photos Come From</h2>
-            <p
-              >The photos come from
-              <a href="https://cmu.widencollective.com/portals/iff7gdfg/CMUPhotographyPortal-Master"
-                >CMU Selects</a
-              >, University Communications &amp; Marketing's collection of campus photography. CMU
-              Selects says they're for "use by the Carnegie Mellon University community in
-              university-related communications and marketing," so use PlaceMellon for CMU work. For
-              a finished page, choose and credit a photo there.</p
+            <p class="cmu-lead"
+              >PlaceMellon gives you Carnegie Mellon photos and artwork at whatever size your mockup
+              or prototype calls for.</p
             >
-            <p
-              >The Scotty in <code>?scotty</code> and <code>?profile</code> is traced from the
-              avatar of the
-              <a href="https://www.cmu.edu/hr/news/2024/02-26-employee-experience.html"
-                >Scotty chatbot</a
-              >.</p
-            >
-            <p
-              >The sample ID card, <a href="images/cmu-id-card.svg">images/cmu-id-card.svg</a>, is
-              redrawn from the ID+ office's sample card, with Carnegie Mellon's official wordmark
-              and the card's own area of the Red Wave 1 tartan pattern.</p
-            >
-            <div class="cmu-callout cmu-callout--blue">
-              <p class="cmu-label">Which Photo Is This?</p>
-              <div>
-                <p
-                  >Each image comes with an <code>X-Photo</code> header that names its photo. Look
-                  it up with this command, using your image's address, then search for the name in
-                  CMU Selects:</p
-                >
-                <div class="cmu-copyable">
-                  <pre
-                    class="cmu-snippet cmu-snippet--wrap"
-                  ><code id="pm-which">curl -sI https://placemellon.andrew.cmu.edu/400/300 | grep -i x-photo</code></pre>
-                  <button
-                    type="button"
-                    class="cmu-copy"
-                    data-cmu-copy="#pm-which"
-                    aria-label="Copy Command"
-                    title="Copy Command"
-                  ></button>
-                </div>
-                <p
-                  >Or open the image in your browser, open its developer tools and find the header
-                  under the image's request on the Network tab.</p
-                >
-              </div>
-            </div>
-            <h2 class="rule-top" id="how">How It Works</h2>
+            <h2 id="how" class="rule-top">How It Works</h2>
             <p
               >PlaceMellon picks a photo with similar proportions: landscape for wide sizes,
               portrait for tall ones and any photo for sizes close to square. It crops the photo to
               fit and keeps the part with the most detail and color.</p
             >
             <ul class="cmu-checks">
-              <li><strong>The same size always gets the same photo.</strong></li>
               <li
-                ><strong>Add <code>?random</code></strong> for a different photo each time.</li
+                ><strong>A size and category select a consistent photo.</strong> The selection can
+                change when the source collection changes. Choose random photos to vary it on each
+                request.</li
               >
               <li
-                ><strong>Scotty stays sharp at any size,</strong> since he's drawn from vector
-                shapes.</li
+                ><strong>An exported image works on its own.</strong> Save the file to keep it with
+                your project. An image loaded from a PlaceMellon address depends on the service.</li
+              >
+              <li
+                ><strong>SVG artwork stays sharp at any size.</strong> Scotty, bio placeholders and
+                solid colors are drawn as vector shapes. PNG exports are also available.</li
               >
               <li
                 ><strong>Source photos aren't saved to disk.</strong> PlaceMellon fetches each one
                 from CMU Selects when it's needed.</li
               >
             </ul>
-            <h2 class="rule-top" id="technical">Technical Details</h2>
-            <p
-              >PlaceMellon keeps a list of the CMU Selects photos and refreshes it every few hours.
-              It narrows the list to photos with similar proportions, then picks one by rendezvous
-              hashing, scoring each photo by your size and its ID and taking the highest. That way,
-              when University Communications &amp; Marketing adds or removes photos, most sizes keep
-              the same photo. With <code>?random</code>, it skips the scoring and picks any photo
-              with similar proportions.</p
-            >
-            <p
-              >To crop, it fetches the smallest preview that covers your size and keeps the part
-              with the most detail and color. It caches recently generated images in memory, and
-              browsers may keep each one for a day, so repeat requests are fast. Random photos are
-              never held.</p
-            >
-            <p>PlaceMellon is a small TypeScript app built with Express and sharp.</p>
           </div></div
         >
-        <div class="grid column2 grey boxes">
-          <h1 id="cmu-web">More CMU Web Tools</h1>
-          <p class="cmu-grid-full">
-            PlaceMellon is one of three CMU Web projects for building Carnegie Mellon websites and
-            web apps.
-          </p>
-          <div>
-            <figure class="cmu-shot cmu-shot--browser">
-              <a href="https://webkilt.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
-                ><img
-                  src="images/gallery-web-kilt.jpg"
-                  alt="The Carnegie Mellon Web Kilt's home page: the heading Made to Measure for CMU Sites and Apps beside stacked screenshots of three CMU sites."
-                  width="1040"
-                  height="656"
-              /></a>
-            </figure>
-            <h2>Carnegie Mellon Web Kilt</h2>
-            <p>Components for websites and web apps on CMU's template.</p>
-            <p><a class="external" href="https://webkilt.andrew.cmu.edu/">Visit the Web Kilt</a></p>
-          </div>
-          <div>
-            <figure class="cmu-shot cmu-shot--browser">
-              <a href="https://jekyllandplaid.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
-                ><img
-                  src="images/gallery-jekyll-and-plaid.jpg"
-                  alt="Jekyll &amp; Plaid's docs: Markdown in CMU's template, with a code block and its copy icon."
-                  width="1040"
-                  height="656"
-              /></a>
-            </figure>
-            <h2>Jekyll &amp; Plaid</h2>
-            <p>A GitHub Pages theme that turns plain Markdown into pages in CMU style.</p>
+        <div class="content wide"
+          ><div>
+            <h2 id="contributing" class="rule-top">Contributing to PlaceMellon</h2>
             <p
-              ><a class="external" href="https://jekyllandplaid.andrew.cmu.edu/"
-                >Visit Jekyll &amp; Plaid</a
-              ></p
+              >PlaceMellon is a TypeScript app built with Express. It fetches photos from CMU
+              Selects and crops them with
+              <a class="external" href="https://sharp.pixelplumbing.com/">sharp</a>. Scotty, bio
+              placeholders and solid colors are drawn as SVG; sharp turns them into PNGs. Tests
+              check sizes, cropping, photo selection and the options.</p
             >
-          </div>
-        </div>
-        <div class="content wide">
-          <div>
-            <h2 id="contributing">Contributing to PlaceMellon</h2>
             <p
               >The
               <a class="external" href="https://github.com/cmu-web/cmu-web-placemellon"
@@ -213,8 +128,141 @@
               has the code, its tests and documentation. To report a problem or suggest a change,
               open an issue or send a pull request.</p
             >
+          </div></div
+        >
+        <div class="grid column4 grey boxes">
+          <h1 id="cmu-web">More CMU Web Tools</h1>
+          <p class="cmu-grid-full">
+            PlaceMellon is part of CMU Web, a collection of projects for Carnegie Mellon web
+            development. The collection also includes:
+          </p>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://webkilt.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="https://webkilt.andrew.cmu.edu/images/cmu-web-preview.webp"
+                  alt="The Carnegie Mellon Web Kilt's home page."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2
+              ><a class="external" href="https://webkilt.andrew.cmu.edu/"
+                >Carnegie Mellon Web Kilt</a
+              ></h2
+            >
+            <p>Components for websites and web apps on CMU's template.</p>
+          </div>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://jekyllandplaid.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="https://jekyllandplaid.andrew.cmu.edu/images/cmu-web-preview.webp"
+                  alt="Jekyll &amp; Plaid's home page."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2
+              ><a class="external" href="https://jekyllandplaid.andrew.cmu.edu/"
+                >Jekyll &amp; Plaid</a
+              ></h2
+            >
+            <p>A GitHub Pages theme that turns plain Markdown into pages in CMU style.</p>
+          </div>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://qrnegie.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="https://qrnegie.andrew.cmu.edu/images/cmu-web-preview.webp"
+                  alt="QRnegie's home page."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2><a class="external" href="https://qrnegie.andrew.cmu.edu/">QRnegie</a></h2>
+            <p
+              >QR codes with Carnegie Mellon character, from Scotty portraits to campus
+              landmarks.</p
+            >
+          </div>
+          <div>
+            <figure class="cmu-shot cmu-shot--browser">
+              <a href="https://fencepost.andrew.cmu.edu/" tabindex="-1" aria-hidden="true"
+                ><img
+                  src="https://fencepost.andrew.cmu.edu/images/cmu-web-preview.webp"
+                  alt="FencePost's home page."
+                  width="1040"
+                  height="656"
+              /></a>
+            </figure>
+            <h2><a class="external" href="https://fencepost.andrew.cmu.edu/">FencePost</a></h2>
+            <p>Link previews for Carnegie Mellon websites: the image and the Open Graph tags.</p>
           </div>
         </div>
+        <div class="content wide"
+          ><div>
+            <h2 id="credits">Licenses and Credits</h2>
+            <p
+              >PlaceMellon's code is available under the
+              <a
+                class="external"
+                href="https://github.com/cmu-web/cmu-web-placemellon/blob/main/LICENSE"
+                >BSD 3-Clause License</a
+              >. CMU's names, marks, photos and artwork retain their own usage requirements and are
+              not covered by that license.</p
+            >
+            <ul>
+              <li id="photos"
+                ><strong>Photos:</strong> University Communications &amp; Marketing's
+                <a
+                  class="external"
+                  href="https://cmu.widencollective.com/portals/iff7gdfg/CMUPhotographyPortal-Master"
+                  >CMU Selects</a
+                >
+                collection provides photos for use by the Carnegie Mellon community in
+                university-related communications and marketing.</li
+              >
+              <li
+                ><strong>Scotty:</strong> The graphic and profile picture use the red-scarf portrait
+                from University Communications &amp; Marketing's
+                <a class="external" href="https://brand.cmu.edu/resources/downloads"
+                  >Scotty artwork</a
+                >.</li
+              >
+              <li
+                ><strong>Wordmark:</strong> The bio placeholder uses Carnegie Mellon's
+                <a
+                  class="external"
+                  href="https://brand.cmu.edu/visual-identity/carnegie-mellon-trademarks/wordmarks"
+                  >stacked wordmark</a
+                >.</li
+              >
+              <li
+                ><strong>ID Card:</strong> The
+                <a href="images/cmu-id-card.svg">sample ID card</a> is redrawn from the ID+ office's
+                sample, with the official wordmark and the card's own area of the Red Wave 1 tartan
+                pattern.</li
+              >
+              <li
+                ><strong>Inspiration:</strong>
+                <a class="external" href="https://www.placecats.com/">PlaceCats</a> and
+                <a class="external" href="https://placebear.com/">PlaceBear</a> inspired the
+                size-in-the-URL approach.</li
+              >
+              <li
+                ><strong>Bunsen Honeydew:</strong> The home page and link preview photo is by
+                <a
+                  class="external"
+                  href="https://commons.wikimedia.org/wiki/File:Dr._Bunsen_Honeydew.png"
+                  >MuppetsStudio</a
+                >, under
+                <a class="external" href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a
+                >, cropped for PlaceMellon.</li
+              >
+            </ul>
+          </div></div
+        >
       </main>
       <footer class="grid column3 invert">
         <div>
@@ -232,14 +280,15 @@
         </div>
         <div></div>
         <div>
-          <nav id="nav">
-            <ul>
-              <li><a href="builder.html">Builder</a></li>
-              <li><a href="options.html">Options</a></li>
-              <li><a href="assets.html">Assets</a></li>
-              <li class="active"><a href="about.html">About</a></li>
-            </ul>
-          </nav>
+          <nav id="nav"
+            ><ul
+              ><li><a href="builder.html">Builder</a></li
+              ><li><a href="styles.html">Styles</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="assets.html">Production Assets</a></li
+              ><li class="active"><a href="about.html" aria-current="page">About</a></li></ul
+            ></nav
+          >
         </div>
       </footer>
     </div>
@@ -247,8 +296,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/js/cmu-app.js"
-      integrity="sha384-Etmkex3xbkUyRJUcASnyzfeR4g6yNwaWbaK+Z3sJvOxk76pCKgcYHAtNZppbmH8Z"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
       crossorigin="anonymous"
     ></script>
     <script src="js/docs.js"></script>

@@ -1,0 +1,33 @@
+# frozen_string_literal: true
+
+require 'rake/testtask'
+require 'rubygems/package'
+require 'fileutils'
+require 'json'
+
+APP = File.expand_path('../..', __dir__)
+
+desc "Copy the app's license and version into the gem"
+task :version do
+  FileUtils.cp(File.join(APP, 'LICENSE'), 'LICENSE')
+  File.write('VERSION', "#{JSON.parse(File.read(File.join(APP, 'package.json'))).fetch('version')}\n")
+end
+
+desc 'Remove the copied files and the build'
+task :clean do
+  FileUtils.rm_rf(%w[LICENSE VERSION pkg])
+end
+
+desc 'Build the gem in pkg/'
+task build: :version do
+  spec = Gem::Specification.load('cmu-web-placemellon.gemspec')
+  FileUtils.mkdir_p('pkg')
+  Gem::Package.build(spec, false, true, File.join('pkg', spec.file_name))
+end
+
+Rake::TestTask.new do |task|
+  task.libs << 'test'
+  task.pattern = 'test/**/*_test.rb'
+end
+
+task default: :test

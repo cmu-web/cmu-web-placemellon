@@ -1,6 +1,9 @@
 import { listPhotos, Photo } from "./widen";
 
 const HOUR = 3600_000;
+// While there are no photos, try again this soon, doubling up to the cap
+const RETRY_MS = 60_000;
+const RETRY_CAP_MS = 15 * 60_000;
 
 // Earliest sig.expires among the preview links, in ms, or null if none parse
 export function earliestExpiry(photos: Photo[]): number | null {
@@ -21,6 +24,7 @@ export class Catalog {
   refreshedAt: Date | null = null;
   private timer: NodeJS.Timeout | null = null;
   private pending: Promise<void> | null = null;
+  private failures = 0;
 
   constructor(
     private list: () => Promise<Photo[]> = listPhotos,
@@ -34,6 +38,11 @@ export class Catalog {
         if (!photos.length) throw new Error("Widen returned no photos");
         this.photos = photos;
         this.refreshedAt = new Date();
+        this.failures = 0;
+      })
+      .catch((e: unknown) => {
+        this.failures++;
+        throw e;
       })
       .finally(() => {
         this.pending = null;
@@ -57,6 +66,13 @@ export class Catalog {
 
   private schedule() {
     this.stop();
+    // With no photos every photo request fails, so don't wait hours to retry
+    if (!this.photos.length && this.failures) {
+      const delay = Math.min(RETRY_MS * 2 ** (this.failures - 1), RETRY_CAP_MS);
+      this.timer = setTimeout(() => void this.start(), delay);
+      this.timer.unref();
+      return;
+    }
     let next = Date.now() + this.everyMs;
     const exp = earliestExpiry(this.photos);
     if (exp) next = Math.min(next, exp - 10 * 60_000);

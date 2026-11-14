@@ -1,3 +1,8 @@
 node_modules/
 dist/
 .env
+# The Ruby gem: copies of the license and version (rake version) and its build
+packages/ruby/Gemfile.lock
+packages/ruby/pkg/
+packages/ruby/LICENSE
+packages/ruby/VERSION

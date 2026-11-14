@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (Google Analytics): docs pages only, never on placeholder images -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MTRD2JHT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PlaceMellon - Carnegie Mellon University</title>
@@ -38,15 +47,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-cms.css"
-      integrity="sha384-jLB4PsCj8eJZzLvX09Rp//BaeUnjZFFNVOS3iVyZhktnIw9EkiZPVseQWE+Yjz/q"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-cms.css"
+      integrity="sha384-yLW+PJWgOwzCEFs7dOsWaFrTYhJHqjb5ZEJvoEnLbHFN/L9GTXF5Df+awov2VyUr"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-app.css"
-      integrity="sha384-Jt4iIjchoqX/sKhhQp2b6Afg8uzXHR9eFVQEgTYnffI+pgwCUQAe48nmkKCRUdhI"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-app.css"
+      integrity="sha384-Tj5sbg6foKwNHx77Xj9uSKHv4N7jiYnj97prQWE3B2+6v3K8tsqz/xmsjxeJKvjA"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -124,16 +133,17 @@
             >
             <ul class="cmu-checks">
               <li
-                ><strong>The same size always gets the same photo</strong>, so your mockup looks the
-                same every time you open it.</li
+                ><strong>A size and category select a consistent photo</strong>, so your mockup
+                looks the same as you work. The selection can change when the source collection
+                changes.</li
               >
               <li
                 ><strong>Wide sizes get landscape photos</strong> and tall sizes get portrait ones,
                 so less is cropped away.</li
               >
               <li
-                ><strong>Photos are cropped around what's interesting</strong> in them, such as
-                people and buildings.</li
+                ><strong>Photos are cropped around what's interesting</strong> in them, like people
+                and buildings.</li
               >
             </ul>
             <p><a class="cta" href="builder.html">Build Your Placeholder</a></p>
@@ -147,7 +157,7 @@
               <p>Copy the prompt into an AI coding agent in your editor or terminal, and it sets up PlaceMellon for your project. <button type="button" class="cmu-copy" data-cmu-copy="#pm-agent-prompt" aria-label="Copy the Prompt" title="Copy the Prompt"></button></p>
               <details class="cmu-more">
                 <summary><span class="cmu-more-closed">Want to read it first?</span> <span class="cmu-more-link"><span class="cmu-more-closed">See the Prompt</span><span class="cmu-more-open">Hide the Prompt</span></span></summary>
-                <pre class="cmu-snippet"><code id="pm-agent-prompt">Use PlaceMellon for placeholder images in this project. Read https://placemellon.andrew.cmu.edu/options.html and https://placemellon.andrew.cmu.edu/assets.html first. Use image addresses at the size the layout uses, such as https://placemellon.andrew.cmu.edu/400/300. Choose campus photos, Scotty, profile pictures, bio placeholders or solid placeholders to suit the page. Keep images stable unless random photos are requested, and write useful alt text. Use photos for mockups and prototypes; for a finished page, choose and credit a photo from the source collection. The supplied artwork and placeholders can be used on live sites.</code></pre>
+                <pre class="cmu-snippet"><code id="pm-agent-prompt">Use PlaceMellon for placeholder images in this project. Read https://placemellon.andrew.cmu.edu/reference.html and https://placemellon.andrew.cmu.edu/assets.html first. Use image addresses at the size the layout uses, like https://placemellon.andrew.cmu.edu/400/300. Choose campus photos, Scotty, profile pictures, bio placeholders or solid placeholders to suit the page. Keep images stable unless random photos are requested, and write useful alt text. Use photos for mockups and prototypes; for a finished page, download the photo from the source collection. The supplied artwork and placeholders can be used on live sites.</code></pre>
               </details>
             </div>
           </div></div
@@ -169,14 +179,15 @@
         </div>
         <div></div>
         <div>
-          <nav id="nav">
-            <ul>
-              <li><a href="builder.html">Builder</a></li>
-              <li><a href="options.html">Options</a></li>
-              <li><a href="assets.html">Assets</a></li>
-              <li><a href="about.html">About</a></li>
-            </ul>
-          </nav>
+          <nav id="nav"
+            ><ul
+              ><li><a href="builder.html">Builder</a></li
+              ><li><a href="styles.html">Styles</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="assets.html">Production Assets</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
         </div>
       </footer>
     </div>
@@ -184,8 +195,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/js/cmu-app.js"
-      integrity="sha384-Etmkex3xbkUyRJUcASnyzfeR4g6yNwaWbaK+Z3sJvOxk76pCKgcYHAtNZppbmH8Z"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
       crossorigin="anonymous"
     ></script>
     <script src="js/docs.js"></script>

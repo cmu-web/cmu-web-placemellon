@@ -4,3 +4,4 @@ coverage/
 package-lock.json
 assets/
 docs/images/
+packages/ruby/pkg/

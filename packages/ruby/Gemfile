@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+gemspec
+
+gem 'rake'
+gem 'minitest', '~> 5.0'
+# For the view helper's tests
+gem 'actionview', ENV.fetch('RAILS_VERSION', '~> 8.1.0')

@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Google tag (Google Analytics): docs pages only, never on placeholder images -->
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-MTRD2JHT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Builder - PlaceMellon - Carnegie Mellon University</title>
@@ -38,15 +47,15 @@
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-cms.css"
-      integrity="sha384-jLB4PsCj8eJZzLvX09Rp//BaeUnjZFFNVOS3iVyZhktnIw9EkiZPVseQWE+Yjz/q"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-cms.css"
+      integrity="sha384-yLW+PJWgOwzCEFs7dOsWaFrTYhJHqjb5ZEJvoEnLbHFN/L9GTXF5Df+awov2VyUr"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
     />
     <link
-      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/css/cmu-app.css"
-      integrity="sha384-Jt4iIjchoqX/sKhhQp2b6Afg8uzXHR9eFVQEgTYnffI+pgwCUQAe48nmkKCRUdhI"
+      href="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/css/cmu-app.css"
+      integrity="sha384-Tj5sbg6foKwNHx77Xj9uSKHv4N7jiYnj97prQWE3B2+6v3K8tsqz/xmsjxeJKvjA"
       crossorigin="anonymous"
       rel="stylesheet"
       type="text/css"
@@ -111,16 +120,6 @@
                     >
                   </fieldset>
                   <fieldset>
-                    <legend>Color</legend>
-                    <ul>
-                      <li
-                        ><input type="checkbox" id="pm-gray" /><label for="pm-gray"
-                          >Grayscale</label
-                        ></li
-                      >
-                    </ul>
-                  </fieldset>
-                  <fieldset>
                     <legend>Image</legend>
                     <ul>
                       <li
@@ -130,7 +129,7 @@
                           id="pm-kind-photo"
                           value="photo"
                           checked
-                        /><label for="pm-kind-photo">A CMU Photo</label>
+                        /><label for="pm-kind-photo">CMU Photo</label>
                         <div class="cmu-sub-options" id="pm-photo-options">
                           <label for="pm-category">Category</label>
                           <select id="pm-category">
@@ -146,21 +145,9 @@
                                 >Random Photo Each Time</label
                               ></li
                             >
-                          </ul>
-                        </div>
-                      </li>
-                      <li
-                        ><input
-                          type="radio"
-                          name="pm-kind"
-                          id="pm-kind-scotty"
-                          value="scotty"
-                        /><label for="pm-kind-scotty">Scotty</label>
-                        <div class="cmu-sub-options" id="pm-scotty-options" hidden>
-                          <ul>
                             <li
-                              ><input type="checkbox" id="pm-white" /><label for="pm-white"
-                                >White Background</label
+                              ><input type="checkbox" id="pm-gray" /><label for="pm-gray"
+                                >Grayscale</label
                               ></li
                             >
                           </ul>
@@ -170,15 +157,44 @@
                         ><input
                           type="radio"
                           name="pm-kind"
-                          id="pm-kind-profile"
-                          value="profile"
-                        /><label for="pm-kind-profile">Round Scotty Profile Picture</label></li
-                      >
+                          id="pm-kind-scotty"
+                          value="scotty"
+                        /><label for="pm-kind-scotty">Scotty Graphic</label>
+                        <div class="cmu-sub-options" id="pm-scotty-options" hidden>
+                          <ul>
+                            <li
+                              ><input
+                                type="radio"
+                                name="pm-scotty-look"
+                                id="pm-scotty-transparent"
+                                value="transparent"
+                                checked
+                              /><label for="pm-scotty-transparent">Transparent</label></li
+                            >
+                            <li
+                              ><input
+                                type="radio"
+                                name="pm-scotty-look"
+                                id="pm-scotty-gradient"
+                                value="gradient"
+                              /><label for="pm-scotty-gradient">On a Gradient</label></li
+                            >
+                          </ul>
+                        </div>
+                      </li>
                       <li
                         ><input type="radio" name="pm-kind" id="pm-kind-bio" value="bio" /><label
                           for="pm-kind-bio"
-                          >CMU Bio Placeholder</label
+                          >Bio Placeholder</label
                         ></li
+                      >
+                      <li
+                        ><input
+                          type="radio"
+                          name="pm-kind"
+                          id="pm-kind-profile"
+                          value="profile"
+                        /><label for="pm-kind-profile">Scotty Profile Picture</label></li
                       >
                       <li
                         ><input
@@ -187,7 +203,33 @@
                           id="pm-kind-solid"
                           value="solid"
                         /><label for="pm-kind-solid">Solid Color</label>
-                        <div class="cmu-sub-options" id="pm-solid-options" hidden>
+                        <div class="cmu-sub-options" id="pm-solid-options" hidden
+                          ><label for="pm-color">Color</label
+                          ><select id="pm-color"
+                            ><optgroup label="Core"
+                              ><option value="carnegie-red">Carnegie Red</option
+                              ><option value="black">Black</option
+                              ><option value="iron-gray" selected>Iron Gray</option
+                              ><option value="steel-gray">Steel Gray</option
+                              ><option value="white">White</option></optgroup
+                            ><optgroup label="Tartan"
+                              ><option value="scots-rose">Scots Rose</option
+                              ><option value="gold-thread">Gold Thread</option
+                              ><option value="green-thread">Green Thread</option
+                              ><option value="teal-thread">Teal Thread</option
+                              ><option value="blue-thread">Blue Thread</option
+                              ><option value="highlands-sky-blue"
+                                >Highlands Sky Blue</option
+                              ></optgroup
+                            ><optgroup label="Campus"
+                              ><option value="machinery-hall-tan">Machinery Hall Tan</option
+                              ><option value="kittanning-brick-beige">Kittanning Brick Beige</option
+                              ><option value="hornbostel-teal">Hornbostel Teal</option
+                              ><option value="palladian-green">Palladian Green</option
+                              ><option value="weaver-blue">Weaver Blue</option
+                              ><option value="skibo-red">Skibo Red</option></optgroup
+                            ></select
+                          >
                           <ul>
                             <li
                               ><input type="checkbox" id="pm-text" /><label for="pm-text"
@@ -198,7 +240,18 @@
                         </div>
                       </li>
                     </ul>
-                  </fieldset>
+                  </fieldset> </div
+                ><div>
+                  <p class="cmu-label">Preview</p>
+                  <figure class="cmu-shot cmu-transparent">
+                    <img id="pm-preview" alt="Preview of the placeholder image." />
+                    <figcaption id="pm-preview-note" hidden></figcaption>
+                  </figure>
+                  <div class="cmu-button-note" id="pm-another-row" hidden>
+                    <button type="button" class="btn ghost" id="pm-another"
+                      >Show Another Photo</button
+                    >
+                  </div>
                   <label for="pm-format">File Type</label>
                   <select id="pm-format" aria-describedby="pm-format-hint">
                     <option value="svg">SVG</option>
@@ -209,18 +262,7 @@
                   <p class="cmu-hint" id="pm-format-hint"
                     >SVG stays sharp at any size. Use PNG for email or a document that doesn't take
                     SVG. Photos are JPEG or WebP, which is smaller.</p
-                  > </div
-                ><div>
-                  <p class="cmu-label">Preview</p>
-                  <figure class="image">
-                    <img id="pm-preview" alt="Preview of the placeholder image." />
-                    <figcaption id="pm-preview-note" hidden></figcaption>
-                  </figure>
-                  <div class="cmu-button-note" id="pm-another-row" hidden>
-                    <button type="button" class="btn ghost" id="pm-another"
-                      >Show Another Photo</button
-                    >
-                  </div>
+                  >
                   <p class="cmu-label">Address</p>
                   <div class="cmu-copyable">
                     <pre class="cmu-snippet cmu-snippet--wrap"><code id="pm-url"></code></pre>
@@ -264,14 +306,15 @@
         </div>
         <div></div>
         <div>
-          <nav id="nav">
-            <ul>
-              <li class="active"><a href="builder.html">Builder</a></li>
-              <li><a href="options.html">Options</a></li>
-              <li><a href="assets.html">Assets</a></li>
-              <li><a href="about.html">About</a></li>
-            </ul>
-          </nav>
+          <nav id="nav"
+            ><ul
+              ><li class="active"><a href="builder.html" aria-current="page">Builder</a></li
+              ><li><a href="styles.html">Styles</a></li
+              ><li><a href="reference.html">Reference</a></li
+              ><li><a href="assets.html">Production Assets</a></li
+              ><li><a href="about.html">About</a></li></ul
+            ></nav
+          >
         </div>
       </footer>
     </div>
@@ -279,8 +322,8 @@
     <script src="https://www.cmu.edu/common/standard-v6/js/jquery-1.10.1.min.js"></script>
     <script src="https://www.cmu.edu/common/standard-v6/js/main.6.7.min.js"></script>
     <script
-      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.0/js/cmu-app.js"
-      integrity="sha384-Etmkex3xbkUyRJUcASnyzfeR4g6yNwaWbaK+Z3sJvOxk76pCKgcYHAtNZppbmH8Z"
+      src="https://cdn.jsdelivr.net/gh/cmu-web/cmu-web-kilt@0.6.6/js/cmu-app.js"
+      integrity="sha384-10393F76wEQPHaJEEoM9M1QEQsl9mTezDdEM45kArp0j26SWs3gxiGsXKrmwJHio"
       crossorigin="anonymous"
     ></script>
     <script src="js/docs.js"></script>
