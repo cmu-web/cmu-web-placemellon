@@ -23,7 +23,7 @@ Inspired by [PlaceCats](https://www.placecats.com/) and
 [PlaceBear](https://placebear.com/), with photos from CMU Selects.
 Use the photos for CMU mockups and prototypes; for a finished page, download the photo from the source collection. The
 [images and icons](https://placemellon.andrew.cmu.edu/assets.html), like
-the sample ID card, bio placeholder and default profile picture, are fine
+the sample ID card, bio placeholder, default profile picture and question mark, are fine
 on live sites.
 
 ## Start With What You're Building
