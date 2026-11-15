@@ -61,7 +61,7 @@
   }
   function alt(k, c) {
     if (k === "solid") return color.options[color.selectedIndex].text + " placeholder";
-    if (k === "profile") return "Placeholder profile picture of Scotty";
+    if (k === "scotty-profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
     if (k === "scotty-bust") return "Placeholder graphic of Scotty's bust";
     if (k === "scotty-question")
@@ -88,9 +88,9 @@
       o.hidden = types.indexOf(o.value) < 0;
     });
     if (types.indexOf(format.value) < 0) format.value = types[0];
-    height.disabled = k === "profile";
+    height.disabled = k === "scotty-profile";
     var w = size(width),
-      h = k === "profile" ? "" : size(height);
+      h = k === "scotty-profile" ? "" : size(height);
     // The hint says what's wrong; aria-invalid marks which box
     width.setAttribute("aria-invalid", w === null || w === "" ? "true" : "false");
     height.setAttribute("aria-invalid", h === null ? "true" : "false");
@@ -164,7 +164,7 @@
       sizeTyped = true;
     }
   });
-  ["scotty-bust", "profile", "bio", "scotty-question", "solid"].forEach(function (k) {
+  ["scotty-bust", "scotty-profile", "bio", "scotty-question", "solid"].forEach(function (k) {
     var radio = document.querySelector('input[name="pm-kind"][value="' + k + '"]');
     if (start.has(k) && radio) radio.checked = true;
   });

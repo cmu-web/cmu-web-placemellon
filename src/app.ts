@@ -86,9 +86,8 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     category,
     color,
     random: "random" in query,
-    // The Scotty art is named scotty-bust, scotty-profile and scotty-question.
-    // ?profile is the default profile picture, Scotty today; ?scotty and
-    // ?question, the first names, still work
+    // The Scotty art is named scotty-bust, scotty-profile and scotty-question;
+    // the first names (?scotty, ?profile, ?question) still work
     scotty: "scotty" in query || "scotty-bust" in query,
     profile: "profile" in query || "scotty-profile" in query,
     bio: "bio" in query,
@@ -101,7 +100,7 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
   if ([o.scotty, o.bio, o.profile, o.solid, o.question].filter(Boolean).length > 1)
     throw new OptionError(
       400,
-      "Pick one of ?scotty-bust, ?profile, ?scotty-question, ?bio or ?solid.",
+      "Pick one of ?scotty-bust, ?scotty-profile, ?scotty-question, ?bio or ?solid.",
     );
   if ((o.scotty || o.profile || o.bio || o.solid || o.question) && (o.category || o.random))
     throw new OptionError(
