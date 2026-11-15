@@ -16,7 +16,6 @@
     solidOptions = $("pm-solid-options"),
     scottyOptions = $("pm-scotty-options"),
     questionOptions = $("pm-question-options"),
-    vertical = $("pm-vertical"),
     text = $("pm-text"),
     color = $("pm-color"),
     format = $("pm-format"),
@@ -53,6 +52,10 @@
     return $("pm-kind").value;
   }
   // The Scotty bust's look: on white or on a gradient
+  // The question mark's pose: recumbent (a play bow) or rampant (standing up)
+  function pose() {
+    return document.querySelector('input[name="pm-question-pose"]:checked').value;
+  }
   function look() {
     return document.querySelector('input[name="pm-scotty-look"]:checked').value;
   }
@@ -115,7 +118,7 @@
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
     if (k === "scotty-bust" && look() === "gradient") q.push("gradient");
-    if (k === "scotty-question" && vertical.checked) q.push("vertical");
+    if (k === "scotty-question") q.push(pose());
     // Grayscale is a photo option; brand colors are a solid color's
     if (photo && gray.checked) q.push("gray");
     if (k === "solid" && color.value !== "iron-gray") q.push("color=" + color.value);
@@ -176,11 +179,11 @@
     ["random", random],
     ["gray", gray],
     ["text", text],
-    ["vertical", vertical],
   ].forEach(function (pair) {
     if (start.has(pair[0])) pair[1].checked = true;
   });
   if (start.has("gradient")) $("pm-scotty-gradient").checked = true;
+  if (start.has("rampant")) $("pm-question-rampant").checked = true;
   // ?category=any picks Any, since the form starts on Campus
   var wanted = start.get("category");
   if (wanted === "any") category.value = "";
