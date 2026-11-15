@@ -73,11 +73,13 @@ export function scottySvg(w: number, h: number, gradient = false): string {
 }
 
 // A question mark in the Web Kilt's gray, with Scotty, on white. Wide and
-// square images get Scotty in a play bow to its left, challenging its dot to
-// play; tall images get Scotty standing on his back legs as the dot, looking
+// square images get Scotty in a play bow to its left, challenging its dot (a
+// red ball) to play; tall images get Scotty standing on his back legs as the dot, looking
 // up at it. Each is drawn in its own box, centered and scaled to 80% of the
 // height or 90% of the width.
 const QUESTION_INK = "#4a535b";
+// The dot is his ball, in the red of his scarf
+const BALL = "#c4122e";
 const HOOK =
   `<path d="M58 66A42 42 0 1 1 128 100C110 112 100 120 100 140V150" fill="none" ` +
   `stroke="${QUESTION_INK}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -102,7 +104,7 @@ export function questionSvg(w: number, h: number): string {
     const dy = 196 - PLAY.h * ds;
     box = { x: -30, y: 22, w: 176, h: 178 };
     art =
-      `<circle cx="100" cy="182" r="14" fill="${QUESTION_INK}"/>` +
+      `<circle cx="100" cy="182" r="14" fill="${BALL}"/>` +
       `<g transform="translate(${f(dx)} ${f(dy)}) scale(${f(ds)})">${play}</g>`;
   }
   const s = Math.min((0.8 * h) / box.h, (0.9 * w) / box.w);

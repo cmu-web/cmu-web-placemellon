@@ -20,13 +20,10 @@ import { PORTALS } from "./widen";
 const OPTIONS = [
   "category",
   "random",
-  "scotty",
   "scotty-bust",
-  "profile",
   "scotty-profile",
   "bio",
   "solid",
-  "question",
   "scotty-question",
   "text",
   "color",
@@ -86,13 +83,12 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     category,
     color,
     random: "random" in query,
-    // The Scotty art is named scotty-bust, scotty-profile and scotty-question;
-    // the first names (?scotty, ?profile, ?question) still work
-    scotty: "scotty" in query || "scotty-bust" in query,
-    profile: "profile" in query || "scotty-profile" in query,
+    // The Scotty art is named by subject first, so other subjects can follow
+    scotty: "scotty-bust" in query,
+    profile: "scotty-profile" in query,
     bio: "bio" in query,
     solid: "solid" in query,
-    question: "question" in query || "scotty-question" in query,
+    question: "scotty-question" in query,
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,

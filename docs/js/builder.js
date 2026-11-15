@@ -48,7 +48,7 @@
   }
 
   function kind() {
-    return document.querySelector('input[name="pm-kind"]:checked').value;
+    return $("pm-kind").value;
   }
   // The Scotty bust's look: on white or on a gradient
   function look() {
@@ -64,14 +64,14 @@
     if (k === "scotty-profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
     if (k === "scotty-bust") return "Placeholder graphic of Scotty's bust";
-    if (k === "scotty-question")
-      return "Placeholder graphic of Scotty playing with a question mark";
+    if (k === "scotty-question") return "Scotty playing with a question mark";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
       : "Placeholder photo of Carnegie Mellon";
   }
 
   function update() {
+    $("pm-kind-hint").textContent = $("pm-kind").selectedOptions[0].dataset.hint;
     var k = kind(),
       photo = k === "photo";
     sizeFor(k);
@@ -164,9 +164,9 @@
       sizeTyped = true;
     }
   });
-  ["scotty-bust", "scotty-profile", "bio", "scotty-question", "solid"].forEach(function (k) {
-    var radio = document.querySelector('input[name="pm-kind"][value="' + k + '"]');
-    if (start.has(k) && radio) radio.checked = true;
+  // The image kind, by name
+  ["scotty-bust", "scotty-profile", "scotty-question", "bio", "solid"].forEach(function (k) {
+    if (start.has(k)) $("pm-kind").value = k;
   });
   [
     ["random", random],
