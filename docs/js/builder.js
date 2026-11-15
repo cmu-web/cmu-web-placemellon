@@ -15,6 +15,8 @@
     photoOptions = $("pm-photo-options"),
     solidOptions = $("pm-solid-options"),
     scottyOptions = $("pm-scotty-options"),
+    questionOptions = $("pm-question-options"),
+    vertical = $("pm-vertical"),
     text = $("pm-text"),
     color = $("pm-color"),
     format = $("pm-format"),
@@ -82,6 +84,7 @@
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
     scottyOptions.hidden = k !== "scotty-bust";
+    questionOptions.hidden = k !== "scotty-question";
     // Photos come as JPEG or WebP; drawn images as SVG or PNG
     var types = photo ? ["jpg", "webp"] : ["svg", "png"];
     Array.prototype.forEach.call(format.options, function (o) {
@@ -112,6 +115,7 @@
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
     if (k === "scotty-bust" && look() === "gradient") q.push("gradient");
+    if (k === "scotty-question" && vertical.checked) q.push("vertical");
     // Grayscale is a photo option; brand colors are a solid color's
     if (photo && gray.checked) q.push("gray");
     if (k === "solid" && color.value !== "iron-gray") q.push("color=" + color.value);
@@ -172,6 +176,7 @@
     ["random", random],
     ["gray", gray],
     ["text", text],
+    ["vertical", vertical],
   ].forEach(function (pair) {
     if (start.has(pair[0])) pair[1].checked = true;
   });

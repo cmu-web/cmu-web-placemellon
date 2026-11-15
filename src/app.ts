@@ -25,6 +25,7 @@ const OPTIONS = [
   "bio",
   "solid",
   "scotty-question",
+  "vertical",
   "text",
   "color",
   "gradient",
@@ -40,6 +41,7 @@ export interface Options {
   bio: boolean;
   solid: boolean;
   question: boolean;
+  vertical: boolean;
   text: boolean;
   color?: string;
   gradient: boolean;
@@ -89,6 +91,7 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     bio: "bio" in query,
     solid: "solid" in query,
     question: "scotty-question" in query,
+    vertical: "vertical" in query,
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
@@ -109,6 +112,7 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
   if (o.gray && (o.scotty || o.profile || o.bio || o.solid || o.question))
     throw new OptionError(400, "Use ?gray (or /g/) with photos only.");
   if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty-bust.");
+  if (o.vertical && !o.question) throw new OptionError(400, "Use ?vertical with ?scotty-question.");
   return o;
 }
 
@@ -279,8 +283,8 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     }
 
     if (o.question) {
-      const key = `question ${w}x${h}${png ? " png" : ""}`;
-      void send(res, key, () => draw(questionSvg(w, h)));
+      const key = `question ${w}x${h}${o.vertical ? " vertical" : ""}${png ? " png" : ""}`;
+      void send(res, key, () => draw(questionSvg(w, h, o.vertical)));
       return;
     }
 

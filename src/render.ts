@@ -72,20 +72,20 @@ export function scottySvg(w: number, h: number, gradient = false): string {
   );
 }
 
-// A question mark in the Web Kilt's gray, with Scotty, on white. Wide and
-// square images get Scotty in a play bow to its left, challenging its dot (a
-// red ball) to play; tall images get Scotty standing on his back legs as the dot, looking
-// up at it. Each is drawn in its own box, centered and scaled to 80% of the
-// height or 90% of the width.
+// A question mark in the Web Kilt's gray, with Scotty, on white: by default
+// Scotty in a play bow to its left, challenging its dot (a red ball) to play;
+// vertical, Scotty standing on his back legs as the dot, looking up at it.
+// Each is drawn in its own box, centered and scaled to 80% of the height or
+// 90% of the width.
 const QUESTION_INK = "#4a535b";
 // The dot is his ball, in the red of his scarf
 const BALL = "#c4122e";
 const HOOK =
   `<path d="M58 66A42 42 0 1 1 128 100C110 112 100 120 100 140V150" fill="none" ` +
   `stroke="${QUESTION_INK}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`;
-export function questionSvg(w: number, h: number): string {
+export function questionSvg(w: number, h: number, vertical = false): string {
   const f = (n: number) => +n.toFixed(3);
-  const tall = h > w;
+  const tall = vertical;
   let box, art;
   if (tall) {
     // Scotty, 82 units tall, his nose a little left of the stem, a gap below it

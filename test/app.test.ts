@@ -485,6 +485,16 @@ describe("routes", () => {
     expect(health.body.categories).toEqual({ campus: 1, classrooms: 0, labs: 1, life: 1 });
   });
 
+  it("draws the play bow by default and Scotty looking up with ?vertical, at any shape", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    const get = async (path: string) =>
+      (await request(app).get(path).buffer(true).parse(binary).expect(200)).body.toString();
+    for (const size of ["400/600", "1040/656", "300"]) {
+      expect(await get(`/${size}?scotty-question`)).toContain("<circle");
+      expect(await get(`/${size}?scotty-question&vertical`)).not.toContain("<circle");
+    }
+  });
+
   it("draws ?scotty-question: the kit's gray question mark and Scotty's red scarf", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const svg = (
@@ -527,6 +537,8 @@ describe("routes", () => {
       ["/90/60?scotty", 400, "Unknown option ?scotty"],
       ["/90?profile", 400, "Unknown option ?profile"],
       ["/90/60?question", 400, "Unknown option ?question"],
+      ["/90/60?vertical", 400, "Use ?vertical with ?scotty-question"],
+      ["/90/60?scotty-bust&vertical", 400, "Use ?vertical with ?scotty-question"],
       ["/90/60?bio&scotty-bust", 400, "Pick one"],
       ["/90/60?scotty-bust&category=labs", 400, "choose photos"],
       ["/90?scotty-profile&random", 400, "choose photos"],
