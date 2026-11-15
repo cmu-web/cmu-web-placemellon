@@ -298,7 +298,11 @@ describe("routes", () => {
       ["/64.png?profile", 64, 64, /png/],
       ["/600/750?bio", 600, 750, /svg/],
       ["/800/300.png?bio", 800, 300, /png/],
+      ["/600/750?scotty-bust", 600, 750, /svg/],
+      ["/600/750.png?scotty-bust&gradient", 600, 750, /png/],
       ["/1040/656?question", 1040, 656, /svg/],
+      ["/1040/656?scotty-question", 1040, 656, /svg/],
+      ["/64?scotty-profile", 64, 64, /svg/],
       ["/300.png?question", 300, 300, /png/],
     ] as const) {
       const res = await request(app)
@@ -524,6 +528,7 @@ describe("routes", () => {
       ["/90?profile&random", 400, "choose photos"],
       ["/90/60?bio&profile", 400, "Pick one"],
       ["/90/60?question&scotty", 400, "Pick one"],
+      ["/90/60?scotty-bust&question", 400, "Pick one"],
       ["/90/60?question&solid", 400, "Pick one"],
       ["/90/60?question&random", 400, "choose photos"],
       ["/90/60?question&text", 400, "Use ?text with ?solid"],

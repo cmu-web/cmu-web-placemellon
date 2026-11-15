@@ -21,10 +21,13 @@ const OPTIONS = [
   "category",
   "random",
   "scotty",
+  "scotty-bust",
   "profile",
+  "scotty-profile",
   "bio",
   "solid",
   "question",
+  "scotty-question",
   "text",
   "color",
   "gradient",
@@ -83,28 +86,34 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     category,
     color,
     random: "random" in query,
-    scotty: "scotty" in query,
-    profile: "profile" in query,
+    // The Scotty art is named scotty-bust, scotty-profile and scotty-question.
+    // ?profile is the default profile picture, Scotty today; ?scotty and
+    // ?question, the first names, still work
+    scotty: "scotty" in query || "scotty-bust" in query,
+    profile: "profile" in query || "scotty-profile" in query,
     bio: "bio" in query,
     solid: "solid" in query,
-    question: "question" in query,
+    question: "question" in query || "scotty-question" in query,
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
   if ([o.scotty, o.bio, o.profile, o.solid, o.question].filter(Boolean).length > 1)
-    throw new OptionError(400, "Pick one of ?scotty, ?bio, ?profile, ?solid or ?question.");
+    throw new OptionError(
+      400,
+      "Pick one of ?scotty-bust, ?profile, ?scotty-question, ?bio or ?solid.",
+    );
   if ((o.scotty || o.profile || o.bio || o.solid || o.question) && (o.category || o.random))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty, ?bio, ?profile, ?solid or ?question.",
+      "?category and ?random choose photos, so they don't go with the Scotty art, ?bio or ?solid.",
     );
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
   if (o.color && !o.solid) throw new OptionError(400, "Use ?color with ?solid.");
   // Grayscale is for photos; the drawn images are already flat colors
   if (o.gray && (o.scotty || o.profile || o.bio || o.solid || o.question))
     throw new OptionError(400, "Use ?gray (or /g/) with photos only.");
-  if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty.");
+  if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty-bust.");
   return o;
 }
 

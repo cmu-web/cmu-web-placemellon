@@ -50,7 +50,7 @@
   function kind() {
     return document.querySelector('input[name="pm-kind"]:checked').value;
   }
-  // The Scotty graphic's look: on white or on a gradient
+  // The Scotty bust's look: on white or on a gradient
   function look() {
     return document.querySelector('input[name="pm-scotty-look"]:checked').value;
   }
@@ -63,8 +63,9 @@
     if (k === "solid") return color.options[color.selectedIndex].text + " placeholder";
     if (k === "profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
-    if (k === "scotty") return "Placeholder graphic of Scotty";
-    if (k === "question") return "Placeholder graphic of Scotty playing with a question mark";
+    if (k === "scotty-bust") return "Placeholder graphic of Scotty's bust";
+    if (k === "scotty-question")
+      return "Placeholder graphic of Scotty playing with a question mark";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
       : "Placeholder photo of Carnegie Mellon";
@@ -80,7 +81,7 @@
     // Graphic"
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
-    scottyOptions.hidden = k !== "scotty";
+    scottyOptions.hidden = k !== "scotty-bust";
     // Photos come as JPEG or WebP; drawn images as SVG or PNG
     var types = photo ? ["jpg", "webp"] : ["svg", "png"];
     Array.prototype.forEach.call(format.options, function (o) {
@@ -110,7 +111,7 @@
     if (photo && random.checked) q.push("random");
     if (!photo) q.push(k);
     if (k === "solid" && text.checked) q.push("text");
-    if (k === "scotty" && look() === "gradient") q.push("gradient");
+    if (k === "scotty-bust" && look() === "gradient") q.push("gradient");
     // Grayscale is a photo option; brand colors are a solid color's
     if (photo && gray.checked) q.push("gray");
     if (k === "solid" && color.value !== "iron-gray") q.push("color=" + color.value);
@@ -163,7 +164,7 @@
       sizeTyped = true;
     }
   });
-  ["scotty", "profile", "bio", "question", "solid"].forEach(function (k) {
+  ["scotty-bust", "profile", "bio", "scotty-question", "solid"].forEach(function (k) {
     var radio = document.querySelector('input[name="pm-kind"][value="' + k + '"]');
     if (start.has(k) && radio) radio.checked = true;
   });

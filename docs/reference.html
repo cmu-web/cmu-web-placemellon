@@ -175,25 +175,26 @@
                     >Flag. Convert a photo to grayscale. The <code>/g/</code> prefix also works.</td
                   ><td>Color</td></tr
                 ><tr
-                  ><th scope="row"><code>scotty</code></th
-                  ><td>Flag. Draw the Scotty graphic.</td><td>Photo</td></tr
+                  ><th scope="row"><code>scotty-bust</code></th
+                  ><td>Flag. Draw the bust of Scotty in his red scarf.</td><td>Photo</td></tr
                 ><tr
                   ><th scope="row"><code>gradient</code></th
                   ><td
-                    >Flag. Add a white-to-gray background to the Scotty graphic. Requires
-                    <code>scotty</code>.</td
+                    >Flag. Add a white-to-gray background to the Scotty bust. Requires
+                    <code>scotty-bust</code>.</td
                   ><td>Transparent</td></tr
                 ><tr
                   ><th scope="row"><code>profile</code></th
                   ><td
-                    >Flag. Draw a round Scotty profile picture. A rectangular request redirects to a
+                    >Flag. The default profile picture, a round Scotty today. For Scotty no matter
+                    what, use <code>scotty-profile</code>. A rectangular request redirects to a
                     square using the smaller dimension.</td
                   ><td>Photo</td></tr
                 ><tr
                   ><th scope="row"><code>bio</code></th
                   ><td>Flag. Draw the gray stacked-wordmark bio placeholder.</td><td>Photo</td></tr
                 ><tr
-                  ><th scope="row"><code>question</code></th
+                  ><th scope="row"><code>scotty-question</code></th
                   ><td
                     >Flag. Draw Scotty in a play bow beside a question mark in the Web Kilt's gray,
                     on white.</td
@@ -215,11 +216,11 @@
               ></table
             >
             <p
-              >Choose at most one of <code>scotty</code>, <code>profile</code>, <code>bio</code>,
-              <code>question</code> and <code>solid</code>. Photo options (<code>category</code>,
-              <code>random</code> and grayscale) do not combine with those image types. Supply
-              <code>category</code> and <code>color</code> once each. Unknown parameter names are
-              rejected.</p
+              >Choose at most one of <code>scotty-bust</code>, <code>profile</code>,
+              <code>bio</code>, <code>scotty-question</code> and <code>solid</code>. Photo options
+              (<code>category</code>, <code>random</code> and grayscale) do not combine with those
+              image types. Supply <code>category</code> and <code>color</code> once each. Unknown
+              parameter names are rejected.</p
             >
             <h2 id="categories" class="rule-top">Category Values</h2
             ><table class="alternate cmu-full"
