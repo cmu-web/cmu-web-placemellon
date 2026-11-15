@@ -75,15 +75,17 @@ export function scottySvg(w: number, h: number, gradient = false): string {
 // A question mark in the Web Kilt's gray, with Scotty, on white: Scotty
 // recumbent (the default), in a play bow to its left, challenging its dot (a
 // red ball) to play; or Scotty rampant, standing on his back legs as the dot,
-// looking up at it.
+// looking up at a question mark in his own black.
 // Each is drawn in its own box, centered and scaled to 80% of the height or
 // 90% of the width.
 const QUESTION_INK = "#4a535b";
 // The dot is his ball, in the red of his scarf
 const BALL = "#c4122e";
-const HOOK =
+// Scotty's own black, from the art, for the rampant question mark: he's its dot
+const SCOTTY_BLACK = "#231f20";
+const hook = (ink: string) =>
   `<path d="M58 66A42 42 0 1 1 128 100C110 112 100 120 100 140V150" fill="none" ` +
-  `stroke="${QUESTION_INK}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`;
+  `stroke="${ink}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`;
 export function questionSvg(w: number, h: number, rampant = false): string {
   const f = (n: number) => +n.toFixed(3);
   const tall = rampant;
@@ -114,7 +116,7 @@ export function questionSvg(w: number, h: number, rampant = false): string {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
     `<rect width="${w}" height="${h}" fill="#fff"/>` +
-    `<g transform="translate(${f(ox)} ${f(oy)}) scale(${f(s)})">${HOOK}${art}</g></svg>`
+    `<g transform="translate(${f(ox)} ${f(oy)}) scale(${f(s)})">${hook(tall ? SCOTTY_BLACK : QUESTION_INK)}${art}</g></svg>`
   );
 }
 

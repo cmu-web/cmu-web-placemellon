@@ -493,6 +493,7 @@ describe("routes", () => {
       expect(await get(`/${size}?scotty-question`)).toContain("<circle");
       expect(await get(`/${size}?scotty-question&recumbent`)).toContain("<circle");
       expect(await get(`/${size}?scotty-question&rampant`)).not.toContain("<circle");
+      expect(await get(`/${size}?scotty-question&rampant`)).toContain('stroke="#231f20"');
     }
   });
 
