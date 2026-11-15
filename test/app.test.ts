@@ -298,6 +298,8 @@ describe("routes", () => {
       ["/64.png?profile", 64, 64, /png/],
       ["/600/750?bio", 600, 750, /svg/],
       ["/800/300.png?bio", 800, 300, /png/],
+      ["/1040/656?question", 1040, 656, /svg/],
+      ["/300.png?question", 300, 300, /png/],
     ] as const) {
       const res = await request(app)
         .get(path)
@@ -327,6 +329,7 @@ describe("routes", () => {
       "/64?profile&grayscale",
       "/g/64?solid",
       "/120/80?bio&gray",
+      "/120/80?question&gray",
     ])
       expect((await request(app).get(path).expect(400)).text, path).toContain("photos only");
   });
@@ -478,6 +481,30 @@ describe("routes", () => {
     expect(health.body.categories).toEqual({ campus: 1, classrooms: 0, labs: 1, life: 1 });
   });
 
+  it("draws ?question: the kit's gray question mark and Scotty's red scarf", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    const svg = (
+      await request(app).get("/1040/656?question").buffer(true).parse(binary).expect(200)
+    ).body.toString();
+    expect(svg).toContain("#4a535b");
+    expect(svg).toContain("#c4122e");
+    const png = (await request(app).get("/200.png?question").buffer(true).parse(binary).expect(200))
+      .body as Buffer;
+    const { data, info } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
+    let red = 0,
+      gray = 0;
+    for (let i = 0; i < data.length; i += info.channels) {
+      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+      if (r > 150 && g < 60 && b < 80) red++;
+      if (Math.abs(r - 0x4a) < 12 && Math.abs(g - 0x53) < 12 && Math.abs(b - 0x5b) < 12) gray++;
+    }
+    expect(red).toBeGreaterThan(20);
+    expect(gray).toBeGreaterThan(200);
+    expect((await request(app).get("/90/60.jpg?question").expect(400)).text).toContain(
+      "question marks",
+    );
+  });
+
   it("says what's wrong with bad options", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const cases: [string, number, string][] = [
@@ -496,6 +523,11 @@ describe("routes", () => {
       ["/90/60?scotty&category=labs", 400, "choose photos"],
       ["/90?profile&random", 400, "choose photos"],
       ["/90/60?bio&profile", 400, "Pick one"],
+      ["/90/60?question&scotty", 400, "Pick one"],
+      ["/90/60?question&solid", 400, "Pick one"],
+      ["/90/60?question&random", 400, "choose photos"],
+      ["/90/60?question&text", 400, "Use ?text with ?solid"],
+      ["/90/60?question&color=teal-thread", 400, "Use ?color with ?solid"],
       ["/90/60?gradient", 400, "Use ?gradient with ?scotty"],
       ["/90/60?color=teal-thread", 400, "Use ?color with ?solid"],
       ["/90/60?solid&color=purple", 404, "Use a CMU brand color"],

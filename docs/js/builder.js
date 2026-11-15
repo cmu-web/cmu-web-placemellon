@@ -64,6 +64,7 @@
     if (k === "profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
     if (k === "scotty") return "Placeholder graphic of Scotty";
+    if (k === "question") return "Placeholder graphic of Scotty playing with a question mark";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
       : "Placeholder photo of Carnegie Mellon";
@@ -162,7 +163,7 @@
       sizeTyped = true;
     }
   });
-  ["scotty", "profile", "bio", "solid"].forEach(function (k) {
+  ["scotty", "profile", "bio", "question", "solid"].forEach(function (k) {
     var radio = document.querySelector('input[name="pm-kind"][value="' + k + '"]');
     if (start.has(k) && radio) radio.checked = true;
   });

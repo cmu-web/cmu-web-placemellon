@@ -11,6 +11,7 @@ import {
   renderPhoto,
   renderSvg,
   scottySvg,
+  questionSvg,
   svgFile,
   StaleLinkError,
 } from "./render";
@@ -23,6 +24,7 @@ const OPTIONS = [
   "profile",
   "bio",
   "solid",
+  "question",
   "text",
   "color",
   "gradient",
@@ -37,6 +39,7 @@ export interface Options {
   profile: boolean;
   bio: boolean;
   solid: boolean;
+  question: boolean;
   text: boolean;
   color?: string;
   gradient: boolean;
@@ -84,21 +87,22 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     profile: "profile" in query,
     bio: "bio" in query,
     solid: "solid" in query,
+    question: "question" in query,
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
-  if ([o.scotty, o.bio, o.profile, o.solid].filter(Boolean).length > 1)
-    throw new OptionError(400, "Pick one of ?scotty, ?bio, ?profile or ?solid.");
-  if ((o.scotty || o.profile || o.bio || o.solid) && (o.category || o.random))
+  if ([o.scotty, o.bio, o.profile, o.solid, o.question].filter(Boolean).length > 1)
+    throw new OptionError(400, "Pick one of ?scotty, ?bio, ?profile, ?solid or ?question.");
+  if ((o.scotty || o.profile || o.bio || o.solid || o.question) && (o.category || o.random))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty, ?bio, ?profile or ?solid.",
+      "?category and ?random choose photos, so they don't go with ?scotty, ?bio, ?profile, ?solid or ?question.",
     );
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
   if (o.color && !o.solid) throw new OptionError(400, "Use ?color with ?solid.");
   // Grayscale is for photos; the drawn images are already flat colors
-  if (o.gray && (o.scotty || o.profile || o.bio || o.solid))
+  if (o.gray && (o.scotty || o.profile || o.bio || o.solid || o.question))
     throw new OptionError(400, "Use ?gray (or /g/) with photos only.");
   if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty.");
   return o;
@@ -245,12 +249,12 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
 
     // Drawn images are SVG unless .png is asked for; photos are JPEGs unless
     // .webp is asked for
-    const drawn = o.solid || o.scotty || o.profile || o.bio;
+    const drawn = o.solid || o.scotty || o.profile || o.bio || o.question;
     if (drawn && (ext === "jpg" || ext === "webp")) {
       res
         .status(400)
         .type("text/plain")
-        .send("Scotty, bio placeholders and solid colors come as .svg or .png.\n");
+        .send("Scotty, question marks, bio placeholders and solid colors come as .svg or .png.\n");
       return;
     }
     if (!drawn && (ext === "svg" || ext === "png")) {
@@ -267,6 +271,12 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     if (o.solid) {
       const key = `solid ${w}x${h} ${o.color ?? DEFAULT_COLOR}${o.text ? " text" : ""}${png ? " png" : ""}`;
       void send(res, key, () => draw(solidSvg(w, h, o.text, o.color)));
+      return;
+    }
+
+    if (o.question) {
+      const key = `question ${w}x${h}${png ? " png" : ""}`;
+      void send(res, key, () => draw(questionSvg(w, h)));
       return;
     }
 

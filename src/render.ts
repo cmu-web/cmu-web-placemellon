@@ -13,6 +13,9 @@ const head = svgInner("scotty-head.svg"); // viewBox 0 0 330.17 443.51
 const HEAD = { w: 330.17, h: 443.51 };
 // A slight gradient behind him, white at the top to light gray at the bottom
 const GRADIENT = `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e4e5e6"/></linearGradient>`;
+// UCM's downward-dog Scotty, in a play bow
+const play = svgInner("scotty-play.svg"); // viewBox 0 0 672 485.92
+const PLAY = { w: 672, h: 485.92 };
 const wordmark = svgInner("cmu-wordmark-stacked.svg"); // viewBox 0 0 95.97 61.16
 const WORDMARK = { w: 95.973335, h: 61.16 };
 
@@ -63,6 +66,32 @@ export function scottySvg(w: number, h: number, gradient = false): string {
     `<defs>${GRADIENT}</defs>` +
     (gradient ? `<rect width="${w}" height="${h}" fill="url(#bg)"/>` : "") +
     `<g transform="translate(${+x.toFixed(2)} ${+y.toFixed(2)}) scale(${+s.toFixed(5)})">${head}</g></svg>`
+  );
+}
+
+// A question mark in the Web Kilt's gray, with Scotty in a play bow to its
+// left, challenging its dot to play. Drawn in a 176 x 178 box, centered and
+// scaled to 80% of the height or 90% of the width, on white.
+const QUESTION_INK = "#4a535b";
+export function questionSvg(w: number, h: number): string {
+  const box = { x: -30, y: 22, w: 176, h: 178 };
+  const s = Math.min((0.8 * h) / box.h, (0.9 * w) / box.w);
+  const ox = (w - box.w * s) / 2 - box.x * s;
+  const oy = (h - box.h * s) / 2 - box.y * s;
+  // Scotty, 104 units wide, his nose 10 units from the dot, his paws level
+  // with its bottom
+  const dw = 104;
+  const ds = dw / PLAY.w;
+  const dx = 100 - 14 - 10 - 0.98 * dw;
+  const dy = 196 - PLAY.h * ds;
+  const f = (n: number) => +n.toFixed(3);
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<rect width="${w}" height="${h}" fill="#fff"/>` +
+    `<g transform="translate(${f(ox)} ${f(oy)}) scale(${f(s)})">` +
+    `<path d="M58 66A42 42 0 1 1 128 100C110 112 100 120 100 140V150" fill="none" stroke="${QUESTION_INK}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<circle cx="100" cy="182" r="14" fill="${QUESTION_INK}"/>` +
+    `<g transform="translate(${f(dx)} ${f(dy)}) scale(${f(ds)})">${play}</g></g></svg>`
   );
 }
 

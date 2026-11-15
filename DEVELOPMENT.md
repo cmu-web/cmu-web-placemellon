@@ -184,7 +184,9 @@ WebP. Scotty, profile pictures, bio placeholders and solid colors are
 rendered as SVG or PNG without the catalog. The Scotty artwork,
 `assets/scotty-head.svg`, is University Communications & Marketing's
 [Scotty illustration](https://brand.cmu.edu/resources/downloads), the same
-file QRnegie uses.
+file QRnegie uses. `assets/scotty-play.svg`, for question marks, is the
+downward-dog Scotty from the same Scotty Illustrations download, converted
+from its EPS with nothing changed.
 Dimension text in solid placeholders uses Open Sans, installed in the
 container for PNG rendering; SVGs use the viewer's fonts.
 
