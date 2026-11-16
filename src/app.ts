@@ -19,6 +19,7 @@ import { PORTALS } from "./widen";
 
 const OPTIONS = [
   "category",
+  "photo",
   "random",
   "scotty",
   "question",
@@ -39,6 +40,7 @@ export type Scotty = (typeof SCOTTY)[number];
 
 export interface Options {
   category?: string;
+  photo?: string;
   random: boolean;
   scotty?: Scotty;
   question: boolean;
@@ -75,6 +77,9 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
       404,
       `No category "${category}". Try ${Object.keys(PORTALS).join(", ")}.`,
     );
+  const photo = query.photo;
+  if (photo !== undefined && (typeof photo !== "string" || !photo))
+    throw new OptionError(400, "Give ?photo once, with a photo's name.");
   const color = query.color;
   if (color !== undefined && typeof color !== "string")
     throw new OptionError(400, "Give ?color once.");
@@ -113,6 +118,7 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
   }
   const o: Options = {
     category,
+    photo,
     color,
     random: "random" in query,
     scotty,
@@ -124,11 +130,12 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     gray: gray || "gray" in query || "grayscale" in query,
   };
   if (o.scotty && o.solid) throw new OptionError(400, "Pick one of ?scotty or ?solid.");
-  if ((o.scotty || o.solid) && (o.category || o.random))
+  if ((o.scotty || o.solid) && (o.category || o.random || o.photo))
     throw new OptionError(
       400,
-      "?category and ?random choose photos, so they don't go with ?scotty or ?solid.",
+      "?category, ?photo and ?random choose photos, so they don't go with ?scotty or ?solid.",
     );
+  if (o.photo && o.random) throw new OptionError(400, "Pick one of ?photo or ?random.");
   if (o.question && o.scotty !== "recumbent" && o.scotty !== "rampant")
     throw new OptionError(400, "Use ?question with ?scotty=recumbent or ?scotty=rampant.");
   // Scotty alone in these poses is still to come
@@ -333,18 +340,24 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     }
     const webp = ext === "webp",
       type = webp ? "webp" : "jpeg";
+    // ?photo names one photo. If it has left CMU Selects (CMU may have pulled
+    // it), it's never served: the usual pick for the size and category stands
+    // in, and X-Photo-Missing says so.
+    const choose = () =>
+      (o.photo && catalog.find(o.photo)) || catalog.pick(w, h, o.random, o.category)!;
+    if (o.photo && !catalog.find(o.photo)) res.set("X-Photo-Missing", o.photo);
     const key = o.random
       ? null
-      : `photo ${w}x${h} ${o.category ?? "all"}${o.gray ? " gray" : ""}${webp ? " webp" : ""}`;
+      : `photo ${w}x${h} ${o.photo ? "photo=" + choose().id : (o.category ?? "all")}${o.gray ? " gray" : ""}${webp ? " webp" : ""}`;
     void send(res, key, async () => {
-      let p = catalog.pick(w, h, o.random, o.category)!;
+      let p = choose();
       try {
         return { type, body: await renderPhoto(p, w, h, o.gray, get, webp), photo: p.filename };
       } catch (e) {
         if (!(e instanceof StaleLinkError)) throw e;
         // Preview links expired early; re-list and try once more
         await catalog.refresh();
-        p = catalog.pick(w, h, o.random, o.category)!;
+        p = choose();
         return { type, body: await renderPhoto(p, w, h, o.gray, get, webp), photo: p.filename };
       }
     });

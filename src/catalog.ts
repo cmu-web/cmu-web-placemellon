@@ -51,6 +51,17 @@ export class Catalog {
     return this.pending;
   }
 
+  // A photo by its CMU Selects file name, with or without the extension,
+  // or by its id; null once it has left the catalog
+  find(name: string): Photo | null {
+    const want = name.toLowerCase().replace(/\.[a-z0-9]+$/, "");
+    return (
+      this.photos.find(
+        (p) => p.id === name || p.filename.toLowerCase().replace(/\.[a-z0-9]+$/, "") === want,
+      ) ?? null
+    );
+  }
+
   count(category: string): number {
     return this.photos.filter((p) => p.categories.includes(category)).length;
   }

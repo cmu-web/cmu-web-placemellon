@@ -496,6 +496,29 @@ describe("routes", () => {
     expect(health.body.categories).toEqual({ campus: 1, classrooms: 0, labs: 1, life: 1 });
   });
 
+  it("serves one photo by name with ?photo, and stands in another once it's gone", async () => {
+    const app = createApp(
+      await ready([photo("q", 1, 1.5, ["campus"]), photo("l", 1, 1.5, ["labs"])]),
+      fakeFetch,
+    );
+    for (const name of ["l", "l.jpg", "L.JPG"]) {
+      const res = await request(app).get(`/90/60?photo=${name}`).expect(200);
+      expect(res.headers["x-photo"], name).toBe("l.jpg");
+      expect(res.headers["x-photo-missing"]).toBeUndefined();
+    }
+    // Any size and grayscale still apply
+    expect((await request(app).get("/g/40/120?photo=l").expect(200)).headers["x-photo"]).toBe(
+      "l.jpg",
+    );
+    // Gone from the catalog: never served, the usual pick stands in
+    const gone = await request(app).get("/90/60?photo=pulled&category=campus").expect(200);
+    expect(gone.headers["x-photo"]).toBe("q.jpg");
+    expect(gone.headers["x-photo-missing"]).toBe("pulled");
+    await request(app).get("/90/60?photo=l&random").expect(400);
+    await request(app).get("/90/60?photo=l&solid").expect(400);
+    await request(app).get("/90/60?photo=").expect(400);
+  });
+
   it("draws the play bow by default and Scotty rampant with ?rampant, at any shape", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const get = async (path: string) =>

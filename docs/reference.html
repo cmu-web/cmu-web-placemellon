@@ -165,6 +165,16 @@
                   ><td>A <a href="#categories">category value</a>. Photos only.</td
                   ><td>All categories</td></tr
                 ><tr
+                  ><th scope="row"><code>photo</code></th
+                  ><td
+                    >One photo by its CMU Selects name (the
+                    <a href="#photo-source"><code>X-Photo</code> header</a>), with or without its
+                    extension. If CMU Selects no longer has that photo, you get another one instead
+                    (from your <code>category</code>, if you gave one), and an
+                    <code>X-Photo-Missing</code> header names the one that's gone. Can't be used
+                    with <code>random</code>.</td
+                  ><td>Selected by size</td></tr
+                ><tr
                   ><th scope="row"><code>random</code></th
                   ><td
                     >Flag. Select a photo on each request. A value like
@@ -178,13 +188,22 @@
                 ><tr
                   ><th scope="row"><code>scotty</code></th
                   ><td
-                    >Draw Scotty: <code>bust</code>, the bust of Scotty in his red scarf;
-                    <code>profile</code>, a round Scotty profile picture; <code>recumbent</code>,
-                    Scotty in a play bow, challenging a question mark's dot to play; or
-                    <code>rampant</code>, Scotty on his back legs as a question mark's dot.
-                    <code>recumbent</code> and <code>rampant</code> require <code>question</code>. A
-                    rectangular <code>profile</code> request redirects to a square using the smaller
-                    dimension.</td
+                    >Draw Scotty, one of:
+                    <ul>
+                      <li><code>bust</code>: the bust of Scotty in his red scarf.</li>
+                      <li
+                        ><code>profile</code>: a round Scotty profile picture. A rectangular request
+                        redirects to a square using the smaller dimension.</li
+                      >
+                      <li
+                        ><code>recumbent</code>: Scotty in a play bow, challenging a question mark's
+                        dot to play. Requires <code>question</code>.</li
+                      >
+                      <li
+                        ><code>rampant</code>: Scotty on his back legs as a question mark's dot.
+                        Requires <code>question</code>.</li
+                      >
+                    </ul></td
                   ><td>Photo</td></tr
                 ><tr
                   ><th scope="row"><code>question</code></th
@@ -417,7 +436,8 @@
                 href="https://cmu.widencollective.com/portals/iff7gdfg/CMUPhotographyPortal-Master"
                 >CMU Selects</a
               >
-              to download the full photo for a finished page. Graphics do not have this header.</p
+              to download the full photo for a finished page, or ask for it again by name with
+              <code>?photo=</code>. Graphics do not have this header.</p
             ><div class="cmu-copyable">
               <pre
                 class="cmu-snippet cmu-snippet--wrap"
@@ -443,8 +463,8 @@
               available photos. The result is cropped to fill the requested dimensions.</p
             >
             <p
-              >Adding or removing source photos can change the selection. Save the response if you
-              need to preserve an exact image.</p
+              >Adding or removing source photos can change the selection. To keep one photo, ask for
+              it by name with <code>photo</code>, or save the response.</p
             >
             <p
               >Nonrandom images are cached in memory, and responses allow browser caching for up to
