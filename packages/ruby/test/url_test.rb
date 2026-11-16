@@ -24,12 +24,18 @@ class UrlTest < Minitest::Test
                  PlaceMellon.url(400, 300, solid: true, text: true, color: 'carnegie-red')
   end
 
+  def test_scotty_art
+    assert_equal "#{BASE}/600/400?scotty=rampant&question",
+                 PlaceMellon.url(600, 400, scotty: :rampant, question: true)
+    assert_equal "#{BASE}/600/750?solid&wordmark", PlaceMellon.url(600, 750, solid: true, wordmark: true)
+  end
+
   def test_false_and_nil_options_are_left_out
     assert_equal "#{BASE}/400/300", PlaceMellon.url(400, 300, random: false, category: nil)
   end
 
   def test_a_file_type
-    assert_equal "#{BASE}/96.png?scotty", PlaceMellon.url(96, scotty: true, format: :png)
+    assert_equal "#{BASE}/96.png?scotty=profile", PlaceMellon.url(96, scotty: :profile, format: :png)
     assert_equal "#{BASE}/400/300.webp", PlaceMellon.url(400, 300, format: 'webp')
   end
 

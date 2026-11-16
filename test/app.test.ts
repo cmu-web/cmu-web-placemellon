@@ -284,26 +284,26 @@ describe("routes", () => {
     expect(await sharp(res.body).metadata()).toMatchObject({ width: 70, height: 70 });
   });
 
-  it("serves ?scotty-bust and ?scotty-profile as SVG at the asked size, or PNG with .png", async () => {
+  it("serves ?scotty=bust and ?scotty=profile as SVG at the asked size, or PNG with .png", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     for (const [path, w, h, type] of [
-      ["/320/180?scotty-bust", 320, 180, /svg/],
-      ["/90/160?scotty-bust", 90, 160, /svg/],
-      ["/600/750?scotty-bust", 600, 750, /svg/],
-      ["/600/750.png?scotty-bust&gradient", 600, 750, /png/],
-      ["/150.svg?scotty-bust", 150, 150, /svg/],
-      ["/64?scotty-profile", 64, 64, /svg/],
-      ["/48/48?scotty-profile", 48, 48, /svg/],
-      ["/320/180.png?scotty-bust", 320, 180, /png/],
-      ["/64.png?scotty-profile", 64, 64, /png/],
-      ["/600/750?bio", 600, 750, /svg/],
-      ["/800/300.png?bio", 800, 300, /png/],
-      ["/600/750?scotty-bust", 600, 750, /svg/],
-      ["/600/750.png?scotty-bust&gradient", 600, 750, /png/],
-      ["/1040/656?scotty-question", 1040, 656, /svg/],
-      ["/1040/656?scotty-question", 1040, 656, /svg/],
-      ["/64?scotty-profile", 64, 64, /svg/],
-      ["/300.png?scotty-question", 300, 300, /png/],
+      ["/320/180?scotty=bust", 320, 180, /svg/],
+      ["/90/160?scotty=bust", 90, 160, /svg/],
+      ["/600/750?scotty=bust", 600, 750, /svg/],
+      ["/600/750.png?scotty=bust&gradient", 600, 750, /png/],
+      ["/150.svg?scotty=bust", 150, 150, /svg/],
+      ["/64?scotty=profile", 64, 64, /svg/],
+      ["/48/48?scotty=profile", 48, 48, /svg/],
+      ["/320/180.png?scotty=bust", 320, 180, /png/],
+      ["/64.png?scotty=profile", 64, 64, /png/],
+      ["/600/750?solid&wordmark", 600, 750, /svg/],
+      ["/800/300.png?solid&wordmark", 800, 300, /png/],
+      ["/600/750?scotty=bust", 600, 750, /svg/],
+      ["/600/750.png?scotty=bust&gradient", 600, 750, /png/],
+      ["/1040/656?scotty=recumbent&question", 1040, 656, /svg/],
+      ["/1040/656?scotty=recumbent&question", 1040, 656, /svg/],
+      ["/64?scotty=profile", 64, 64, /svg/],
+      ["/300.png?scotty=recumbent&question", 300, 300, /png/],
     ] as const) {
       const res = await request(app)
         .get(path)
@@ -325,28 +325,39 @@ describe("routes", () => {
       for (let k = 0; k < px.length; k += 3) most = Math.max(most, Math.abs(px[k] - px[k + 1]));
       return most;
     };
-    expect(await tint("/90/160?scotty-bust")).toBeGreaterThan(100);
-    expect(await tint("/90/160.png?scotty-bust")).toBeGreaterThan(100);
+    expect(await tint("/90/160?scotty=bust")).toBeGreaterThan(100);
+    expect(await tint("/90/160.png?scotty=bust")).toBeGreaterThan(100);
     for (const path of [
-      "/g/90/160?scotty-bust",
-      "/90/160.png?scotty-bust&gray",
-      "/64?scotty-profile&grayscale",
+      "/g/90/160?scotty=bust",
+      "/90/160.png?scotty=bust&gray",
+      "/64?scotty=profile&grayscale",
       "/g/64?solid",
-      "/120/80?bio&gray",
-      "/120/80?scotty-question&gray",
+      "/120/80?solid&wordmark&gray",
+      "/120/80?scotty=recumbent&question&gray",
     ])
       expect((await request(app).get(path).expect(400)).text, path).toContain("photos only");
   });
 
-  it("serves ?scotty-bust on a transparent background and ?scotty-bust&gradient on the gradient", async () => {
+  it("serves ?scotty=bust on a transparent background and ?scotty=bust&gradient on the gradient", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const get = (path: string) => request(app).get(path).buffer(true).parse(binary).expect(200);
-    const clear = await get("/120/80.png?scotty-bust");
-    const gradient = await get("/120/80.png?scotty-bust&gradient");
+    const clear = await get("/120/80.png?scotty=bust");
+    const gradient = await get("/120/80.png?scotty=bust&gradient");
     // A bottom corner: see-through without the gradient, light gray with it
     const corner = async (b: Buffer) =>
       sharp(b).extract({ left: 0, top: 79, width: 1, height: 1 }).ensureAlpha().raw().toBuffer();
     expect((await corner(clear.body))[3]).toBe(0);
+    // ?profile is ?scotty=profile
+    const profile = await get("/120.png?profile");
+    expect(profile.body.equals((await get("/120.png?scotty=profile")).body)).toBe(true);
+    // ?bio=list is ?scotty=profile, square like it
+    const list = await get("/120.png?bio=list");
+    expect(list.body.equals((await get("/120.png?scotty=profile")).body)).toBe(true);
+    // ?bio is ?solid&wordmark
+    const bio = await get("/120/80.png?bio");
+    expect(bio.body.equals((await get("/120/80.png?solid&wordmark")).body)).toBe(true);
+    // Plain ?scotty draws the bust
+    expect((await get("/120/80.png?scotty")).body.equals(clear.body)).toBe(true);
     const [r, , , alpha] = await corner(gradient.body);
     expect(alpha).toBe(255);
     expect(r).toBeLessThan(240);
@@ -403,8 +414,8 @@ describe("routes", () => {
       ["/90/60.png", "Photos come as JPEG or WebP"],
       ["/90/60.svg?category=labs", "Photos come as JPEG or WebP"],
       ["/90/60.jpg?solid", "come as .svg or .png"],
-      ["/90.jpg?scotty-bust", "come as .svg or .png"],
-      ["/90.webp?scotty-profile", "come as .svg or .png"],
+      ["/90.jpg?scotty=bust", "come as .svg or .png"],
+      ["/90.webp?scotty=profile", "come as .svg or .png"],
       ["/90/60.gif?solid", "Sizes must be"],
       ["/90.png/60?solid", "Sizes must be"],
     ]) {
@@ -490,22 +501,30 @@ describe("routes", () => {
     const get = async (path: string) =>
       (await request(app).get(path).buffer(true).parse(binary).expect(200)).body.toString();
     for (const size of ["400/600", "1040/656", "300"]) {
-      expect(await get(`/${size}?scotty-question`)).toContain("<circle");
-      expect(await get(`/${size}?scotty-question&recumbent`)).toContain("<circle");
-      expect(await get(`/${size}?scotty-question&rampant`)).not.toContain("<circle");
-      expect(await get(`/${size}?scotty-question&rampant`)).toContain('stroke="#231f20"');
+      expect(await get(`/${size}?scotty=recumbent&question`)).toContain("<circle");
+      expect(await get(`/${size}?scotty=recumbent&question`)).toContain("<circle");
+      expect(await get(`/${size}?scotty=rampant&question`)).not.toContain("<circle");
+      expect(await get(`/${size}?scotty=rampant&question`)).toContain('stroke="#231f20"');
     }
   });
 
-  it("draws ?scotty-question: the kit's gray question mark and Scotty's red scarf", async () => {
+  it("draws ?scotty=recumbent&question: the kit's gray question mark and Scotty's red scarf", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const svg = (
-      await request(app).get("/1040/656?scotty-question").buffer(true).parse(binary).expect(200)
+      await request(app)
+        .get("/1040/656?scotty=recumbent&question")
+        .buffer(true)
+        .parse(binary)
+        .expect(200)
     ).body.toString();
     expect(svg).toContain("#4a535b");
     expect(svg).toContain("#c4122e");
     const png = (
-      await request(app).get("/200.png?scotty-question").buffer(true).parse(binary).expect(200)
+      await request(app)
+        .get("/200.png?scotty=recumbent&question")
+        .buffer(true)
+        .parse(binary)
+        .expect(200)
     ).body as Buffer;
     const { data, info } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
     let red = 0,
@@ -517,9 +536,9 @@ describe("routes", () => {
     }
     expect(red).toBeGreaterThan(20);
     expect(gray).toBeGreaterThan(200);
-    expect((await request(app).get("/90/60.jpg?scotty-question").expect(400)).text).toContain(
-      "question marks",
-    );
+    expect(
+      (await request(app).get("/90/60.jpg?scotty=recumbent&question").expect(400)).text,
+    ).toContain("come as .svg or .png");
   });
 
   it("says what's wrong with bad options", async () => {
@@ -528,36 +547,39 @@ describe("routes", () => {
       ["/90/60?category=dogs", 404, "campus, classrooms, labs, life"],
       ["/90/60?categroy=labs", 400, "Unknown option ?categroy"],
       ["/90/60?category=labs&category=life", 400, "once"],
-      ["/90/60?scotty-bust&scotty-profile", 400, "Pick one"],
-      ["/90/60?solid&bio", 400, "Pick one"],
-      ["/90/60?solid&scotty-profile", 400, "Pick one"],
+      ["/90/60?scotty=bust&scotty=profile", 400, "Give ?scotty once"],
+      ["/90?profile&scotty=bust", 400, "Pick one of ?profile or ?scotty"],
+      ["/90?bio=card", 404, "?bio=list"],
+      ["/90?bio=list&scotty=bust", 400, "Pick one of ?bio, ?profile or ?scotty"],
+      ["/90/60?scotty=head", 404, "bust, profile, recumbent, rampant"],
+      ["/90/60?solid&scotty=profile", 400, "Pick one of ?scotty or ?solid"],
       ["/90/60?solid&category=labs", 400, "choose photos"],
       ["/90/60?solid&random", 400, "choose photos"],
       ["/90/60?text", 400, "Use ?text with ?solid"],
-      ["/90/60?scotty-bust&text", 400, "Use ?text with ?solid"],
+      ["/90/60?scotty=bust&text", 400, "Use ?text with ?solid"],
+      ["/90/60?wordmark", 400, "Use ?wordmark with ?solid"],
+      ["/90/60?solid&wordmark&text", 400, "Pick one of ?text or ?wordmark"],
       ["/90/60?white", 400, "Unknown option ?white"],
-      ["/90/60?scotty", 400, "Unknown option ?scotty"],
-      ["/90?profile", 400, "Unknown option ?profile"],
-      ["/90/60?question", 400, "Unknown option ?question"],
-      ["/90/60?rampant", 400, "Use ?recumbent or ?rampant with ?scotty-question"],
-      ["/90/60?scotty-question&recumbent&rampant", 400, "Pick one of ?recumbent or ?rampant"],
-      ["/90/60?scotty-bust&rampant", 400, "Use ?recumbent or ?rampant"],
-      ["/90/60?bio&scotty-bust", 400, "Pick one"],
-      ["/90/60?scotty-bust&category=labs", 400, "choose photos"],
-      ["/90?scotty-profile&random", 400, "choose photos"],
-      ["/90/60?bio&scotty-profile", 400, "Pick one"],
-      ["/90/60?scotty-question&scotty-bust", 400, "Pick one"],
-      ["/90/60?scotty-bust&scotty-question", 400, "Pick one"],
-      ["/90/60?scotty-question&solid", 400, "Pick one"],
-      ["/90/60?scotty-question&random", 400, "choose photos"],
-      ["/90/60?scotty-question&text", 400, "Use ?text with ?solid"],
-      ["/90/60?scotty-question&color=teal-thread", 400, "Use ?color with ?solid"],
-      ["/90/60?gradient", 400, "Use ?gradient with ?scotty-bust"],
+      ["/90/60?scotty-bust", 400, "Unknown option ?scotty-bust"],
+      ["/90/60?rampant", 400, "Unknown option ?rampant"],
+      ["/90/60?question", 400, "Use ?question with ?scotty=recumbent or ?scotty=rampant"],
+      ["/90/60?scotty=bust&question", 400, "Use ?question with"],
+      ["/90/60?scotty=profile&question", 400, "Use ?question with"],
+      ["/90/60?scotty=rampant", 400, "Add ?question to ?scotty=rampant"],
+      ["/90/60?scotty=recumbent", 400, "Add ?question to ?scotty=recumbent"],
+      ["/90/60?scotty=bust&category=labs", 400, "choose photos"],
+      ["/90?scotty=profile&random", 400, "choose photos"],
+      ["/90/60?scotty=recumbent&question&solid", 400, "Pick one of ?scotty or ?solid"],
+      ["/90/60?scotty=recumbent&question&random", 400, "choose photos"],
+      ["/90/60?scotty=recumbent&question&text", 400, "Use ?text with ?solid"],
+      ["/90/60?scotty=recumbent&question&color=teal-thread", 400, "Use ?color with ?solid"],
+      ["/90/60?scotty=profile&gradient", 400, "Use ?gradient with ?scotty=bust"],
+      ["/90/60?gradient", 400, "Use ?gradient with ?scotty=bust"],
       ["/90/60?color=teal-thread", 400, "Use ?color with ?solid"],
       ["/90/60?solid&color=purple", 404, "Use a CMU brand color"],
-      ["/90/60?bio&gradient", 400, "Use ?gradient with ?scotty-bust"],
-      ["/90/60?bio&category=labs", 400, "choose photos"],
-      ["/90/60.jpg?bio", 400, "come as .svg or .png"],
+      ["/90/60?solid&wordmark&gradient", 400, "Use ?gradient with ?scotty=bust"],
+      ["/90/60?solid&wordmark&category=labs", 400, "choose photos"],
+      ["/90/60.jpg?solid&wordmark", 400, "come as .svg or .png"],
     ];
     for (const [path, status, text] of cases) {
       const res = await request(app).get(path).expect(status);
@@ -565,16 +587,16 @@ describe("routes", () => {
     }
   });
 
-  it("redirects a non-square ?scotty-profile to the smaller square", async () => {
+  it("redirects a non-square ?scotty=profile to the smaller square", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     await request(app)
-      .get("/96/64?scotty-profile")
+      .get("/96/64?scotty=profile")
       .expect(302)
-      .expect("Location", "/64?scotty-profile");
+      .expect("Location", "/64?scotty=profile");
     await request(app)
-      .get("/96/64.png?scotty-profile")
+      .get("/96/64.png?scotty=profile")
       .expect(302)
-      .expect("Location", "/64.png?scotty-profile");
+      .expect("Location", "/64.png?scotty=profile");
   });
 
   it("serves the bundled docs at /", async () => {
@@ -589,7 +611,7 @@ describe("routes", () => {
 
   it("rejects bad sizes", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
-    for (const path of ["/0/10", "/10/3000", "/0?scotty-profile", "/x/10?scotty-bust", "/g/abc"])
+    for (const path of ["/0/10", "/10/3000", "/0?scotty=profile", "/x/10?scotty=bust", "/g/abc"])
       await request(app).get(path).expect(400);
   });
 
@@ -605,6 +627,6 @@ describe("routes", () => {
     const app = createApp(new Catalog(async () => []), fakeFetch);
     await request(app).get("/40/40").expect(503);
     await request(app).get("/healthz").expect(503);
-    await request(app).get("/40/40?scotty-bust").expect(200);
+    await request(app).get("/40/40?scotty=bust").expect(200);
   });
 });

@@ -24,8 +24,8 @@ class HelperTest < Minitest::Test
   end
 
   def test_a_square_gets_both_dimensions
-    html = tag(96, alt: 'Scotty', scotty: true, format: :png)
-    assert_includes html, 'src="https://placemellon.andrew.cmu.edu/96.png?scotty"'
+    html = tag(96, alt: 'Scotty', scotty: :profile, format: :png)
+    assert_includes html, 'src="https://placemellon.andrew.cmu.edu/96.png?scotty=profile"'
     assert_includes html, 'height="96"'
   end
 

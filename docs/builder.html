@@ -132,15 +132,15 @@
                         ></optgroup
                       ><optgroup label="Scotty"
                         ><option
-                          value="scotty-bust"
+                          value="bust"
                           data-hint="Scotty in his red scarf, on a transparent background or a gradient."
                           >Scotty Bust</option
                         ><option
-                          value="scotty-profile"
+                          value="profile"
                           data-hint="A round Scotty for a signed-in user's default picture. Always square."
                           >Scotty Profile Picture</option
                         ><option
-                          value="scotty-question"
+                          value="question"
                           data-hint="Scotty playing with a question mark, for something still to come."
                           >Scotty Question Mark</option
                         ></optgroup
@@ -251,9 +251,29 @@
                       >
                       <ul>
                         <li
-                          ><input type="checkbox" id="pm-text" /><label for="pm-text"
-                            >Show Width &times; Height</label
-                          ></li
+                          ><input
+                            type="radio"
+                            name="pm-solid-show"
+                            id="pm-solid-plain"
+                            value=""
+                            checked
+                          /><label for="pm-solid-plain">Color Only</label></li
+                        >
+                        <li
+                          ><input
+                            type="radio"
+                            name="pm-solid-show"
+                            id="pm-text"
+                            value="text"
+                          /><label for="pm-text">Show Width &times; Height</label></li
+                        >
+                        <li
+                          ><input
+                            type="radio"
+                            name="pm-solid-show"
+                            id="pm-wordmark"
+                            value="wordmark"
+                          /><label for="pm-wordmark">Show the Wordmark</label></li
                         >
                       </ul>
                     </fieldset>

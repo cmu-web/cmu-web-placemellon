@@ -9,10 +9,11 @@ require_relative 'place_mellon/version'
 module PlaceMellon
   # The largest width or height the service draws
   MAX = 2048
-  # Options with a value: a photo category, or a solid color
-  VALUES = %i[category color].freeze
+  # Options with a value: a photo category, Scotty's art (bust, profile,
+  # recumbent or rampant) or a solid color
+  VALUES = %i[category scotty color].freeze
   # Options that are on or off
-  FLAGS = %i[random scotty profile bio solid text gradient gray].freeze
+  FLAGS = %i[random question gradient solid text wordmark gray].freeze
   FORMATS = %i[jpg webp svg png].freeze
 
   class << self
@@ -24,7 +25,7 @@ module PlaceMellon
     end
 
     # PlaceMellon.url(400, 300, category: :campus)
-    # PlaceMellon.url(96, scotty: true, format: :png)
+    # PlaceMellon.url(96, scotty: :profile, format: :png)
     # A height left out makes a square.
     def url(width, height = nil, format: nil, **options)
       sizes = [width, height].compact.map { |size| check_size(size) }

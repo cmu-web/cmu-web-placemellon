@@ -107,7 +107,8 @@
               ><ul
                 ><li><a href="#photo-source">Find the Original Photo</a></li
                 ><li><a href="#caching">Selection and Caching</a></li
-                ><li><a href="#errors">Errors</a></li></ul
+                ><li><a href="#errors">Errors</a></li
+                ><li><a href="#agent">Set Up With an AI Agent</a></li></ul
               ></div
             ></div
           ></div
@@ -175,41 +176,28 @@
                     >Flag. Convert a photo to grayscale. The <code>/g/</code> prefix also works.</td
                   ><td>Color</td></tr
                 ><tr
-                  ><th scope="row"><code>scotty-bust</code></th
-                  ><td>Flag. Draw the bust of Scotty in his red scarf.</td><td>Photo</td></tr
+                  ><th scope="row"><code>scotty</code></th
+                  ><td
+                    >Draw Scotty: <code>bust</code>, the bust of Scotty in his red scarf;
+                    <code>profile</code>, a round Scotty profile picture; <code>recumbent</code>,
+                    Scotty in a play bow, challenging a question mark's dot to play; or
+                    <code>rampant</code>, Scotty on his back legs as a question mark's dot.
+                    <code>recumbent</code> and <code>rampant</code> require <code>question</code>. A
+                    rectangular <code>profile</code> request redirects to a square using the smaller
+                    dimension.</td
+                  ><td>Photo</td></tr
+                ><tr
+                  ><th scope="row"><code>question</code></th
+                  ><td
+                    >Flag. Add the question mark, on white. Requires
+                    <code>scotty=recumbent</code> or <code>scotty=rampant</code>.</td
+                  ><td>No question mark</td></tr
                 ><tr
                   ><th scope="row"><code>gradient</code></th
                   ><td
                     >Flag. Add a white-to-gray background to the Scotty bust. Requires
-                    <code>scotty-bust</code>.</td
+                    <code>scotty=bust</code>.</td
                   ><td>Transparent</td></tr
-                ><tr
-                  ><th scope="row"><code>scotty-profile</code></th
-                  ><td
-                    >Flag. Draw a round Scotty profile picture. A rectangular request redirects to a
-                    square using the smaller dimension.</td
-                  ><td>Photo</td></tr
-                ><tr
-                  ><th scope="row"><code>bio</code></th
-                  ><td>Flag. Draw the gray stacked-wordmark bio placeholder.</td><td>Photo</td></tr
-                ><tr
-                  ><th scope="row"><code>scotty-question</code></th
-                  ><td
-                    >Flag. Draw Scotty and a question mark, on white. Add <code>recumbent</code> or
-                    <code>rampant</code> for his pose.</td
-                  ><td>Photo</td></tr
-                ><tr
-                  ><th scope="row"><code>recumbent</code></th
-                  ><td
-                    >Flag. Draw Scotty recumbent, in a play bow beside the question mark,
-                    challenging its dot to play. Requires <code>scotty-question</code>.</td
-                  ><td>Pick one</td></tr
-                ><tr
-                  ><th scope="row"><code>rampant</code></th
-                  ><td
-                    >Flag. Draw Scotty rampant, standing on his back legs as the question mark's dot
-                    and looking up at it. Requires <code>scotty-question</code>.</td
-                  ><td>Pick one</td></tr
                 ><tr
                   ><th scope="row"><code>solid</code></th
                   ><td>Flag. Fill the image with a CMU brand color.</td><td>Photo</td></tr
@@ -223,14 +211,21 @@
                     >Flag. Show the width &times; height on a solid placeholder. Requires
                     <code>solid</code>.</td
                   ><td>No dimensions</td></tr
+                ><tr
+                  ><th scope="row"><code>wordmark</code></th
+                  ><td
+                    >Flag. Show the stacked Carnegie Mellon wordmark on a solid placeholder, in the
+                    color's label ink. With no <code>color</code>, it's the gray-on-gray bio
+                    placeholder from CMU's staff pages. Requires <code>solid</code>.</td
+                  ><td>No wordmark</td></tr
                 ></tbody
               ></table
             >
             <p
-              >Choose at most one of <code>scotty-bust</code>, <code>scotty-profile</code>,
-              <code>bio</code>, <code>scotty-question</code> and <code>solid</code>. Photo options
-              (<code>category</code>, <code>random</code> and grayscale) do not combine with those
-              image types. Supply <code>category</code> and <code>color</code> once each. Unknown
+              >Choose one of <code>scotty</code> and <code>solid</code>, and one of
+              <code>text</code> and <code>wordmark</code>. Photo options (<code>category</code>,
+              <code>random</code> and grayscale) do not combine with drawn images. Supply
+              <code>category</code>, <code>color</code> and <code>scotty</code> once each. Unknown
               parameter names are rejected.</p
             >
             <h2 id="categories" class="rule-top">Category Values</h2
@@ -497,8 +492,9 @@
               <code>refreshedAt</code>; its status is 200 when the catalog contains photos or 503
               when empty.</p
             >
+            <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
             <p
-              >To set up an AI coding agent, use the
+              >To set up PlaceMellon with an AI coding agent, use the
               <a href="./#agent">prompt on the home page</a>.</p
             ></div
           ></div

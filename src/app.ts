@@ -3,7 +3,7 @@ import path from "path";
 import { Catalog } from "./catalog";
 import {
   profileSvg,
-  bioSvg,
+  wordmarkSvg,
   COLORS,
   DEFAULT_COLOR,
   solidSvg,
@@ -20,13 +20,12 @@ import { PORTALS } from "./widen";
 const OPTIONS = [
   "category",
   "random",
-  "scotty-bust",
-  "scotty-profile",
-  "bio",
+  "scotty",
+  "question",
   "solid",
-  "scotty-question",
-  "recumbent",
-  "rampant",
+  "wordmark",
+  "bio",
+  "profile",
   "text",
   "color",
   "gradient",
@@ -34,16 +33,17 @@ const OPTIONS = [
   "grayscale",
 ];
 
+// The Scotty art. The value names the art; ?question and ?gradient add to it.
+const SCOTTY = ["bust", "profile", "recumbent", "rampant"] as const;
+export type Scotty = (typeof SCOTTY)[number];
+
 export interface Options {
   category?: string;
   random: boolean;
-  scotty: boolean;
-  profile: boolean;
-  bio: boolean;
-  solid: boolean;
+  scotty?: Scotty;
   question: boolean;
-  recumbent: boolean;
-  rampant: boolean;
+  solid: boolean;
+  wordmark: boolean;
   text: boolean;
   color?: string;
   gradient: boolean;
@@ -83,41 +83,66 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
       404,
       `No color "${color}". Use a CMU brand color: ${Object.keys(COLORS).join(", ")}.`,
     );
+  const question = "question" in query;
+  // Production Assets' addresses name a purpose, so each can change on its own,
+  // and only that page shows them, so the server logs show which live sites
+  // use each: ?bio (a bio page, now ?solid&wordmark), ?bio=list (a person in
+  // a list of people, now ?scotty=profile) and ?profile (the signed-in user's
+  // picture, now ?scotty=profile).
+  const bio = query.bio;
+  if (bio !== undefined && typeof bio !== "string") throw new OptionError(400, "Give ?bio once.");
+  if (bio !== undefined && !["", "page", "list"].includes(bio))
+    throw new OptionError(404, `No ?bio=${bio}. Use ?bio for a bio page or ?bio=list for a list.`);
+  const bioList = bio === "list";
+  let scotty: Scotty | undefined;
+  if (bioList) {
+    if ("scotty" in query || "profile" in query)
+      throw new OptionError(400, "Pick one of ?bio, ?profile or ?scotty.");
+    scotty = "profile";
+  } else if ("profile" in query) {
+    if ("scotty" in query) throw new OptionError(400, "Pick one of ?profile or ?scotty.");
+    scotty = "profile";
+  } else if ("scotty" in query) {
+    const v = query.scotty;
+    if (typeof v !== "string") throw new OptionError(400, "Give ?scotty once.");
+    // Undocumented: plain ?scotty draws the bust, and with ?question the play bow
+    const named = v === "" ? (question ? "recumbent" : "bust") : v;
+    if (!(SCOTTY as readonly string[]).includes(named))
+      throw new OptionError(404, `No ?scotty=${v}. Try ${SCOTTY.join(", ")}.`);
+    scotty = named as Scotty;
+  }
   const o: Options = {
     category,
     color,
     random: "random" in query,
-    // The Scotty art is named by subject first, so other subjects can follow
-    scotty: "scotty-bust" in query,
-    profile: "scotty-profile" in query,
-    bio: "bio" in query,
-    solid: "solid" in query,
-    question: "scotty-question" in query,
-    recumbent: "recumbent" in query,
-    rampant: "rampant" in query,
+    scotty,
+    question,
+    solid: "solid" in query || (bio !== undefined && !bioList),
+    wordmark: "wordmark" in query || (bio !== undefined && !bioList),
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
   };
-  if ([o.scotty, o.bio, o.profile, o.solid, o.question].filter(Boolean).length > 1)
+  if (o.scotty && o.solid) throw new OptionError(400, "Pick one of ?scotty or ?solid.");
+  if ((o.scotty || o.solid) && (o.category || o.random))
     throw new OptionError(
       400,
-      "Pick one of ?scotty-bust, ?scotty-profile, ?scotty-question, ?bio or ?solid.",
+      "?category and ?random choose photos, so they don't go with ?scotty or ?solid.",
     );
-  if ((o.scotty || o.profile || o.bio || o.solid || o.question) && (o.category || o.random))
-    throw new OptionError(
-      400,
-      "?category and ?random choose photos, so they don't go with the Scotty art, ?bio or ?solid.",
-    );
+  if (o.question && o.scotty !== "recumbent" && o.scotty !== "rampant")
+    throw new OptionError(400, "Use ?question with ?scotty=recumbent or ?scotty=rampant.");
+  // Scotty alone in these poses is still to come
+  if ((o.scotty === "recumbent" || o.scotty === "rampant") && !o.question)
+    throw new OptionError(400, `Add ?question to ?scotty=${o.scotty}.`);
+  if (o.gradient && o.scotty !== "bust")
+    throw new OptionError(400, "Use ?gradient with ?scotty=bust.");
+  if (o.wordmark && !o.solid) throw new OptionError(400, "Use ?wordmark with ?solid.");
   if (o.text && !o.solid) throw new OptionError(400, "Use ?text with ?solid.");
+  if (o.text && o.wordmark) throw new OptionError(400, "Pick one of ?text or ?wordmark.");
   if (o.color && !o.solid) throw new OptionError(400, "Use ?color with ?solid.");
   // Grayscale is for photos; the drawn images are already flat colors
-  if (o.gray && (o.scotty || o.profile || o.bio || o.solid || o.question))
+  if (o.gray && (o.scotty || o.solid))
     throw new OptionError(400, "Use ?gray (or /g/) with photos only.");
-  if (o.gradient && !o.scotty) throw new OptionError(400, "Use ?gradient with ?scotty-bust.");
-  if (o.recumbent && o.rampant) throw new OptionError(400, "Pick one of ?recumbent or ?rampant.");
-  if ((o.recumbent || o.rampant) && !o.question)
-    throw new OptionError(400, "Use ?recumbent or ?rampant with ?scotty-question.");
   return o;
 }
 
@@ -253,8 +278,8 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       return;
     }
 
-    // Profile pictures are square: send /96/64?profile to /64?profile
-    if (o.profile && w !== h) {
+    // Profile pictures are square: send /96/64?scotty=profile to /64?scotty=profile
+    if (o.scotty === "profile" && w !== h) {
       const qs = req.originalUrl.slice(req.originalUrl.indexOf("?"));
       res.redirect(302, `${gray ? "/g" : ""}/${Math.min(w, h)}${ext ? "." + ext : ""}${qs}`);
       return;
@@ -262,12 +287,9 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
 
     // Drawn images are SVG unless .png is asked for; photos are JPEGs unless
     // .webp is asked for
-    const drawn = o.solid || o.scotty || o.profile || o.bio || o.question;
+    const drawn = o.solid || o.scotty;
     if (drawn && (ext === "jpg" || ext === "webp")) {
-      res
-        .status(400)
-        .type("text/plain")
-        .send("Scotty, question marks, bio placeholders and solid colors come as .svg or .png.\n");
+      res.status(400).type("text/plain").send("Scotty and solid colors come as .svg or .png.\n");
       return;
     }
     if (!drawn && (ext === "svg" || ext === "png")) {
@@ -282,26 +304,25 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       png ? { type: "png", body: await renderSvg(svg) } : { type: "svg", body: svgFile(svg) };
 
     if (o.solid) {
-      const key = `solid ${w}x${h} ${o.color ?? DEFAULT_COLOR}${o.text ? " text" : ""}${png ? " png" : ""}`;
-      void send(res, key, () => draw(solidSvg(w, h, o.text, o.color)));
+      const c = o.color ?? "";
+      const extra = o.text ? " text" : o.wordmark ? " wordmark" : "";
+      const key = `solid ${w}x${h} ${c}${extra}${png ? " png" : ""}`;
+      const svg = o.wordmark
+        ? wordmarkSvg(w, h, o.color)
+        : solidSvg(w, h, o.text, o.color ?? DEFAULT_COLOR);
+      void send(res, key, () => draw(svg));
       return;
     }
 
-    if (o.question) {
-      const key = `question ${w}x${h}${o.rampant ? " rampant" : ""}${png ? " png" : ""}`;
-      void send(res, key, () => draw(questionSvg(w, h, o.rampant)));
-      return;
-    }
-
-    if (o.bio) {
-      const key = `bio ${w}x${h}${png ? " png" : ""}`;
-      void send(res, key, () => draw(bioSvg(w, h)));
-      return;
-    }
-
-    if (o.scotty || o.profile) {
-      const svg = o.profile ? profileSvg(w) : scottySvg(w, h, o.gradient);
-      const key = `${o.profile ? "profile" : "scotty"} ${w}x${h}${o.gradient ? " gradient" : ""}${png ? " png" : ""}`;
+    if (o.scotty) {
+      const s = o.scotty;
+      const svg =
+        s === "profile"
+          ? profileSvg(w)
+          : s === "bust"
+            ? scottySvg(w, h, o.gradient)
+            : questionSvg(w, h, s === "rampant");
+      const key = `scotty=${s} ${w}x${h}${o.gradient ? " gradient" : ""}${png ? " png" : ""}`;
       void send(res, key, () => draw(svg));
       return;
     }

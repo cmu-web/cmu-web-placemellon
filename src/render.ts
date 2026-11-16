@@ -202,11 +202,13 @@ export function solidSvg(w: number, h: number, text: boolean, color = DEFAULT_CO
   );
 }
 
-// A bio placeholder as on CMU's own staff pages: the stacked wordmark in dark
-// gray on gray, three-quarters of the width, a little above center (at 41% of
-// the height, as on the 600 x 750 original). In a wide image it's centered
-// and fits the height too.
-export function bioSvg(w: number, h: number): string {
+// The stacked wordmark on a solid color, three-quarters of the width, a little
+// above center (at 41% of the height, as on the 600 x 750 original). In a wide
+// image it's centered and fits the height too. With no color it's the bio
+// placeholder on CMU's own staff pages: dark gray on gray.
+export function wordmarkSvg(w: number, h: number, color?: string): string {
+  const bg = color ? COLORS[color].hex : "#a6a6a6";
+  const ink = color ? COLORS[color].label : "#6d6e72";
   const ww = 0.73 * Math.min(w, (h * 0.8 * WORDMARK.w) / WORDMARK.h / 1.25);
   const s = ww / WORDMARK.w;
   const cy = h > w ? 0.41 * h : 0.5 * h;
@@ -214,8 +216,8 @@ export function bioSvg(w: number, h: number): string {
   const y = cy - (WORDMARK.h * s) / 2;
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
-    `<rect width="${w}" height="${h}" fill="#a6a6a6"/>` +
-    `<g transform="translate(${x} ${y}) scale(${s})" fill="#6d6e72">${wordmark}</g></svg>`
+    `<rect width="${w}" height="${h}" fill="${bg}"/>` +
+    `<g transform="translate(${x} ${y}) scale(${s})" fill="${ink}">${wordmark}</g></svg>`
   );
 }
 

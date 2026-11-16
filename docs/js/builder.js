@@ -16,7 +16,6 @@
     solidOptions = $("pm-solid-options"),
     scottyOptions = $("pm-scotty-options"),
     questionOptions = $("pm-question-options"),
-    text = $("pm-text"),
     color = $("pm-color"),
     format = $("pm-format"),
     url = $("pm-url"),
@@ -56,6 +55,10 @@
   function pose() {
     return document.querySelector('input[name="pm-question-pose"]:checked').value;
   }
+  // A solid color shows nothing, its width and height, or the wordmark
+  function show() {
+    return document.querySelector('input[name="pm-solid-show"]:checked').value;
+  }
   function look() {
     return document.querySelector('input[name="pm-scotty-look"]:checked').value;
   }
@@ -66,10 +69,10 @@
   }
   function alt(k, c) {
     if (k === "solid") return color.options[color.selectedIndex].text + " placeholder";
-    if (k === "scotty-profile") return "Placeholder profile picture of Scotty";
+    if (k === "profile") return "Placeholder profile picture of Scotty";
     if (k === "bio") return "Placeholder photo with the Carnegie Mellon wordmark";
-    if (k === "scotty-bust") return "Placeholder graphic of Scotty's bust";
-    if (k === "scotty-question") return "Scotty playing with a question mark";
+    if (k === "bust") return "Placeholder graphic of Scotty's bust";
+    if (k === "question") return "Scotty playing with a question mark";
     return c
       ? "Placeholder photo of Carnegie Mellon " + (c === "life" ? "student life" : c)
       : "Placeholder photo of Carnegie Mellon";
@@ -86,17 +89,17 @@
     // Graphic"
     photoOptions.hidden = !photo;
     solidOptions.hidden = k !== "solid";
-    scottyOptions.hidden = k !== "scotty-bust";
-    questionOptions.hidden = k !== "scotty-question";
+    scottyOptions.hidden = k !== "bust";
+    questionOptions.hidden = k !== "question";
     // Photos come as JPEG or WebP; drawn images as SVG or PNG
     var types = photo ? ["jpg", "webp"] : ["svg", "png"];
     Array.prototype.forEach.call(format.options, function (o) {
       o.hidden = types.indexOf(o.value) < 0;
     });
     if (types.indexOf(format.value) < 0) format.value = types[0];
-    height.disabled = k === "scotty-profile";
+    height.disabled = k === "profile";
     var w = size(width),
-      h = k === "scotty-profile" ? "" : size(height);
+      h = k === "profile" ? "" : size(height);
     // The hint says what's wrong; aria-invalid marks which box
     width.setAttribute("aria-invalid", w === null || w === "" ? "true" : "false");
     height.setAttribute("aria-invalid", h === null ? "true" : "false");
@@ -115,13 +118,21 @@
     var q = [];
     if (photo && category.value) q.push("category=" + category.value);
     if (photo && random.checked) q.push("random");
-    if (!photo) q.push(k);
-    if (k === "solid" && text.checked) q.push("text");
-    if (k === "scotty-bust" && look() === "gradient") q.push("gradient");
-    if (k === "scotty-question") q.push(pose());
-    // Grayscale is a photo option; brand colors are a solid color's
+    // Scotty's art is ?scotty=bust, profile, recumbent or rampant; the
+    // question mark and gradient add to it
+    if (k === "bust" || k === "profile") q.push("scotty=" + k);
+    if (k === "bust" && look() === "gradient") q.push("gradient");
+    if (k === "question") q.push("scotty=" + pose(), "question");
+    // The bio placeholder is the wordmark on no color. The Builder never
+    // writes ?bio: only Production Assets shows it, to count live sites.
+    if (k === "bio") q.push("solid", "wordmark");
+    if (k === "solid") q.push("solid");
+    if (k === "solid" && show()) q.push(show());
+    // Grayscale is a photo option; brand colors are a solid color's. The
+    // wordmark with no color is the bio placeholder, so it always names one.
     if (photo && gray.checked) q.push("gray");
-    if (k === "solid" && color.value !== "iron-gray") q.push("color=" + color.value);
+    if (k === "solid" && (color.value !== "iron-gray" || show() === "wordmark"))
+      q.push("color=" + color.value);
     var qs = q.length ? "?" + q.join("&") : "";
     var state = ["width=" + w];
     if (h !== "") state.push("height=" + h);
@@ -171,19 +182,26 @@
       sizeTyped = true;
     }
   });
-  // The image kind, by name
-  ["scotty-bust", "scotty-profile", "scotty-question", "bio", "solid"].forEach(function (k) {
-    if (start.has(k)) $("pm-kind").value = k;
-  });
+  // The image kind, by name. The wordmark with no color is the bio
+  // placeholder; ?bio is the same.
+  var scotty = start.get("scotty");
+  if (scotty === "bust" || scotty === "profile") $("pm-kind").value = scotty;
+  if (scotty === "recumbent" || scotty === "rampant") {
+    $("pm-kind").value = "question";
+    $("pm-question-" + scotty).checked = true;
+  }
+  if (start.has("solid")) $("pm-kind").value = "solid";
+  if (start.has("bio") || (start.has("wordmark") && !start.has("color")))
+    $("pm-kind").value = "bio";
+  else if (start.has("wordmark")) $("pm-wordmark").checked = true;
+  if (start.has("text")) $("pm-text").checked = true;
   [
     ["random", random],
     ["gray", gray],
-    ["text", text],
   ].forEach(function (pair) {
     if (start.has(pair[0])) pair[1].checked = true;
   });
   if (start.has("gradient")) $("pm-scotty-gradient").checked = true;
-  if (start.has("rampant")) $("pm-question-rampant").checked = true;
   // ?category=any picks Any, since the form starts on Campus
   var wanted = start.get("category");
   if (wanted === "any") category.value = "";

@@ -25,7 +25,7 @@ else goes to `image_tag`:
 
 ```erb
 <%= placemellon_tag 400, 300, alt: 'A campus photo', category: :campus %>
-<%= placemellon_tag 96, alt: 'Scotty', scotty: true, format: :png, class: 'avatar' %>
+<%= placemellon_tag 96, alt: 'Scotty', scotty: :profile, format: :png, class: 'avatar' %>
 <%= placemellon_tag 640, 360, alt: 'A placeholder', solid: true, text: true, color: 'carnegie-red' %>
 ```
 
@@ -40,21 +40,21 @@ PlaceMellon.url(400, 300)                      # a photo
 PlaceMellon.url(400, 300, category: :labs)     # from one category
 PlaceMellon.url(400, 300, random: true)        # a different photo each time
 PlaceMellon.url(400, 300, format: :webp)       # a smaller WebP photo
-PlaceMellon.url(120, profile: true)            # a default profile picture
+PlaceMellon.url(120, scotty: :profile)         # a default profile picture
 ```
 
 ## Options
 
-| Option          | Gives                                                               |
-| --------------- | ------------------------------------------------------------------- |
-| `category:`     | Photos from one category: `campus`, `classrooms`, `labs` or `life`  |
-| `random: true`  | A different photo on each request                                   |
-| `gray: true`    | A grayscale photo                                                   |
-| `scotty: true`  | Scotty instead of a photo; add `gradient: true` for a gray gradient |
-| `profile: true` | A default profile picture                                           |
-| `bio: true`     | A bio placeholder                                                   |
-| `solid: true`   | A solid color; add `color:` (a CMU brand color) and `text: true`    |
-| `format:`       | `:jpg` or `:webp` for photos, `:svg` or `:png` for the others       |
+| Option           | Gives                                                                                                                 |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `category:`      | Photos from one category: `campus`, `classrooms`, `labs` or `life`                                                    |
+| `random: true`   | A different photo on each request                                                                                     |
+| `gray: true`     | A grayscale photo                                                                                                     |
+| `scotty:`        | Scotty: `:bust`, `:profile` (square), `:recumbent` or `:rampant`                                                      |
+| `gradient: true` | A gray gradient behind `scotty: :bust`                                                                                |
+| `question: true` | A question mark with `scotty: :recumbent` or `:rampant`                                                               |
+| `solid: true`    | A solid color; add `color:` (a CMU brand color), and `text: true` or `wordmark: true` (no color: the bio placeholder) |
+| `format:`        | `:jpg` or `:webp` for photos, `:svg` or `:png` for the others                                                         |
 
 Sizes are whole numbers from 1 to 2048. The gem checks sizes, option names
 and formats; PlaceMellon checks the rest and explains any address it can't
