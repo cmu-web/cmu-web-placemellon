@@ -51,10 +51,18 @@ or devcontainer configuration, select **Dev Containers: Rebuild Container**.
 ## Maintain the CMU Web Preview
 
 `docs/images/cmu-web-preview.webp` is this site's screenshot for cards and
-gallery entries on the other CMU Web sites. Keep it at 1040 by 656 pixels,
+gallery entries on the other CMU Web sites. Keep it at 1040 × 656 pixels,
 without a decorative browser frame, and publish updates at the same path.
 Consumers use the public URL directly. The Open Graph image,
 `images/preview.jpg`, is maintained separately.
+
+To make it, capture the published home page with FencePost's gallery
+command, from a FencePost checkout. It takes the public page at 1040 × 656,
+signed out, with the menu closed:
+
+```bash
+npm run gallery -- https://placemellon.andrew.cmu.edu/ /path/to/cmu-web-placemellon/docs/images/cmu-web-preview.webp
+```
 
 ## Checks
 

@@ -27,7 +27,7 @@
     sizeHint = $("pm-size-hint");
   var HINT = sizeHint.textContent,
     tries = 0;
-  // The bio placeholder starts at UCM's own size, 600 x 750, unless the size
+  // The bio placeholder starts at UCM's own size, 600 × 750, unless the size
   // has been typed in; back on another kind, the starting size returns
   var START = { w: width.value, h: height.value },
     BIO = { w: "600", h: "750" },

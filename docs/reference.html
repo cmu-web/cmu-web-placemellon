@@ -84,35 +84,39 @@
               then use the address in your page or save the image with your project.</p
             ></div
           ></div
-        ><div class="grid column3 nav cmu-on-this-page"
-          ><p class="cmu-label">On This Page</p
-          ><div
-            ><div class="nav-list"
-              ><ul
-                ><li><a href="#image-addresses">Image URLs</a></li
-                ><li><a href="#parameters">Parameters</a></li
-                ><li><a href="#categories">Category Values</a></li></ul
-              ></div
-            ></div
-          ><div
-            ><div class="nav-list"
-              ><ul
-                ><li><a href="#colors">Color Values</a></li
-                ><li><a href="#file-types">File Types</a></li
-                ><li><a href="#embedding">Embedding and Downloads</a></li></ul
-              ></div
-            ></div
-          ><div
-            ><div class="nav-list"
-              ><ul
-                ><li><a href="#photo-source">Find the Original Photo</a></li
-                ><li><a href="#caching">Selection and Caching</a></li
-                ><li><a href="#errors">Errors</a></li
-                ><li><a href="#agent">Set Up With an AI Agent</a></li></ul
-              ></div
-            ></div
-          ></div
-        ><div class="content wide"
+        >
+        <div class="grid column3 nav cmu-on-this-page">
+          <p class="cmu-label">On This Page</p>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#image-addresses">Image URLs</a></li>
+                <li><a href="#parameters">Parameters</a></li>
+                <li><a href="#categories">Category Values</a></li>
+                <li><a href="#colors">Color Values</a></li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#file-types">File Types</a></li>
+                <li><a href="#embedding">Embedding and Downloads</a></li>
+                <li><a href="#photo-source">Find the Original Photo</a></li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="nav-list">
+              <ul>
+                <li><a href="#caching">Selection and Caching</a></li>
+                <li><a href="#agent">Set Up With an AI Agent</a></li>
+                <li><a href="#errors">Errors</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="content wide"
           ><div
             ><h2 id="image-addresses" class="rule-top">Image URLs</h2
             ><table class="alternate cmu-full"
@@ -471,6 +475,11 @@
               a day. Random photos skip both caches and return <code>Cache-Control: no-store</code>.
               Development responses also use <code>no-store</code>.</p
             >
+            <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
+            <p
+              >To set up PlaceMellon with an AI coding agent, use the
+              <a href="./#agent">prompt on the home page</a>.</p
+            >
             <h2 id="errors" class="rule-top">Errors</h2
             ><table class="alternate cmu-full"
               ><thead
@@ -511,11 +520,6 @@
               <code>GET /healthz</code> returns JSON with the total photo count, category counts and
               <code>refreshedAt</code>; its status is 200 when the catalog contains photos or 503
               when empty.</p
-            >
-            <h2 id="agent" class="rule-top">Set Up With an AI Agent</h2>
-            <p
-              >To set up PlaceMellon with an AI coding agent, use the
-              <a href="./#agent">prompt on the home page</a>.</p
             ></div
           ></div
         >

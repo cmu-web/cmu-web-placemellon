@@ -203,7 +203,7 @@ export function solidSvg(w: number, h: number, text: boolean, color = DEFAULT_CO
 }
 
 // The stacked wordmark on a solid color, three-quarters of the width, a little
-// above center (at 41% of the height, as on the 600 x 750 original). In a wide
+// above center (at 41% of the height, as on the 600 × 750 original). In a wide
 // image it's centered and fits the height too. With no color it's the bio
 // placeholder on CMU's own staff pages: dark gray on gray.
 export function wordmarkSvg(w: number, h: number, color?: string): string {
