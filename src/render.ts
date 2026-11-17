@@ -222,6 +222,48 @@ export function wordmarkSvg(w: number, h: number, color?: string): string {
 }
 
 // The drawing as an SVG file
+// A measuring grid: labeled cells (A1, A2 … B1 …) at the asked-for size, for
+// finding where a service crops an uploaded image, such as the round icon
+// Google Drive cuts from a shared drive's theme. Cells are close to square,
+// one sixth of the shorter side, so a label stays readable in a small crop.
+// Each column has its own hue, and the rows alternate dark and light, so a
+// cropped edge is easy to place.
+export function gridSvg(w: number, h: number): string {
+  const side = Math.min(w, h) / 6;
+  const cols = Math.max(1, Math.round(w / side));
+  const rows = Math.max(1, Math.round(h / side));
+  const cw = w / cols,
+    ch = h / rows;
+  const font = Math.max(6, Math.min(cw / 3.2, ch * 0.42));
+  const rowName = (r: number): string =>
+    (r >= 26 ? rowName(Math.floor(r / 26) - 1) : "") + String.fromCharCode(65 + (r % 26));
+  const hex = (hue: number, light: number): string => {
+    // HSL to RGB, saturation 0.75
+    const s = 0.75,
+      a = s * Math.min(light, 1 - light);
+    const f = (n: number) => {
+      const k = (n + hue / 30) % 12;
+      return Math.round(255 * (light - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+    };
+    return "#" + [f(0), f(8), f(4)].map((v) => v.toString(16).padStart(2, "0")).join("");
+  };
+  let cells = "";
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const x = c * cw,
+        y = r * ch;
+      cells +=
+        `<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="${hex((360 * c) / cols, r % 2 ? 0.62 : 0.36)}" stroke="#fff" stroke-width="1"/>` +
+        `<text x="${x + cw / 2}" y="${y + ch / 2}" dominant-baseline="central">${rowName(r)}${c + 1}</text>`;
+    }
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+    `<g font-family="Open Sans, Arial, sans-serif" font-weight="700" font-size="${font}" text-anchor="middle" fill="#fff" stroke="#222" stroke-width="${font / 9}" paint-order="stroke">` +
+    cells +
+    "</g></svg>"
+  );
+}
+
 export function svgFile(svg: string): Buffer {
   return Buffer.from(svg);
 }

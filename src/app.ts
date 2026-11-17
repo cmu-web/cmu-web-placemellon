@@ -4,6 +4,7 @@ import { Catalog } from "./catalog";
 import {
   profileSvg,
   wordmarkSvg,
+  gridSvg,
   COLORS,
   DEFAULT_COLOR,
   solidSvg,
@@ -32,7 +33,11 @@ const OPTIONS = [
   "gradient",
   "gray",
   "grayscale",
+  // A measuring grid, for finding where a service crops an image. The Cut
+  // & Paste documents it; PlaceMellon's own pages and errors don't list it.
+  "grid",
 ];
+const LISTED = OPTIONS.filter((o) => o !== "grid");
 
 // The Scotty art. The value names the art; ?question and ?gradient add to it.
 const SCOTTY = ["bust", "profile", "recumbent", "rampant"] as const;
@@ -50,6 +55,7 @@ export interface Options {
   color?: string;
   gradient: boolean;
   gray: boolean;
+  grid: boolean;
 }
 
 export class OptionError extends Error {
@@ -67,7 +73,7 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
   if (unknown.length)
     throw new OptionError(
       400,
-      `Unknown option ?${unknown[0]}. Options: ${OPTIONS.map((o) => "?" + o).join(", ")}.`,
+      `Unknown option ?${unknown[0]}. Options: ${LISTED.map((o) => "?" + o).join(", ")}.`,
     );
   const category = query.category;
   if (category !== undefined && typeof category !== "string")
@@ -128,7 +134,12 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
     text: "text" in query,
     gradient: "gradient" in query,
     gray: gray || "gray" in query || "grayscale" in query,
+    grid: "grid" in query,
   };
+  // A measuring grid is its own image: nothing else goes with it
+  if (o.grid && Object.keys(query).some((k) => k !== "grid"))
+    throw new OptionError(400, "Use ?grid on its own.");
+  if (o.grid && gray) throw new OptionError(400, "Use ?grid on its own, without /g/.");
   if (o.scotty && o.solid) throw new OptionError(400, "Pick one of ?scotty or ?solid.");
   if ((o.scotty || o.solid) && (o.category || o.random || o.photo))
     throw new OptionError(
@@ -294,9 +305,12 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
 
     // Drawn images are SVG unless .png is asked for; photos are JPEGs unless
     // .webp is asked for
-    const drawn = o.solid || o.scotty;
+    const drawn = o.solid || o.scotty || o.grid;
     if (drawn && (ext === "jpg" || ext === "webp")) {
-      res.status(400).type("text/plain").send("Scotty and solid colors come as .svg or .png.\n");
+      res
+        .status(400)
+        .type("text/plain")
+        .send("Scotty, solid colors and grids come as .svg or .png.\n");
       return;
     }
     if (!drawn && (ext === "svg" || ext === "png")) {
@@ -309,6 +323,11 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
     const png = ext === "png";
     const draw = async (svg: string): Promise<Rendered> =>
       png ? { type: "png", body: await renderSvg(svg) } : { type: "svg", body: svgFile(svg) };
+
+    if (o.grid) {
+      void send(res, `grid ${w}x${h}${png ? " png" : ""}`, () => draw(gridSvg(w, h)));
+      return;
+    }
 
     if (o.solid) {
       const c = o.color ?? "";

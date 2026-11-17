@@ -4,7 +4,7 @@ import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
 import { createApp, Lru, parseSize } from "../src/app";
 import { Catalog, earliestExpiry } from "../src/catalog";
-import { solidSvg, pickPreview, renderPhoto, renderSvg } from "../src/render";
+import { gridSvg, solidSvg, pickPreview, renderPhoto, renderSvg } from "../src/render";
 import { Photo, toPhoto } from "../src/widen";
 
 const photo = (id: string, expires = 1792969200, aspect = 1.5, categories = ["campus"]): Photo => ({
@@ -651,5 +651,34 @@ describe("routes", () => {
     await request(app).get("/40/40").expect(503);
     await request(app).get("/healthz").expect(503);
     await request(app).get("/40/40?scotty=bust").expect(200);
+  });
+});
+
+describe("measuring grid", () => {
+  it("labels near-square cells, six down the shorter side", () => {
+    const svg = gridSvg(1600, 480);
+    expect(svg).toContain(">A1<");
+    expect(svg).toContain(">F20<");
+    expect(svg).not.toContain(">G1<");
+    expect(svg).not.toContain(">A21<");
+    const tall = gridSvg(100, 2048);
+    expect(tall).toContain(">Z1<");
+    expect(tall).toContain(">AA1<");
+  });
+
+  it("serves SVG or PNG at the asked-for size, on its own, and stays unlisted", async () => {
+    const app = createApp(new Catalog());
+    const png = await request(app).get("/1600/480.png?grid").buffer(true);
+    expect(png.status).toBe(200);
+    expect(png.headers["content-type"]).toMatch(/png/);
+    const meta = await sharp(png.body as Buffer).metadata();
+    expect([meta.width, meta.height]).toEqual([1600, 480]);
+    const svg = await request(app).get("/800/200?grid");
+    expect(svg.headers["content-type"]).toMatch(/svg/);
+    for (const path of ["/800/200?grid&solid", "/800/200?grid&category=campus", "/g/800/200?grid"])
+      expect((await request(app).get(path)).status).toBe(400);
+    expect((await request(app).get("/800/200.jpg?grid")).status).toBe(400);
+    const unknown = await request(app).get("/800/200?nope");
+    expect(unknown.text).not.toContain("?grid");
   });
 });
