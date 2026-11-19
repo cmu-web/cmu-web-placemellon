@@ -32,6 +32,12 @@ changes. It also serves `docs/` at `/`; reload the browser after editing
 those HTML, JavaScript or image files. Photos return 503 until the catalog
 loads. Drawn placeholders and the documentation are available immediately.
 
+To see an unreleased Web Kilt change here, run `npm run preview:kilt` in a
+second terminal and open http://127.0.0.1:4100/. It puts the Web Kilt's
+preview proxy in front of the service, with the pages' Kilt links pointed at
+the checkout beside this one (`../cmu-web-kilt`, or set `KILT_DIR`). The
+service itself still shows the pinned release.
+
 Run `npm ci` after pulling dependency changes. After changing the Dockerfile
 or devcontainer configuration, select **Dev Containers: Rebuild Container**.
 
