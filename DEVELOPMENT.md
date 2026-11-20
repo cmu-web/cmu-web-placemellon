@@ -170,7 +170,7 @@ A release publishes a container image to GitHub Container Registry.
    tag before publishing.
 
 4. Push `main` and the specific new tag together. The version tag starts
-   the publishing workflow.
+   the Publish Image workflow.
 5. Confirm the workflow passed, add release notes and update deployments
    to the published image digest. See [Deployment](DEPLOYMENT.md#images).
 
