@@ -531,6 +531,29 @@ describe("routes", () => {
     }
   });
 
+  it("draws ?scotty=rampant alone: Scotty on his back legs on a clear background", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    const get = async (path: string) =>
+      (await request(app).get(path).buffer(true).parse(binary).expect(200)).body.toString();
+    const alone = await get("/400/600?scotty=rampant");
+    expect(alone).not.toContain("<rect");
+    expect(alone).not.toContain('stroke="#231f20"');
+    expect(await get("/400/600?scotty=rampant&question")).toContain('stroke="#231f20"');
+  });
+
+  it("draws ?scotty=recumbent alone: the play bow on a clear background, no question mark", async () => {
+    const app = createApp(await ready([photo("a")]), fakeFetch);
+    const get = async (path: string) =>
+      (await request(app).get(path).buffer(true).parse(binary).expect(200)).body.toString();
+    const alone = await get("/600/434?scotty=recumbent");
+    expect(alone).not.toContain("<circle");
+    expect(alone).not.toContain("#4a535b");
+    expect(alone).not.toContain("<rect");
+    // The same size with ?question is a different image, not a cached copy
+    expect(await get("/600/434?scotty=recumbent&question")).toContain("<circle");
+    expect(await get("/600/434?scotty=recumbent")).toBe(alone);
+  });
+
   it("draws ?scotty=recumbent&question: the kit's gray question mark and Scotty's red scarf", async () => {
     const app = createApp(await ready([photo("a")]), fakeFetch);
     const svg = (
@@ -588,8 +611,6 @@ describe("routes", () => {
       ["/90/60?question", 400, "Use ?question with ?scotty=recumbent or ?scotty=rampant"],
       ["/90/60?scotty=bust&question", 400, "Use ?question with"],
       ["/90/60?scotty=profile&question", 400, "Use ?question with"],
-      ["/90/60?scotty=rampant", 400, "Add ?question to ?scotty=rampant"],
-      ["/90/60?scotty=recumbent", 400, "Add ?question to ?scotty=recumbent"],
       ["/90/60?scotty=bust&category=labs", 400, "choose photos"],
       ["/90?scotty=profile&random", 400, "choose photos"],
       ["/90/60?scotty=recumbent&question&solid", 400, "Pick one of ?scotty or ?solid"],

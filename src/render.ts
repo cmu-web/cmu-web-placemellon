@@ -57,18 +57,25 @@ export async function renderPhoto(
     : img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
 }
 
-// The Scotty graphic: Scotty centered on a transparent background, to blend
-// into any page, or on the slight gradient, edge to edge, to read as a full
-// image
-export function scottySvg(w: number, h: number, gradient = false): string {
-  const s = Math.min((0.8 * w) / HEAD.w, (0.8 * h) / HEAD.h);
-  const x = (w - HEAD.w * s) / 2;
-  const y = (h - HEAD.h * s) / 2;
+// The Scotty graphic: the bust, Scotty in a play bow or Scotty standing on
+// his back legs, centered on a transparent background to blend into any page,
+// or (the bust) on the slight gradient, edge to edge, to read as a full image
+export function scottySvg(
+  w: number,
+  h: number,
+  gradient = false,
+  pose: "bust" | "recumbent" | "rampant" = "bust",
+): string {
+  const art = pose === "recumbent" ? play : pose === "rampant" ? up : head;
+  const size = pose === "recumbent" ? PLAY : pose === "rampant" ? UP : HEAD;
+  const s = Math.min((0.8 * w) / size.w, (0.8 * h) / size.h);
+  const x = (w - size.w * s) / 2;
+  const y = (h - size.h * s) / 2;
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
     `<defs>${GRADIENT}</defs>` +
     (gradient ? `<rect width="${w}" height="${h}" fill="url(#bg)"/>` : "") +
-    `<g transform="translate(${+x.toFixed(2)} ${+y.toFixed(2)}) scale(${+s.toFixed(5)})">${head}</g></svg>`
+    `<g transform="translate(${+x.toFixed(2)} ${+y.toFixed(2)}) scale(${+s.toFixed(5)})">${art}</g></svg>`
   );
 }
 

@@ -150,8 +150,6 @@ export function parseOptions(query: Record<string, unknown>, gray = false): Opti
   if (o.question && o.scotty !== "recumbent" && o.scotty !== "rampant")
     throw new OptionError(400, "Use ?question with ?scotty=recumbent or ?scotty=rampant.");
   // Scotty alone in these poses is still to come
-  if ((o.scotty === "recumbent" || o.scotty === "rampant") && !o.question)
-    throw new OptionError(400, `Add ?question to ?scotty=${o.scotty}.`);
   if (o.gradient && o.scotty !== "bust")
     throw new OptionError(400, "Use ?gradient with ?scotty=bust.");
   if (o.wordmark && !o.solid) throw new OptionError(400, "Use ?wordmark with ?solid.");
@@ -345,10 +343,10 @@ export function createApp(catalog: Catalog, get: typeof fetch = fetch) {
       const svg =
         s === "profile"
           ? profileSvg(w)
-          : s === "bust"
-            ? scottySvg(w, h, o.gradient)
+          : !o.question
+            ? scottySvg(w, h, o.gradient, s)
             : questionSvg(w, h, s === "rampant");
-      const key = `scotty=${s} ${w}x${h}${o.gradient ? " gradient" : ""}${png ? " png" : ""}`;
+      const key = `scotty=${s} ${w}x${h}${o.question ? " question" : ""}${o.gradient ? " gradient" : ""}${png ? " png" : ""}`;
       void send(res, key, () => draw(svg));
       return;
     }
