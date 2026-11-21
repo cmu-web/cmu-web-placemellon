@@ -1,11 +1,17 @@
 # Development
 
+Set up your computer once with
+[Working on CMU Web Projects](https://github.com/cmu-web/.github/blob/main/DEVELOPMENT.md);
+this page covers this project's own commands.
+
 PlaceMellon is a TypeScript service built with Express and sharp. It keeps
 its photo catalog and rendered image cache in memory, with no database or
 API keys. Live photos come from CMU Selects and its image CDN. Tests use a
 fake photo source.
 
-## Set Up the Devcontainer
+## Build It
+
+### In the Devcontainer
 
 Use Docker and the VS Code Dev Containers extension. Open the repository
 in VS Code and select **Dev Containers: Reopen in Container** from the
@@ -19,7 +25,6 @@ the checkout is mounted at `/app`, and commands run as the `node` user.
 In the container terminal:
 
 ```bash
-npx prek install
 npm run dev
 ```
 
@@ -41,94 +46,7 @@ service itself still shows the pinned release.
 Run `npm ci` after pulling dependency changes. After changing the Dockerfile
 or devcontainer configuration, select **Dev Containers: Rebuild Container**.
 
-## Where to Make Changes
-
-| To Change                                         | Start Here                          |
-| ------------------------------------------------- | ----------------------------------- |
-| Image URLs, option validation or response caching | `src/app.ts`                        |
-| Photo discovery, catalog refreshes or selection   | `src/widen.ts` and `src/catalog.ts` |
-| Image rendering or placeholder artwork            | `src/render.ts` and `assets/`       |
-| Documentation and examples                        | HTML pages in `docs/`               |
-| The image builder or docs interactions            | `docs/js/`                          |
-| Service tests                                     | `test/`                             |
-| The runtime image or development environment      | `Dockerfile` and `.devcontainer/`   |
-| Tooling checks or link preview generation         | `scripts/`                          |
-
-## Maintain the CMU Web Preview
-
-`docs/images/cmu-web-preview.webp` is this site's screenshot for cards and
-gallery entries on the other CMU Web sites. Keep it at 1040 × 656 pixels,
-without a decorative browser frame, and publish updates at the same path.
-Consumers use the public URL directly. The Open Graph image,
-`images/preview.jpg`, is maintained separately.
-
-To make it, capture the published home page with FencePost's gallery
-command, from a FencePost checkout. It takes the public page at 1040 × 656,
-signed out, with the menu closed:
-
-```bash
-npm run gallery -- https://placemellon.andrew.cmu.edu/ /path/to/cmu-web-placemellon/docs/images/cmu-web-preview.webp
-```
-
-## Checks
-
-```bash
-npm run check
-```
-
-This checks the Node types version, ESLint, Prettier, link preview metadata
-and TypeScript, then runs tests, compiles the service and checks the generated
-color reference. CI runs the same
-command in the Dockerfile's `test` stage. To reproduce that from the host:
-
-```bash
-podman build --target test .
-```
-
-Tests cover URL options, sizing, rendering, selection, caching and expired
-preview links. They start local HTTP servers and require loopback ports.
-They do not contact CMU Selects.
-
-### Pre-commit Hooks
-
-Enable hooks once per checkout in the environment where you make commits:
-
-```bash
-npx prek install
-```
-
-The hooks run linting, formatting and type checking. Relevant tooling
-changes also trigger the Node version check. They use the npm dependencies
-and Node installation available to Git; run them inside the devcontainer
-when committing there.
-
-To run all hooks manually:
-
-```bash
-npx prek run --all-files
-```
-
-Hooks cover part of the full check. Run `npm run check` before submitting.
-
-### Linting and Formatting
-
-```bash
-npm run lint:fix
-npm run format
-```
-
-Review the diff after applying fixes. `npm run lint` and
-`npm run format:check` check without changing files. The devcontainer
-includes ESLint and Prettier extensions and formats supported files on save.
-
-After changing documentation titles or descriptions, run
-`npm run opengraph` to refresh link preview metadata, then format the results.
-
-The color table in `docs/reference.html` is generated from `COLORS` in
-`src/render.ts`. After changing the palette, run `npm run docs`.
-`npm run check:docs` checks that the table matches the renderer.
-
-## Compile and Run
+### Compile and Run
 
 ```bash
 npm run build
@@ -141,42 +59,18 @@ build step. Runtime settings are listed in
 [Deployment](DEPLOYMENT.md#configuration); the service does not load an
 `.env` file automatically.
 
-## Update Node
+## Where to Make Changes
 
-Dependabot proposes Node changes through the Dockerfile's `FROM` line.
-Update `@types/node` to the same major in that pull request; the
-`check:node` command enforces the match. Rebuild the devcontainer and run
-checks with the updated image. Keep the project on an even-numbered Node
-release line; close proposals for odd-numbered lines.
-
-## Releasing
-
-A release publishes a container image to GitHub Container Registry.
-
-1. Start from an up-to-date `main` with passing CI and a clean working tree.
-2. Choose a major version for incompatible URL or option changes, a minor
-   version for new features or runtime changes, or a patch for fixes and
-   dependency updates.
-3. Run `npm version major`, `npm version minor` or `npm version patch` with
-   a Conventional Commits release message. For example:
-
-   ```bash
-   npm version minor -m "chore: release %s"
-   ```
-
-   This updates `package.json` and `package-lock.json`, creates a local
-   commit and creates an annotated tag named for the version, like
-   `1.4.0`, with no `v` prefix (set in `.npmrc`). Review the commit and
-   tag before publishing.
-
-4. Push `main` and the specific new tag together. The version tag starts
-   the Publish Image workflow.
-5. Confirm the workflow passed, add release notes and update deployments
-   to the published image digest. See [Deployment](DEPLOYMENT.md#images).
-
-Before pushing, correct any release preparation mistake locally and rerun
-the checks. After publication, leave the tag in place and fix mistakes in
-a new version.
+| To Change                                         | Start Here                          |
+| ------------------------------------------------- | ----------------------------------- |
+| Image URLs, option validation or response caching | `src/app.ts`                        |
+| Photo discovery, catalog refreshes or selection   | `src/widen.ts` and `src/catalog.ts` |
+| Image rendering or placeholder artwork            | `src/render.ts` and `assets/`       |
+| Documentation and examples                        | HTML pages in `docs/`               |
+| The image builder or docs interactions            | `docs/js/`                          |
+| Service tests                                     | `test/`                             |
+| The runtime image or development environment      | `Dockerfile` and `.devcontainer/`   |
+| Tooling checks or link preview generation         | `scripts/`                          |
 
 ## How the Service Works
 
@@ -214,3 +108,99 @@ The `X-Photo` response header identifies the source photo by filename.
 A preview returning 403 or 404 triggers a catalog refresh and one retry.
 Refresh failures preserve the previous catalog and schedule another
 attempt. Nothing is written to disk.
+
+## Check a Change
+
+The everyday check is `npm run check`: it needs nothing beyond `npm ci` and
+no network access. It checks the Node types version, ESLint, Prettier, link
+preview metadata and TypeScript, then runs the tests, compiles the service
+and checks the generated color reference.
+
+The Publish Image workflow runs the same check in the Dockerfile's `test`
+stage. To run it that way from the host (Podman takes the same command):
+
+```bash
+docker build --target test .
+```
+
+Tests cover URL options, sizing, rendering, selection, caching and expired
+preview links. They start local HTTP servers and require loopback ports.
+They do not contact CMU Selects.
+
+### Linting and Formatting
+
+```bash
+npm run lint:fix
+npm run format
+```
+
+Review the diff after applying fixes. `npm run lint` and
+`npm run format:check` check without changing files. The devcontainer
+includes ESLint and Prettier extensions and formats supported files on save.
+
+After changing documentation titles or descriptions, run
+`npm run opengraph` to refresh link preview metadata, then format the results.
+
+The color table in `docs/reference.html` is generated from `COLORS` in
+`src/render.ts`. After changing the palette, run `npm run docs`.
+`npm run check:docs` checks that the table matches the renderer.
+
+## Maintain the CMU Web Preview
+
+`docs/images/cmu-web-preview.webp` is this site's screenshot for cards and
+gallery entries on the other CMU Web sites. Keep it at 1040 × 656 pixels,
+without a decorative browser frame, and publish updates at the same path.
+Consumers use the public URL directly. The Open Graph image,
+`images/preview.jpg`, is maintained separately.
+
+To make it, capture the published home page with FencePost's gallery
+command, from a FencePost checkout. It takes the public page at 1040 × 656,
+signed out, with the menu closed:
+
+```bash
+npm run gallery -- https://placemellon.andrew.cmu.edu/ /path/to/cmu-web-placemellon/docs/images/cmu-web-preview.webp
+```
+
+## Update Node
+
+Dependabot proposes Node changes through the Dockerfile's `FROM` line.
+Update `@types/node` to the same major in that pull request; the
+`check:node` command enforces the match. Rebuild the devcontainer and run
+checks with the updated image. Keep the project on an even-numbered Node
+release line; close proposals for odd-numbered lines.
+
+## Release
+
+A release publishes a container image to GitHub Container Registry and the
+Ruby gem in `packages/ruby/` to RubyGems.org, both at the release's version.
+
+1. Start from an up-to-date `main` with passing CI and a clean working tree.
+2. Choose a major version for incompatible URL or option changes, a minor
+   version for new features or runtime changes, or a patch for fixes and
+   dependency updates.
+3. Run `npm version major`, `npm version minor` or `npm version patch` with
+   a Conventional Commits release message, e.g.:
+
+   ```bash
+   npm version minor -m "chore: release %s"
+   ```
+
+   This updates `package.json` and `package-lock.json`, creates a local
+   commit and creates an annotated tag named for the version (e.g.,
+   `1.4.0`, with no `v`, set in `.npmrc`). Review the commit and
+   tag before publishing.
+
+4. Push `main` and the specific new tag together. The version tag starts
+   the Publish Image and Publish Gem workflows.
+5. Confirm both workflows passed, create the tag's GitHub release with its
+   notes and record the image's digest.
+
+Before pushing, correct any release preparation mistake locally and rerun
+the checks. After publication, leave the tag in place and fix mistakes in
+a new version.
+
+The Publish Gem workflow uses trusted publishing, so there's no API key to
+store. RubyGems.org trusts it as: GitHub Actions, owner `cmu-web`, repository
+`cmu-web-placemellon`, workflow `publish-gem.yml` and environment `rubygems`.
+Renaming the workflow file stops publishing until that trusted publisher is
+changed to match.

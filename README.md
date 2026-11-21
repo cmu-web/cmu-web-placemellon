@@ -1,53 +1,36 @@
 # PlaceMellon
 
-**My Art Is in the Work**
+PlaceMellon gives you placeholder images for Carnegie Mellon websites and
+apps, at whatever size your layout calls for, from campus photos to Scotty
+profile pictures and plain gray boxes.
 
-Placeholder Images, Fresh From the Mellon Patch
+Site: https://placemellon.andrew.cmu.edu/
 
-Building a CMU website or app? PlaceMellon gives you placeholder images at
-whatever size your layout calls for, from campus photos to Scotty profile
-pictures and plain gray boxes.
+[![PlaceMellon's home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew.](docs/images/preview.jpg)](https://placemellon.andrew.cmu.edu/)
 
-**[Explore the Documentation](https://placemellon.andrew.cmu.edu/)** ·
-[Build a Placeholder](https://placemellon.andrew.cmu.edu/builder.html) ·
-[Explore the Styles](https://placemellon.andrew.cmu.edu/styles.html)
+## Use It
 
-[![The PlaceMellon home page: Placeholder Images, Fresh From the Mellon Patch, beside a photo of Dr. Bunsen Honeydew.](docs/images/preview.jpg)](https://placemellon.andrew.cmu.edu/)
-
-Put a width and height in the URL, like
-`https://placemellon.andrew.cmu.edu/400/300`, and use it wherever you need
+Put a width and height in the URL (e.g.,
+`https://placemellon.andrew.cmu.edu/400/300`) and use it wherever you need
 an image. Choose a category, make it grayscale or ask for a random photo.
-The builder lets you preview the result and copy its URL or HTML.
+The builder lets you preview the result and copy its URL or HTML. In Ruby
+and Rails, the `cmu-web-placemellon` gem builds the same addresses; see
+[its README](packages/ruby/README.md).
 
-Inspired by [PlaceCats](https://www.placecats.com/) and
-[PlaceBear](https://placebear.com/), with photos from CMU Selects.
-Use the photos for CMU mockups and prototypes; for a finished page, download the photo from the source collection. The
-[images and icons](https://placemellon.andrew.cmu.edu/assets.html), like
-the sample ID card, bio placeholder, default profile picture and question mark, are fine
-on live sites.
+The photos come from CMU Selects. Use them for CMU mockups and prototypes;
+for a finished page, download the photo from the source collection. The
+[images and icons](https://placemellon.andrew.cmu.edu/assets.html), such as
+the sample ID card, bio placeholder, default profile picture and question
+mark, are fine on live sites. PlaceMellon was inspired by
+[PlaceCats](https://www.placecats.com/) and
+[PlaceBear](https://placebear.com/).
 
-## Start With What You're Building
+### Start With What You're Building
 
 - **A page layout:** [Find a photo that fits](https://placemellon.andrew.cmu.edu/builder.html).
 - **A people page:** [Use the bio placeholder and default profile picture](https://placemellon.andrew.cmu.edu/assets.html).
 - **A wireframe:** [Try solid placeholders with dimensions](https://placemellon.andrew.cmu.edu/styles.html).
 
-The [reference](https://placemellon.andrew.cmu.edu/reference.html) covers image URLs and parameters; the docs also explain
+The [reference](https://placemellon.andrew.cmu.edu/reference.html) covers
+image URLs and options, and About explains
 [where the photos come from](https://placemellon.andrew.cmu.edu/about.html).
-
-## Help Improve PlaceMellon
-
-[Report a problem or suggest a feature](https://github.com/cmu-web/cmu-web-placemellon/issues),
-or read the [contributing guide](CONTRIBUTING.md) to work on the service.
-[Development](DEVELOPMENT.md) covers local setup and checks;
-[Deployment](DEPLOYMENT.md) explains how to run your own instance.
-
-## License
-
-Copyright Carnegie Mellon University. The code uses the
-[BSD 3-Clause License](LICENSE). CMU's names, marks and Scotty artwork,
-and the CMU Selects photos, are not covered by that license.
-
-Bunsen Honeydew photo by
-[MuppetsStudio](https://commons.wikimedia.org/wiki/File:Dr._Bunsen_Honeydew.png),
-[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), cropped for the docs and preview.
