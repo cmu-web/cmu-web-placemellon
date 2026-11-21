@@ -1,6 +1,6 @@
 # Runs every check in the Dockerfile's test stage, then builds the service's
 # image. Pushes it to ghcr.io/cmu-web/cmu-web-placemellon only for releases
-# (version tags or a manual run); the fleet pins it by digest.
+# (version tags or a manual run); a deployment pins it by digest.
 name: Publish Image
 
 on:
