@@ -1,0 +1,24 @@
+# Retakes the docs' preview images when the docs change, with CMU Web's
+# shared Update Preview Images workflow, which commits them back only when
+# the page looks different
+name: Update Preview Images
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", "src/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    permissions:
+      contents: write
+    uses: cmu-web/.github/.github/workflows/update-preview-images.yml@ae3ec9cf474ea9fafd6436037b0e3bf6fe0f72b6 # main
+    with:
+      node-version: "26"
+      setup: npm ci && npm run build
+      serve: PORT=3000 npm start
+      url: http://127.0.0.1:3000/
