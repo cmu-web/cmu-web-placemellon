@@ -16,7 +16,7 @@ jobs:
   update:
     permissions:
       contents: write
-    uses: cmu-web/.github/.github/workflows/update-preview-images.yml@ae3ec9cf474ea9fafd6436037b0e3bf6fe0f72b6 # main
+    uses: cmu-web/.github/.github/workflows/update-preview-images.yml@6d0b1e4ef5516f71b9c740b51bc9d75b6022ef48 # main
     with:
       node-version: "26"
       setup: npm ci && npm run build
