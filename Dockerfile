@@ -14,7 +14,7 @@ RUN npm ci
 
 FROM dependencies AS development
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl git \
+    && apt-get install -y --no-install-recommends ca-certificates curl git make \
     && rm -rf /var/lib/apt/lists/* \
     && chown -R node:node /app
 USER node

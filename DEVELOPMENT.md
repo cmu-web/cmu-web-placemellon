@@ -25,37 +25,38 @@ the checkout is mounted at `/app`, and commands run as the `node` user.
 In the container terminal:
 
 ```bash
-npm run dev
+make run
 ```
 
-Open the forwarded address for port 3000 in VS Code's **Ports** panel.
+Open the forwarded address for port 3200 in VS Code's **Ports** panel.
 If that port is already in use on the host, VS Code may forward another
 local port. Opening the container does not start the server automatically.
 
-`npm run dev` watches `src/` and restarts the service when TypeScript
+`make run` watches `src/` and restarts the service when TypeScript
 changes. It also serves `docs/` at `/`; reload the browser after editing
 those HTML, JavaScript or image files. Photos return 503 until the catalog
 loads. Drawn placeholders and the documentation are available immediately.
 
 To see an unreleased Web Kilt change here, run `npm run preview:kilt` in a
-second terminal and open http://127.0.0.1:4100/. It puts the Web Kilt's
+second terminal and open http://127.0.0.1:3201/. It puts the Web Kilt's
 preview proxy in front of the service, with the pages' Kilt links pointed at
 the checkout beside this one (`../cmu-web-kilt`, or set `KILT_DIR`). The
 service itself still shows the pinned release.
 
-Run `npm ci` after pulling dependency changes. After changing the Dockerfile
-or devcontainer configuration, select **Dev Containers: Rebuild Container**.
+Run `make setup` after pulling dependency changes. After changing the
+Dockerfile or devcontainer configuration, select
+**Dev Containers: Rebuild Container**.
 
 ### Compile and Run
 
 ```bash
-npm run build
+make build
 npm start
 ```
 
-The build compiles TypeScript from `src/` to CommonJS JavaScript in `dist/`.
-`npm start` runs `dist/index.js`. Browser scripts in `docs/js/` have no
-build step. Runtime settings are listed in
+`make build` compiles TypeScript from `src/` to CommonJS JavaScript in
+`dist/`. `npm start` runs `dist/index.js` on port 3000, or `PORT`. Browser
+scripts in `docs/js/` have no build step. Runtime settings are listed in
 [Deployment](DEPLOYMENT.md#configuration); the service does not load an
 `.env` file automatically.
 
@@ -111,10 +112,10 @@ attempt. Nothing is written to disk.
 
 ## Check a Change
 
-The everyday check is `npm run check`: it needs nothing beyond `npm ci` and
-no network access. It checks the Node types version, ESLint, Prettier, link
-preview metadata and TypeScript, then runs the tests, compiles the service
-and checks the generated color reference.
+The everyday check is `make check` (`npm run check`): it needs nothing
+beyond `make setup` and no network access. It checks the Node types version,
+ESLint, Prettier, link preview metadata and TypeScript, then runs the tests,
+compiles the service and checks the generated color reference.
 
 The Publish Image workflow runs the same check in the Dockerfile's `test`
 stage. To run it that way from the host (Podman takes the same command):
@@ -142,7 +143,7 @@ After changing documentation titles or descriptions, run
 `npm run opengraph` to refresh link preview metadata, then format the results.
 
 The color table in `docs/reference.html` is generated from `COLORS` in
-`src/render.ts`. After changing the palette, run `npm run docs`.
+`src/render.ts`. After changing the palette, run `make docs`.
 `npm run check:docs` checks that the table matches the renderer.
 
 ## Maintain the CMU Web Preview

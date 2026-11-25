@@ -14,11 +14,12 @@
   "remoteUser": "node",
   "updateRemoteUserUID": true,
   "containerEnv": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "development",
+    "PORT": "3200"
   },
-  "forwardPorts": [3000],
+  "forwardPorts": [3200],
   "portsAttributes": {
-    "3000": {
+    "3200": {
       "label": "PlaceMellon",
       "onAutoForward": "notify"
     }
